@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="icon" href="/favicon.ico"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#000000"/>
+  <title>회원가입</title>
+</head>
+<body>
+<h1>CarroThunder</h1>
+<p>중고거래</p>
+
+<form action="add" method="post" onsubmit="return validatePassword();">
+  <label for="email">이메일</label>
+  <input type="email" id="email" name='email' placeholder="이메일을 입력해주세요">
+
+  <label for="password">비밀번호</label>
+  <input type="password" id="password" name='password' placeholder="비밀번호를 입력해 주세요">
+  <input type="password" id="confirmPassword" placeholder="비밀번호를 한번더 입력해 주세요">
+
+  <label for="nickname">닉네임</label>
+  <input type="text" id="nickname" name='nickName' placeholder="닉네임을 입력해 주세요">
+
+  <button type="submit">회원가입 하기</button>
+
+  <p>
+    <span>이미 회원이신가요? </span>
+    <span id="goToLogin">로그인하기</span>
+  </p>
+</form>
+
+<form action="/sms/send" method="POST">
+  <h2>전화번호 인증</h2>
+  <p>전화번호를 입력하고 인증 코드를 받으세요.</p>
+
+  <!-- 전화번호 입력 필드 -->
+  <input type="text" id="phoneNumber" name="to" placeholder="휴대폰 번호 입력">
+  <button type="button" id="sendVerificationCode">인증 받기</button>
+
+  <!-- 인증 코드 입력 필드와 확인 버튼 -->
+  <input type="text" id="verificationCode" placeholder="인증 코드 입력">
+  <button type="button" id="confirmVerificationCode">확인</button>
+
+  <!-- 전화번호 인증 결과 -->
+  <label for="tel">전화 번호 확인</label>
+  <input type="text" id="tel" name='tel' placeholder="전화번호 인증을 받으세요" readonly>
+</form>
+
+<script>
+  // "인증 코드 전송" 버튼 클릭 시 AJAX 요청을 통해 데이터를 서버로 전송
+  document.getElementById("sendVerificationCode").addEventListener("click", function () {
+    // 여기에서 AJAX 요청 코드를 작성하세요.
+  });
+
+  // "확인" 버튼 클릭 시 모달 닫기 및 인증 처리
+  document.getElementById("confirmVerificationCode").addEventListener("click", function () {
+    // 여기에서 인증 확인 코드를 작성하세요.
+  });
+
+  // "로그인하기" 텍스트 클릭 시 login.html로 이동
+  document.getElementById("goToLogin").addEventListener("click", function () {
+    window.location.href = "login";
+  });
+
+  function validatePassword() {
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      alert("비밀번호를 확인해 주세요.");
+      return false; // 회원가입 중단
+    }
+
+    return true;
+  }
+</script>
+</body>
+</html>

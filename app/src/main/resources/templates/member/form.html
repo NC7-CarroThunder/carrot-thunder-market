@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="icon" href="/favicon.ico"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#000000"/>
+  <title>로그인</title>
+</head>
+
+<body>
+<h1>CarroThunder</h1>
+<p>누구나 이용할 수 있는 중고거래 플랫폼</p>
+<img src="/static/images/logo.png" alt="Dog Image"/>
+
+<h2>로그인</h2>
+<p>계정이 없으신가요? <span id="goToRegister">회원가입하기</span></p>
+
+<form action='login' method='post'>
+  <label>
+    이메일
+    <input type='email' name='email' placeholder="이메일을 입력하세요" data-th-value='${email}'>
+  </label>
+
+  <div>
+    <label>
+      비밀번호
+      <input type='password' name='password' placeholder="비밀번호를 입력하세요">
+    </label>
+    <p><a href="/findpw/reset">비밀번호 찾기</a></p>
+  </div>
+
+  <button onclick="redirectToIndex()">로그인하기</button>
+</form>
+
+<div>
+  <a href="https://kauth.kakao.com/oauth/authorize?client_id=값입력&redirect_uri=http://localhost/user/login&response_type=code">
+    카카오톡으로 간편로그인 하기
+  </a>
+</div>
+<div>네이버로 간편로그인 하기</div>
+<span>
+  <a href="https://kauth.kakao.com/oauth/logout?client_id=값입력&logout_redirect_uri=http://localhost/user/form">
+    <input type="submit" value="로그아웃">
+  </a>
+  <div>로그인 중: 이메일=<span></span> 이름=<span></span></div>
+</span>
+
+<script>
+  // 로그인 버튼을 눌렀을 때 실행되는 함수
+  function redirectToIndex() {
+    // 로그인 정보가 일치한다고 가정하고, 리디렉션 URL을 index.html로 설정
+    var redirectUrl = "index.html";
+    window.location.href = redirectUrl;
+  }
+
+  // "회원가입하기" 텍스트 클릭 시 register.html로 이동
+  document.getElementById("goToRegister").addEventListener("click", function () {
+    window.location.href = '/member/join';
+  });
+</script>
+</body>
+</html>
