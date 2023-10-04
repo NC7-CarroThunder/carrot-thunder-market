@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
 
-    // implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     // implementation 'org.springframework.kafka:spring-kafka'
     // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     // implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -50,14 +50,22 @@ dependencies {
     // Lombok 관련 라이브러리
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.530'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
+    // 아임포트 결제 라이브러리
+    // implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+
+    // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.3.1'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
 
     implementation 'org.apache.clerezza.ext:org.json.simple:0.4'
 }
