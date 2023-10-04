@@ -4,46 +4,65 @@ import bitcamp.carrot_thunder.member.model.vo.Member;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 
 public class Post implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private int id;
-  private Member member;
+
   private String title;
   private String content;
   private int viewCount;
-  private String hashtag;
-  private int category;
   private Timestamp createdAt;
   private List<AttachedFile> attachedFiles;
   private int likeCount;
   private boolean liked;
-  private boolean isBookmarked;
+  private Member member;
+  private Item item;
+  private ItemStatus itemStatus;
+  private DealingType dealingType;
+  private int price;
+  private int starCount;
 
-  @Override
+
+
+
   public String toString() {
     return "Post{" +
         "id=" + id +
-        ", member=" + member +
         ", title='" + title + '\'' +
         ", content='" + content + '\'' +
+        ", member=" + member +
         ", viewCount=" + viewCount +
-        ", hashtag='" + hashtag + '\'' +
-        ", category=" + category +
         ", createdAt=" + createdAt +
         ", attachedFiles=" + attachedFiles +
+        ", item=" + item +
+        ", itemStatus=" + itemStatus +
+        ", dealingType=" + dealingType +
+        ", price=" + price +
+        ", starcount=" + starCount +
         '}';
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
 
-  @Override
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getStarCount() {
+        return starCount;
+    }
+
+    public void setStarCount(int starCount) {
+        this.starCount = starCount;
+    }
+
+
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -64,14 +83,6 @@ public class Post implements Serializable {
 
   public void setId(int id) {
     this.id = id;
-  }
-
-  public Member getMember() {
-    return member;
-  }
-
-  public void setMember(Member member) {
-    this.member = member;
   }
 
   public String getTitle() {
@@ -96,22 +107,6 @@ public class Post implements Serializable {
 
   public void setViewCount(int viewCount) {
     this.viewCount = viewCount;
-  }
-
-  public String getHashTag() {
-    return hashtag;
-  }
-
-  public void setHashTag(String hashtag) {
-    this.hashtag = hashtag;
-  }
-
-  public int getCategory() {
-    return category;
-  }
-
-  public void setCategory(int category) {
-    this.category = category;
   }
 
   public Timestamp getCreatedAt() {
@@ -146,11 +141,38 @@ public class Post implements Serializable {
     this.liked = liked;
   }
 
-  public boolean isBookmarked() {
-    return isBookmarked;
-  }
+  public Member getMember() {
+        return member;
+    }
 
-  public void setBookmarked(boolean bookmarked) {
-    isBookmarked = bookmarked;
-  }
+
+
+ public void setMember(Member member) {
+        this.member = member;
+    }
+
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public ItemStatus getItemStatus() {
+        return itemStatus;
+    }
+
+    public void setItemStatus(ItemStatus itemStatus) {
+        this.itemStatus = itemStatus;
+    }
+
+    public DealingType getDealingType() {
+        return dealingType;
+    }
+
+    public void setDealingType(DealingType dealingType) {
+        this.dealingType = dealingType;
+    }
 }

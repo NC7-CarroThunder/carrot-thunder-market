@@ -1,7 +1,6 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.Comment;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,8 +34,4 @@ public interface PostDao {
     List<Post> getBookmarkedPosts(int memberId);
     List<Post> getMyPosts(int memberId);
 
-    List<Comment> findCommentsByPostId(int postId);
-    void insertComment(int postId, int memberId, String content) throws Exception;
-    void deleteComment(@Param("commentId") int commentId, @Param("memberId") int memberId);
-    void insertComment(Comment comment);
 }

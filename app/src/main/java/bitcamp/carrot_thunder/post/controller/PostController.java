@@ -4,8 +4,6 @@ import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.member.model.vo.Member;
 import bitcamp.carrot_thunder.member.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.Comment;
-import bitcamp.carrot_thunder.post.model.vo.CommentRequest;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.post.service.PostService;
 import java.util.ArrayList;
@@ -66,7 +64,7 @@ public class PostController {
     post.setAttachedFiles(attachedFiles);
 
     postService.add(post);
-    return "redirect:/post/list?category=" + post.getCategory();
+    return "redirect:/post/list?category=" + post.getDealingType();
   }
 
   @GetMapping("delete")
@@ -134,7 +132,7 @@ public class PostController {
     post.setAttachedFiles(attachedFiles);
 
     postService.update(post);
-    return "redirect:/post/list?category=" + p.getCategory();
+    return "redirect:/post/list?category=" + p.getDealingType();
 
   }
 
@@ -159,7 +157,7 @@ public class PostController {
     if (postService.deleteAttachedFile(id) == 0) {
       throw new Exception("해당 번호의 첨부파일이 없다.");
     } else {
-      return "redirect:/post/detail/" + post.getCategory() + "/" + post.getId();
+      return "redirect:/post/detail/" + post.getDealingType() + "/" + post.getId();
     }
   }
 
@@ -231,117 +229,5 @@ public class PostController {
     return response;
   }
 
-  @PostMapping("/{postId}/bookmark")
-  @ResponseBody
-  public Map<String, Object> postBookmark(@PathVariable int postId, HttpSession session)
-      throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "notLoggedIn");
-      return response;
-    }
-
-    int memberId = loginUser.getId();
-    boolean newIsBookmarked = postService.postBookmark(postId, memberId);
-
-    if (newIsBookmarked) {
-      Post post = postService.get(postId);
-      if (post != null) {
-        String content = loginUser.getNickName() + "님이 당신의 게시글을 북마크했습니다.";
-        defaultNotificationService.send(content, post.getMember().getId());
-      }
-    }
-    response.put("newIsBookmarked", newIsBookmarked);
-    return response;
-  }
-
-  @GetMapping("/bookmarked")
-  public String getBookmarkedPosts(Model model, HttpSession session) throws Exception {
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/member/form";
-    }
-    int memberId = loginUser.getId();
-    List<Post> posts = postService.getBookmarkedPosts(memberId, session);
-    model.addAttribute("bookmarkedPosts", posts);
-    return "/post/bookmarkList";
-  }
-
-  @PostMapping("/getBookmarkStatus")
-  @ResponseBody
-  public Map<Integer, Boolean> getBookmarkStatus(@RequestBody List<Integer> postIds,
-      HttpSession session) {
-    System.out.println("북마크 상태 정보 업데이트!");
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    Map<Integer, Boolean> response = new HashMap<>();
-    if (loginUser != null) {
-      int memberId = loginUser.getId();
-      for (int postId : postIds) {
-        boolean isBookmarked = postService.isBookmarked(postId, memberId);
-        response.put(postId, isBookmarked);
-      }
-    }
-    return response;
-  }
-
-  @PostMapping("/detail/{category}/{postId}/comment")
-  @ResponseBody
-  public Map<String, Object> addComment(
-      @PathVariable String category,
-      @PathVariable int postId,
-      @RequestBody CommentRequest commentRequest,
-      HttpSession session) throws Exception {
-
-    Map<String, Object> response = new HashMap<>();
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "unauthorized");
-      return response;
-    }
-    int commentId = postService.addComment(postId, loginUser.getId(), commentRequest.getContent());
-
-    Post post = postService.get(postId);
-    if (post != null) {
-      String content = loginUser.getNickName() + "님이 당신의 게시글에 댓글을 남겼습니다.";
-      defaultNotificationService.send(content, post.getMember().getId());
-    }
-
-    response.put("status", "success");
-    response.put("commenter", loginUser.getNickName());
-    response.put("commentId", commentId);
-    return response;
-  }
-
-
-  @DeleteMapping("/detail/{category}/{postId}/comment/{commentId}")
-  @ResponseBody
-  public Map<String, Object> deleteComment(
-      @PathVariable String category,
-      @PathVariable int postId,
-      @PathVariable int commentId,
-      HttpSession session) throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "unauthorized");
-      return response;
-    }
-    postService.deleteComment(commentId, loginUser.getId());
-    response.put("status", "success");
-    return response;
-  }
-
-  @GetMapping("/detail/{category}/{postId}/comment")
-  @ResponseBody
-  public Map<String, Object> getCommentsByPostId(
-      @PathVariable String category,
-      @PathVariable int postId) {
-    Map<String, Object> response = new HashMap<>();
-    List<Comment> comments = postService.getCommentsByPostId(postId);
-    response.put("status", "success");
-    response.put("comments", comments);
-    return response;
-  }
 
 }

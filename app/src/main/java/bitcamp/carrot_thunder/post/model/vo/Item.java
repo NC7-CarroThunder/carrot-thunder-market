@@ -1,0 +1,7 @@
+package bitcamp.carrot_thunder.post.model.vo;
+
+public enum Item {
+
+ DIGITAL, SPORTS_LEISURE, BOOK, PET, FOOD, KITCHENWARE, CLOTHING,BEAUTY_COSMETIC,FURNITURE_INTERIOR,APPLIANCES,ETC
+
+}
