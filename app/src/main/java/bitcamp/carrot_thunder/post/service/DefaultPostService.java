@@ -1,9 +1,8 @@
 package bitcamp.carrot_thunder.post.service;
 
-import bitcamp.carrot_thunder.member.model.vo.Member;
+import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.Comment;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import javax.servlet.http.HttpSession;
@@ -46,15 +45,15 @@ public class DefaultPostService implements PostService {
 
   @Override
   public List<Post> list(HttpSession session) throws Exception {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     List<Post> posts = postDao.findAll();
     if (loginUser != null) {
       int loggedInUserId = loginUser.getId();
       for (Post post : posts) {
         boolean isLiked = postDao.isLiked(post.getId(), loggedInUserId);
         boolean isBookmarked = postDao.isBookmarked(post.getId(), loggedInUserId);
-        post.setLiked(isLiked);
-        post.setBookmarked(isBookmarked);
+        //post.setLiked(isLiked);
+        //post.setBookmarked(isBookmarked);
       }
     }
     return posts;
@@ -104,13 +103,13 @@ public class DefaultPostService implements PostService {
 
   @Override
   public List<Post> getLikedPosts(int memberId, HttpSession session) {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     List<Post> posts = postDao.getLikedPosts(memberId);
     if (loginUser != null) {
       int loggedInUserId = loginUser.getId();
       for (Post post : posts) {
         boolean isLiked = postDao.isLiked(post.getId(), loggedInUserId);
-        post.setLiked(isLiked);
+        //post.setLiked(isLiked);
       }
     }
     return posts;
@@ -129,13 +128,13 @@ public class DefaultPostService implements PostService {
 
   @Override
   public List<Post> getBookmarkedPosts(int memberId, HttpSession session) {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     List<Post> posts = postDao.getBookmarkedPosts(memberId);
     if (loginUser != null) {
       int loggedInUserId = loginUser.getId();
       for (Post post : posts) {
         boolean isBookmarked = postDao.isBookmarked(post.getId(), loggedInUserId);
-        post.setBookmarked(isBookmarked);
+        //post.setBookmarked(isBookmarked);
       }
     }
     return posts;
@@ -144,13 +143,13 @@ public class DefaultPostService implements PostService {
   @Override
   public Post setSessionStatus(int id, HttpSession session) throws Exception {
     Post post = postDao.findBy(id);
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser != null) {
       int loggedInUserId = loginUser.getId();
       boolean isLiked = postDao.isLiked(id, loggedInUserId);
       boolean isBookmarked = postDao.isBookmarked(id, loggedInUserId);
-      post.setLiked(isLiked);
-      post.setBookmarked(isBookmarked);
+      //post.setLiked(isLiked);
+      //post.setBookmarked(isBookmarked);
     }
     return post;
   }
@@ -171,23 +170,4 @@ public class DefaultPostService implements PostService {
     return postDao.getMyPosts(memberId);
   }
 
-  @Override
-  public List<Comment> getCommentsByPostId(int postId) {
-    return postDao.findCommentsByPostId(postId);
-  }
-
-  @Override
-  public int addComment(int postId, int memberId, String content) {
-    Comment comment = new Comment();
-    comment.setPostId(postId);
-    comment.setMemberId(memberId);
-    comment.setContent(content);
-    postDao.insertComment(comment);
-    return postId;
-  }
-
-  @Override
-  public void deleteComment(int commentId, int memberId) {
-    postDao.deleteComment(commentId, memberId);
-  }
 }

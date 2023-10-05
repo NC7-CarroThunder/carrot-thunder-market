@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.mail;
 
-import bitcamp.carrot_thunder.member.model.vo.Member;
+import bitcamp.carrot_thunder.user.model.vo.User;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class EmailService {
   @Autowired
   private TemplateEngine templateEngine;
 
-  public void sendWelcomeEmail(Member member) throws MessagingException {
+  public void sendWelcomeEmail(User member) throws MessagingException {
     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 

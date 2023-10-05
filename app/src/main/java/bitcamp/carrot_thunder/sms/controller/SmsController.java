@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.sms.controller;
 
-import bitcamp.carrot_thunder.member.service.MemberService;
+import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.sms.Dto.MessageDto;
 import bitcamp.carrot_thunder.sms.Dto.SmsResponseDto;
 import bitcamp.carrot_thunder.sms.service.SmsService;
@@ -25,7 +25,7 @@ import org.springframework.web.client.RestClientException;
 public class SmsController {
 
   private final SmsService smsService;
-  private final MemberService memberService;
+  private final UserService memberService;
 
   @GetMapping("/send")
   public String getSmsPage() {

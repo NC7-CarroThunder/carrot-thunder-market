@@ -1,7 +1,6 @@
 package bitcamp.carrot_thunder.post.service;
 
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.Comment;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import javax.servlet.http.HttpSession;
@@ -28,7 +27,4 @@ public interface PostService {
     boolean isBookmarked(int postId, int memberId);
     List<Post> getMyPosts(int memberId);
 
-    int addComment(int postId, int memberId, String content);
-    List<Comment> getCommentsByPostId(int postId);
-    void deleteComment(int commentId, int memberId) throws Exception;
 }

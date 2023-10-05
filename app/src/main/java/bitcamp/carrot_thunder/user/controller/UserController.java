@@ -1,14 +1,15 @@
-package bitcamp.carrot_thunder.member.controller;
+package bitcamp.carrot_thunder.user.controller;
 
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
 import bitcamp.carrot_thunder.mail.EmailService;
-import bitcamp.carrot_thunder.member.model.vo.Member;
-import bitcamp.carrot_thunder.member.model.vo.Notification;
-import bitcamp.carrot_thunder.member.model.vo.Role;
-import bitcamp.carrot_thunder.member.service.DefaultNotificationService;
-import bitcamp.carrot_thunder.member.service.MemberService;
+import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.user.model.vo.Notification;
+import bitcamp.carrot_thunder.user.model.vo.Role;
+import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
+import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,13 +34,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Controller
-@RequestMapping("/member")
-public class MemberController {
+@RequestMapping("/users")
+public class UserController {
 
   private final EmailService emailService;
 
-  public MemberController(MemberService memberService, EmailService emailService) {
-    this.memberService = memberService;
+  public UserController(UserService userService, EmailService emailService) {
+    this.userService = userService;
     this.emailService = emailService;
   }
 
@@ -47,7 +48,7 @@ public class MemberController {
   NcpConfig ncpConfig;
 
   @Autowired
-  MemberService memberService;
+  UserService userService;
 
   @Autowired
   NcpObjectStorageService ncpObjectStorageService;
@@ -66,29 +67,15 @@ public class MemberController {
   // 로그인
   @PostMapping("login")
   public String login(
-      String email,
-      String password,
-      String saveEmail,
-      HttpSession session,
-      Model model,
-      HttpServletResponse response) throws Exception {
+          LoginRequestDto loginInfo,
+          HttpServletResponse response) throws Exception {
 
-    if (saveEmail != null) {
-      Cookie cookie = new Cookie("email", email);
-      response.addCookie(cookie);
-    } else {
-      Cookie cookie = new Cookie("email", "id");
-      cookie.setMaxAge(0);
-      response.addCookie(cookie);
-    }
-
-    Member loginUser = memberService.get(email, password);
+    User loginUser = userService.get(loginInfo.getEmail(), loginInfo.getPassword());
     if (loginUser == null) {
-      model.addAttribute("refresh", "1;url=form");
+      //model.addAttribute("refresh", "1;url=form");
       throw new Exception("회원 정보가 일치하지 않습니다.");
+      //return "redirect:/member/form";
     }
-
-    session.setAttribute("loginUser", loginUser);
 
     if (loginUser.getRole() == Role.ADMIN) {
       System.out.println(loginUser.getRole());
@@ -112,8 +99,8 @@ public class MemberController {
 
   // 회원가입
   @PostMapping("add")
-  public String add(Member member) throws Exception {
-    memberService.add(member);
+  public String add(User member) throws Exception {
+    userService.add(member);
 
     // 회원가입 이메일 전송
     emailService.sendWelcomeEmail(member);
@@ -123,7 +110,7 @@ public class MemberController {
 
   @GetMapping("delete")
   public String delete(int id, Model model) throws Exception {
-    if (memberService.delete(id) == 0) {
+    if (userService.delete(id) == 0) {
       model.addAttribute("refresh", "2;url=../post/list");
       throw new Exception("해당 회원이 없습니다.");
     }
@@ -133,32 +120,32 @@ public class MemberController {
 
   @GetMapping("list")
   public void list(Model model) throws Exception {
-    model.addAttribute("list", memberService.list());
+    model.addAttribute("list", userService.list());
   }
 
   @GetMapping("profile/{memberId}")
   public String viewProfile(@PathVariable int memberId, Model model, HttpSession session)
       throws Exception {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
-      return "redirect:/member/form";
+      return "redirect:/user/form";
     }
     List<Notification> notifications;
     if (loginUser.getId() == memberId) {
-      notifications = memberService.getNotifications(memberId);
+      notifications = userService.getNotifications(memberId);
     } else {
       notifications = new ArrayList<>();
     }
 
-    List<Member> followersList;
-    List<Member> followingsList;
+    List<User> followersList;
+    List<User> followingsList;
 
     if (loginUser.getId() == memberId) {
-      followersList = memberService.getFollowers(loginUser.getId());
-      followingsList = memberService.getFollowings(loginUser.getId());
+      followersList = userService.getFollowers(loginUser.getId());
+      followingsList = userService.getFollowings(loginUser.getId());
     } else {
-      followersList = memberService.getFollowers(memberId);
-      followingsList = memberService.getFollowings(memberId);
+      followersList = userService.getFollowers(memberId);
+      followingsList = userService.getFollowings(memberId);
     }
 
     model.addAttribute("followersList", followersList);
@@ -166,7 +153,7 @@ public class MemberController {
     model.addAttribute("followingsList", followingsList);
     model.addAttribute("followingsCount", followingsList.size());
 
-    model.addAttribute("member", memberService.get(memberId));
+    model.addAttribute("member", userService.get(memberId));
     model.addAttribute("myPosts", postService.getMyPosts(memberId));
     model.addAttribute("likedPosts", postService.getLikedPosts(memberId, session));
     model.addAttribute("bookMarkedPosts", postService.getBookmarkedPosts(memberId, session));
@@ -177,14 +164,14 @@ public class MemberController {
 
   @GetMapping("detail/{id}")
   public String detail(@PathVariable int id, Model model) throws Exception {
-    model.addAttribute("member", memberService.get(id));
+    model.addAttribute("member", userService.get(id));
     return "member/detail";
   }
 
 
   @PostMapping("update")
   public String update(
-      Member member,
+      User member,
       HttpSession session,
       MultipartFile photofile) throws Exception {
 
@@ -194,11 +181,11 @@ public class MemberController {
       member.setPhoto(uploadFileUrl);
     } else {
       // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.
-      Member loginUser = (Member) session.getAttribute("loginUser");
+      User loginUser = (User) session.getAttribute("loginUser");
       member.setPhoto(loginUser.getPhoto());
     }
 
-    if (memberService.update(member) == 0) {
+    if (userService.update(member) == 0) {
       throw new Exception("회원이 없습니다.");
     } else {
       session.setAttribute("loginUser", member);
@@ -212,7 +199,7 @@ public class MemberController {
   public Map<String, Object> memberFollow(@PathVariable int memberId, HttpSession session)
       throws Exception {
     Map<String, Object> response = new HashMap<>();
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
 
     if (loginUser == null) {
       response.put("status", "notLoggedIn");
@@ -220,10 +207,10 @@ public class MemberController {
     }
 
     int currentMemberId = loginUser.getId();
-    boolean newIsFollowed = memberService.memberFollow(currentMemberId, memberId);
+    boolean newIsFollowed = userService.memberFollow(currentMemberId, memberId);
     response.put("newIsFollowed", newIsFollowed);
     if (newIsFollowed) {
-      Member member = memberService.get(memberId);
+      User member = userService.get(memberId);
       if (member != null) {
         String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
         defaultNotificationService.send(content, member.getId());
@@ -239,12 +226,12 @@ public class MemberController {
       HttpSession session)
       throws Exception {
     System.out.println("컨트롤러 팔로우상태확인 호출됨!");
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     Map<Integer, Boolean> response = new HashMap<>();
     if (loginUser != null) {
       int currentMemberId = loginUser.getId();
       for (int memberId : memberIds) {
-        boolean isFollowing = memberService.isFollowed(currentMemberId, memberId);
+        boolean isFollowing = userService.isFollowed(currentMemberId, memberId);
         response.put(memberId, isFollowing);
       }
     }
@@ -253,11 +240,11 @@ public class MemberController {
 
   @GetMapping("/followers")
   public String followers(HttpSession session, Model model) throws Exception {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/member/form";
     }
-    List<Member> followersList = memberService.getFollowers(loginUser.getId());
+    List<User> followersList = userService.getFollowers(loginUser.getId());
     model.addAttribute("followersList", followersList);
     model.addAttribute("followerCount", followersList.size());
     return "member/followers";
@@ -265,11 +252,11 @@ public class MemberController {
 
   @GetMapping("/followings")
   public String followings(HttpSession session, Model model) throws Exception {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/member/form";
     }
-    List<Member> followingsList = memberService.getFollowings(loginUser.getId());
+    List<User> followingsList = userService.getFollowings(loginUser.getId());
     model.addAttribute("followingsList", followingsList);
     model.addAttribute("followingsCount", followingsList.size()); // 팔로잉 숫자 추가
     return "member/followings";
@@ -277,7 +264,7 @@ public class MemberController {
 
   @GetMapping("/notifications/stream")
   public SseEmitter streamNotifications(HttpSession session) {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       throw new RuntimeException("로그인이 필요합니다.");
     }
@@ -288,13 +275,13 @@ public class MemberController {
 
   @PostMapping("/notifications/deleteAll")
   public ResponseEntity<?> deleteAllNotifications(HttpSession session) {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
     }
 
     try {
-      memberService.deleteAllNotifications(loginUser.getId());
+      userService.deleteAllNotifications(loginUser.getId());
       return new ResponseEntity<>("모든 알림이 삭제되었습니다.", HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -303,12 +290,12 @@ public class MemberController {
 
   @GetMapping("/headerNotifications")
   public ResponseEntity<List<Notification>> getHeaderNotifications(HttpSession session) {
-    Member loginUser = (Member) session.getAttribute("loginUser");
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
     try {
-      List<Notification> notifications = memberService.getNotifications(loginUser.getId());
+      List<Notification> notifications = userService.getNotifications(loginUser.getId());
       return new ResponseEntity<>(notifications, HttpStatus.OK);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,28 +1,29 @@
-package bitcamp.carrot_thunder.member.model.dao;
+package bitcamp.carrot_thunder.user.model.dao;
 
-import bitcamp.carrot_thunder.member.model.vo.Member;
-import bitcamp.carrot_thunder.member.model.vo.Notification;
+import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface MemberDao {
+public interface UserDao {
 
-  int insert(Member member);
-  List<Member> findAll();
-  Member findBy(int memberId);
-  Member findByEmailAndPassword(
+  int insert(User member);
+  List<User> findAll();
+  User findBy(int memberId);
+  User findByName(String name);
+  User findByEmailAndPassword(
       @Param("email") String email,
       @Param("password") String password);
-  int update(Member member);
+  int update(User member);
   int delete(int no);
 
   void insertFollow(int followerId, int followingId);
   void deleteFollow(int followerId, int followingId);
   boolean isFollowed(int followerId, int followingId);
-  List<Member> getFollowers(int memberId);
-  List<Member> getFollowings(int memberId);
+  List<User> getFollowers(int memberId);
+  List<User> getFollowings(int memberId);
 
   int insertNotification(Notification notification);
   int updateReadStatus(int id, boolean isRead);

@@ -1,4 +1,4 @@
-package bitcamp.carrot_thunder.member.repository;
+package bitcamp.carrot_thunder.user.repository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

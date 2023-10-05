@@ -2,73 +2,77 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="bitcamp.carrot_thunder.member.model.dao.MemberDao">
+<mapper namespace="bitcamp.carrot_thunder.user.model.dao.UserDao">
 
-  <resultMap type="member" id="memberMap">
-    <id column="member_id" property="id"/>
+  <resultMap type="user" id="userMap">
+    <id column="id" property="id"/>
     <result column="role" property="role"/>
     <result column="activation" property="activation"/>
     <result column="email" property="email"/>
     <result column="password" property="password"/>
     <result column="nickname" property="nickName"/>
+    <result column="phone" property="phone"/>
+    <result column="address" property="address"/>
+    <result column="detail_address" property="detailAddress"/>
     <result column="photo" property="photo"/>
-    <result column="intro" property="intro"/>
-    <result column="category" property="category"/>
-    <result column="tel" property="tel"/>
+    <result column="point" property="point"/>
   </resultMap>
 
-  <insert id="insert" parameterType="member">
-    insert into member (email, password, nickname, category, tel)
-    values(#{email}, sha1(#{password}), #{nickName}, #{category}, #{tel})
+  <insert id="insert" parameterType="user">
+    insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
+    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
   <select id="findAll" resultMap="memberMap">
     select
-    member_id,
+    id,
     role,
     activation,
     email,
     nickname,
+    phone,
+    address,
+    detail_address,
     photo,
-    intro,
-    category,
-    tel
+    point
     from
-    member
+    tbl_user
     order by
     role asc
   </select>
 
-  <select id="findBy" parameterType="int" resultMap="memberMap">
-    select
-    member_id,
-    role,
-    activation,
-    email,
-    nickname,
-    photo,
-    intro,
-    category,
-    tel
-    from
-    member
-    where
-    member_id=#{id}
-  </select>
-
-
-  <select id="findByEmailAndPassword" resultMap="memberMap">
+  <select id="findBy" parameterType="int" resultMap="userMap">
     select
     *
     from
-    member
+    tbl_user
+    where
+    id=#{id}
+  </select>
+
+
+  <select id="findByEmailAndPassword" resultMap="userMap">
+    select
+    *
+    from
+    tbl_user
     where
     email=#{email}
     and password=sha1(#{password})
   </select>
 
-  <update id="update" parameterType="member">
-    update member set
+  <select id="findByName" resultMap="userMap">
+    select
+    *
+    from
+    tbl_user
+    where
+    name=#{name}
+    and password=sha1(#{password})
+  </select>
+
+  <update id="update" parameterType="user">
+    update tbl_user set
     nickname=#{nickName}
     ,password=sha1(#{password})
     ,intro=#{intro}
@@ -77,14 +81,14 @@
     </if>
     ,tel=#{tel}
     where
-    member_id=#{id}
+    id=#{id}
   </update>
 
 
   <delete id="delete" parameterType="int">
-    delete from member
+    delete from tbl_user
     where
-    member_id=#{id}
+    id=#{id}
   </delete>
 
   <insert id="insertFollow">
@@ -123,7 +127,7 @@
   </insert>
 
   <select id="findNotificationsByMemberId"
-    resultType="bitcamp.carrot_thunder.member.model.vo.Notification">
+    resultType="bitcamp.carrot_thunder.user.model.vo.Notification">
     SELECT * FROM notification WHERE member_id = #{memberId}
   </select>
 
@@ -131,7 +135,7 @@
     UPDATE notification SET isRead = #{isRead} WHERE id = #{id}
   </update>
 
-  <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.member.model.vo.Notification">
+  <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">
     INSERT INTO notification (member_id, content, created_at, type, isRead)
     VALUES (#{memberId}, #{content}, #{createdAt}, #{type}, #{isRead})
   </insert>
