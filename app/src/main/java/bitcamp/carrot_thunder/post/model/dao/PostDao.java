@@ -1,14 +1,18 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
-import java.util.List;
-
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
+
 public interface PostDao {
+
+
     int insert(Post post);
     Post findBy(int id);
     int updateCount(int no);
@@ -35,8 +39,6 @@ public interface PostDao {
     List<Post> getBookmarkedPosts(int memberId);
     List<Post> getMyPosts(int memberId);
 
-//    List<Comment> findCommentsByPostId(int postId);
-//    void insertComment(int postId, int memberId, String content) throws Exception;
-//    void deleteComment(@Param("commentId") int commentId, @Param("memberId") int memberId);
-//    void insertComment(Comment comment);
+    Optional<Post> findPostDetailById(int id) throws Exception;
+
 }

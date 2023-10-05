@@ -1,8 +1,8 @@
 package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
-import bitcamp.carrot_thunder.user.model.vo.User;
-import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
+import bitcamp.carrot_thunder.member.model.vo.Member;
+import bitcamp.carrot_thunder.member.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.post.service.PostService;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.MatrixVariable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/post")
 public class PostController {
 
-  @Autowired
   PostService postService;
 
   @Autowired
@@ -38,6 +36,7 @@ public class PostController {
   @Autowired
   DefaultNotificationService defaultNotificationService;
 
+
   @GetMapping("form")
   public void form() {
   }
@@ -45,11 +44,11 @@ public class PostController {
   @PostMapping("add")
   public String add(Post post, MultipartFile[] files, HttpSession session) throws Exception {
 
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "/member/form";
     }
-    post.setUser(loginUser);
+    post.setMember(loginUser);
 
     ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
     for (MultipartFile part : files) {
@@ -61,23 +60,24 @@ public class PostController {
         attachedFiles.add(attachedFile);
       }
     }
+
+
     post.setAttachedFiles(attachedFiles);
 
     postService.add(post);
-    return "";
-    //return "redirect:/post/list?category=" + post.getCategory();
+    return "redirect:/post/list?category=" + post.getDealingType();
   }
 
   @GetMapping("delete")
   public String delete(int id, int category, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/member/form";
     }
 
     Post p = postService.get(id);
 
-    if (p == null || p.getUser().getId() != loginUser.getId()) {
+    if (p == null || p.getMember().getId() != loginUser.getId()) {
       throw new Exception("해당 번호의 게시글이 없거나 삭제 권한이 없습니다.");
     } else {
       postService.delete(p.getId());
@@ -95,28 +95,34 @@ public class PostController {
 
   }
 
-  @GetMapping("detail/{category}/{id}")
-  public String detail(@PathVariable int id, Model model, HttpSession session) throws Exception {
-    System.out.println("detail 호출! PostController");
-    Post post = postService.setSessionStatus(id, session);
-    User loginUser = (User) session.getAttribute("loginUser");
-    boolean isLoggedIn = (loginUser != null);
-    model.addAttribute("isLoggedIn", isLoggedIn);
-    if (post != null) {
-      model.addAttribute("post", post);
+
+    /**
+     *
+     *
+     * @param id
+     * @param session
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
+
+    @GetMapping("detail/{id}")
+    public String detail(@PathVariable int id, Model model, HttpSession session) throws Exception {
+
+        Post post = postService.getPostDetailById(id);
+        model.addAttribute("post", post);
+        return "post/detail";
+
     }
-    return "post/detail";
-  }
 
   @PostMapping("update")
   public String update(Post post, MultipartFile[] files, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/auth/form";
     }
 
     Post p = postService.get(post.getId());
-    if (p == null || p.getUser().getId() != loginUser.getId()) {
+    if (p == null || p.getMember().getId() != loginUser.getId()) {
       throw new Exception("게시글이 존재하지 않거나 변경 권한이 없습니다.");
     }
 
@@ -133,8 +139,7 @@ public class PostController {
     post.setAttachedFiles(attachedFiles);
 
     postService.update(post);
-    //return "redirect:/post/list?category=" + p.getCategory();
-    return "redirect:/post/list?category=";
+    return "redirect:/post/list?category=" + p.getDealingType();
 
   }
 
@@ -143,7 +148,7 @@ public class PostController {
       @MatrixVariable("id") int id,
       HttpSession session) throws Exception {
 
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/auth/form";
     }
@@ -152,14 +157,14 @@ public class PostController {
 
     AttachedFile attachedFile = postService.getAttachedFile(id);
     post = postService.get(attachedFile.getPostId());
-    if (post.getUser().getId() != loginUser.getId()) {
+    if (post.getMember().getId() != loginUser.getId()) {
       throw new Exception("게시글 변경 권한이 없습니다!");
     }
 
     if (postService.deleteAttachedFile(id) == 0) {
       throw new Exception("해당 번호의 첨부파일이 없다.");
     } else {
-      return "redirect:/post/detail/" ;//+ post.getCategory() + "/" + post.getId();
+      return "redirect:/post/detail/" + post.getDealingType() + "/" + post.getId();
     }
   }
 
@@ -168,7 +173,7 @@ public class PostController {
   public Map<String, Object> postLike(@PathVariable int postId, HttpSession session)
       throws Exception {
     Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       response.put("status", "notLoggedIn");
       return response;
@@ -184,7 +189,7 @@ public class PostController {
       Post post = postService.get(postId);
       if (post != null) {
         String content = loginUser.getNickName() + "님이 당신의 게시글을 좋아합니다.";
-        defaultNotificationService.send(content, post.getUser().getId());
+        defaultNotificationService.send(content, post.getMember().getId());
       }
     }
 
@@ -195,7 +200,7 @@ public class PostController {
 
   @GetMapping("/liked")
   public String getLikedPosts(Model model, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/member/form";
     }
@@ -211,7 +216,7 @@ public class PostController {
       HttpSession session)
       throws Exception {
     System.out.println("좋아요 상태 정보 업데이트!");
-    User loginUser = (User) session.getAttribute("loginUser");
+    Member loginUser = (Member) session.getAttribute("loginUser");
     Map<Integer, Map<String, Object>> response = new HashMap<>();
 
     if (loginUser != null) {
@@ -231,101 +236,5 @@ public class PostController {
     return response;
   }
 
-  @PostMapping("/{postId}/bookmark")
-  @ResponseBody
-  public Map<String, Object> postBookmark(@PathVariable int postId, HttpSession session)
-      throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "notLoggedIn");
-      return response;
-    }
-
-    int memberId = loginUser.getId();
-    boolean newIsBookmarked = postService.postBookmark(postId, memberId);
-
-    if (newIsBookmarked) {
-      Post post = postService.get(postId);
-      if (post != null) {
-        String content = loginUser.getNickName() + "님이 당신의 게시글을 북마크했습니다.";
-        defaultNotificationService.send(content, post.getUser().getId());
-      }
-    }
-    response.put("newIsBookmarked", newIsBookmarked);
-    return response;
-  }
-
-  @GetMapping("/bookmarked")
-  public String getBookmarkedPosts(Model model, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/member/form";
-    }
-    int memberId = loginUser.getId();
-    List<Post> posts = postService.getBookmarkedPosts(memberId, session);
-    model.addAttribute("bookmarkedPosts", posts);
-    return "/post/bookmarkList";
-  }
-
-  @PostMapping("/getBookmarkStatus")
-  @ResponseBody
-  public Map<Integer, Boolean> getBookmarkStatus(@RequestBody List<Integer> postIds,
-      HttpSession session) {
-    System.out.println("북마크 상태 정보 업데이트!");
-    User loginUser = (User) session.getAttribute("loginUser");
-    Map<Integer, Boolean> response = new HashMap<>();
-    if (loginUser != null) {
-      int memberId = loginUser.getId();
-      for (int postId : postIds) {
-        boolean isBookmarked = postService.isBookmarked(postId, memberId);
-        response.put(postId, isBookmarked);
-      }
-    }
-    return response;
-  }
-
-  @PostMapping("/detail/{category}/{postId}/comment")
-  @ResponseBody
-  public Map<String, Object> addComment(
-      @PathVariable String category,
-      @PathVariable int postId,
-      HttpSession session) throws Exception {
-
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "unauthorized");
-      return response;
-    }
-
-    Post post = postService.get(postId);
-    if (post != null) {
-      String content = loginUser.getNickName() + "님이 당신의 게시글에 댓글을 남겼습니다.";
-      defaultNotificationService.send(content, post.getUser().getId());
-    }
-
-    response.put("status", "success");
-    //response.put("commenter", loginUser.getNickName());
-    return response;
-  }
-
-
-  @DeleteMapping("/detail/{category}/{postId}/comment/{commentId}")
-  @ResponseBody
-  public Map<String, Object> deleteComment(
-      @PathVariable String category,
-      @PathVariable int postId,
-      @PathVariable int commentId,
-      HttpSession session) throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "unauthorized");
-      return response;
-    }
-    response.put("status", "success");
-    return response;
-  }
 
 }

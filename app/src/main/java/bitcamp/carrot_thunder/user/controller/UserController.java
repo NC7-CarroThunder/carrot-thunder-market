@@ -156,7 +156,6 @@ public class UserController {
     model.addAttribute("member", userService.get(memberId));
     model.addAttribute("myPosts", postService.getMyPosts(memberId));
     model.addAttribute("likedPosts", postService.getLikedPosts(memberId, session));
-    model.addAttribute("bookMarkedPosts", postService.getBookmarkedPosts(memberId, session));
     model.addAttribute("notifications", notifications);
 
     return "member/profile";
