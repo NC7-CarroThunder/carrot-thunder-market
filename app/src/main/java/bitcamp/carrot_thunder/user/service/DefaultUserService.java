@@ -1,46 +1,46 @@
-package bitcamp.carrot_thunder.member.service;
+package bitcamp.carrot_thunder.user.service;
 
-import bitcamp.carrot_thunder.member.model.dao.MemberDao;
-import bitcamp.carrot_thunder.member.model.vo.Member;
-import bitcamp.carrot_thunder.member.model.vo.Notification;
+import bitcamp.carrot_thunder.user.model.dao.UserDao;
+import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class DefaultMemberService implements MemberService {
+public class DefaultMemberService implements UserService {
 
-  MemberDao memberDao;
+  UserDao memberDao;
 
-  public DefaultMemberService(MemberDao memberDao) {
+  public DefaultMemberService(UserDao memberDao) {
     this.memberDao = memberDao;
   }
 
   @Transactional
   @Override
-  public int add(Member member) throws Exception {
+  public int add(User member) throws Exception {
     return memberDao.insert(member);
   }
 
   @Override
-  public List<Member> list() throws Exception {
+  public List<User> list() throws Exception {
     return memberDao.findAll();
   }
 
   @Override
-  public Member get(int memberId) throws Exception {
+  public User get(int memberId) throws Exception {
     return memberDao.findBy(memberId);
   }
 
   @Override
-  public Member get(String email, String password) throws Exception {
+  public User get(String email, String password) throws Exception {
     return memberDao.findByEmailAndPassword(email, password);
   }
 
   @Transactional
   @Override
-  public int update(Member member) throws Exception {
+  public int update(User member) throws Exception {
     return memberDao.update(member);
   }
 
@@ -68,25 +68,25 @@ public class DefaultMemberService implements MemberService {
   }
 
   @Override
-  public Member get(int memberId, HttpSession session) throws Exception {
-    Member member = memberDao.findBy(memberId);
-    Member loginUser = (Member) session.getAttribute("loginUser");
+  public User get(int memberId, HttpSession session) throws Exception {
+    User member = memberDao.findBy(memberId);
+    User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser != null) {
       int loggedInUserId = loginUser.getId();
-      member.setFollowed(memberDao.isFollowed(loggedInUserId, memberId));
+      //member.setFollowed(memberDao.isFollowed(loggedInUserId, memberId));
     } else {
-      member.setFollowed(false);
+      //member.setFollowed(false);
     }
     return member;
   }
 
   @Override
-  public List<Member> getFollowers(int memberId) throws Exception {
+  public List<User> getFollowers(int memberId) throws Exception {
     return memberDao.getFollowers(memberId);
   }
 
   @Override
-  public List<Member> getFollowings(int memberId) throws Exception {
+  public List<User> getFollowings(int memberId) throws Exception {
     return memberDao.getFollowings(memberId);
   }
 

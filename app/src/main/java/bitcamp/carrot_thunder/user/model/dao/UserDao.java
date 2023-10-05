@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface MemberDao {
+public interface UserDao {
 
   int insert(Member member);
   List<Member> findAll();

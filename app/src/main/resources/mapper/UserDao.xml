@@ -11,28 +11,30 @@
     <result column="email" property="email"/>
     <result column="password" property="password"/>
     <result column="nickname" property="nickName"/>
+    <result column="phone" property="phone"/>
+    <result column="address" property="address"/>
+    <result column="detail_address" property="detailAddress"/>
     <result column="photo" property="photo"/>
-    <result column="intro" property="intro"/>
-    <result column="category" property="category"/>
-    <result column="tel" property="tel"/>
+    <result column="point" property="point"/>
   </resultMap>
 
   <insert id="insert" parameterType="member">
-    insert into member (email, password, nickname, category, tel)
-    values(#{email}, sha1(#{password}), #{nickName}, #{category}, #{tel})
+    insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
+    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
   <select id="findAll" resultMap="memberMap">
     select
-    member_id,
+    id,
     role,
     activation,
     email,
     nickname,
+    phone,
+    address,
+    detail_address,
     photo,
-    intro,
-    category,
-    tel
+    point
     from
     member
     order by
@@ -41,19 +43,11 @@
 
   <select id="findBy" parameterType="int" resultMap="memberMap">
     select
-    member_id,
-    role,
-    activation,
-    email,
-    nickname,
-    photo,
-    intro,
-    category,
-    tel
+    *
     from
-    member
+    tbl_user
     where
-    member_id=#{id}
+    id=#{id}
   </select>
 
 
@@ -61,14 +55,14 @@
     select
     *
     from
-    member
+    tbl_user
     where
     email=#{email}
     and password=sha1(#{password})
   </select>
 
   <update id="update" parameterType="member">
-    update member set
+    update tbl_user set
     nickname=#{nickName}
     ,password=sha1(#{password})
     ,intro=#{intro}
@@ -77,14 +71,14 @@
     </if>
     ,tel=#{tel}
     where
-    member_id=#{id}
+    id=#{id}
   </update>
 
 
   <delete id="delete" parameterType="int">
-    delete from member
+    delete from tbl_user
     where
-    member_id=#{id}
+    id=#{id}
   </delete>
 
   <insert id="insertFollow">

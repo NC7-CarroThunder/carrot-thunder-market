@@ -5,7 +5,7 @@ import bitcamp.carrot_thunder.member.model.vo.Notification;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 
-public interface MemberService {
+public interface UserService {
 
     int add(Member member) throws Exception;
     List<Member> list() throws Exception;

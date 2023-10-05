@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.member.service;
 
-import bitcamp.carrot_thunder.member.model.dao.MemberDao;
+import bitcamp.carrot_thunder.member.model.dao.UserDao;
 import bitcamp.carrot_thunder.member.model.vo.Member;
 import bitcamp.carrot_thunder.member.model.vo.Notification;
 import bitcamp.carrot_thunder.member.repository.EmitterRepository;
@@ -21,7 +21,7 @@ public class DefaultNotificationService implements NotificationService {
 
   private final static String ALARM_NAME = "alarm";
   private final EmitterRepository emitterRepository;
-  private final MemberDao memberDao;
+  private final UserDao memberDao;
 
   public void send(String content, int receiverId) {
     Member member = memberDao.findBy(receiverId);

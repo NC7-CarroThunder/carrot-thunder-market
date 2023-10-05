@@ -8,7 +8,7 @@ import bitcamp.carrot_thunder.member.model.vo.Member;
 import bitcamp.carrot_thunder.member.model.vo.Notification;
 import bitcamp.carrot_thunder.member.model.vo.Role;
 import bitcamp.carrot_thunder.member.service.DefaultNotificationService;
-import bitcamp.carrot_thunder.member.service.MemberService;
+import bitcamp.carrot_thunder.member.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,11 +34,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Controller
 @RequestMapping("/member")
-public class MemberController {
+public class UserController {
 
   private final EmailService emailService;
 
-  public MemberController(MemberService memberService, EmailService emailService) {
+  public UserController(UserService memberService, EmailService emailService) {
     this.memberService = memberService;
     this.emailService = emailService;
   }
@@ -47,7 +47,7 @@ public class MemberController {
   NcpConfig ncpConfig;
 
   @Autowired
-  MemberService memberService;
+  UserService memberService;
 
   @Autowired
   NcpObjectStorageService ncpObjectStorageService;
