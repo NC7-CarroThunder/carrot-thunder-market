@@ -31,12 +31,6 @@ public interface PostDao {
     boolean isLiked(@Param("postId") int postId, @Param("memberId") int memberId);
     int getLikeCount(int postId);
     List<Post> getLikedPosts(int memberId);
-
-    int deleteBookmarks(int postId);
-    int insertBookmark(@Param("postId") int postId, @Param("memberId") int memberId);
-    int deleteBookmark(@Param("postId") int postId, @Param("memberId") int memberId);
-    boolean isBookmarked(@Param("postId") int postId, @Param("memberId") int memberId);
-    List<Post> getBookmarkedPosts(int memberId);
     List<Post> getMyPosts(int memberId);
 
     Optional<Post> findPostDetailById(int id) throws Exception;

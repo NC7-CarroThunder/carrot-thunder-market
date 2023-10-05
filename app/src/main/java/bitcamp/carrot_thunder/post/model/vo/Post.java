@@ -5,6 +5,7 @@ import bitcamp.carrot_thunder.post.model.vo.DealingType;
 import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
 import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
 //import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.user.model.vo.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,7 @@ public class Post implements Serializable {
     private int viewCount;
     private Timestamp createdAt;
     private List<AttachedFile> attachedFiles;
-//    private User user;
+    private User user;
     private ItemCategory itemCategory;
     private ItemStatus itemStatus;
     private DealingType dealingType;

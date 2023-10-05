@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.post.service;
 
-import bitcamp.carrot_thunder.member.model.vo.Member;
+import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
@@ -49,7 +49,7 @@ public class DefaultPostService implements PostService {
     @Transactional(readOnly = true)
 
     public List<Post> list(HttpSession session) throws Exception {
-        Member loginUser = (Member) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute("loginUser");
         List<Post> posts = postDao.findAll();
         if (loginUser != null) {
             int loggedInUserId = loginUser.getId();
@@ -65,49 +65,44 @@ public class DefaultPostService implements PostService {
         return postDao.findFileBy(fileId);
     }
 
+
+
     public int increaseViewCount(int boardNo) throws Exception {
         return postDao.updateCount(boardNo);
     }
 
-    @Transactional
-    public int delete(int postId) throws Exception {
-        postDao.deleteFiles(postId);
-        postDao.deleteLikes(postId);
-        postDao.deleteBookmarks(postId);
-        return postDao.delete(postId);
-    }
 
-    public int deleteAttachedFile(int fileId) throws Exception {
-        return postDao.deleteFile(fileId);
-    }
-
-    /** 좋아요 개수 조회
+    /** 게시글 삭제
      *
      *
      * @param postId
      * @return
      * @throws Exception ( 난중에 처리 )
      */
-
-    public int getLikeCount(int postId) {
-        return postDao.getLikeCount(postId);
+    @Transactional
+    public int delete(int postId) throws Exception {
+        postDao.deleteFiles(postId);
+        postDao.deleteLikes(postId);
+        return postDao.delete(postId);
     }
 
-    public boolean postLike(int postId, int memberId) {
-        boolean liked = postDao.isLiked(postId, memberId);
-        if (liked) {
-            postDao.deleteLike(postId, memberId);
-            postDao.updateLikeCount(postId, -1);
-        } else {
-            postDao.insertLike(postId, memberId);
-            postDao.updateLikeCount(postId, 1);
-        }
-        return !liked;
+    /** 게시글 상세에서 첨부파일 삭제
+     *
+     *
+     * @param fileId
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
+
+    public int deleteAttachedFile(int fileId) throws Exception {
+        return postDao.deleteFile(fileId);
     }
+
+
+
 
 
     /** 관심버튼이 눌려진 게시글들의 정보를 가져오는 기능
-     *
      *
      * @param memberId
      * @param session
@@ -115,7 +110,7 @@ public class DefaultPostService implements PostService {
      */
 
     public List<Post> getLikedPosts(int memberId, HttpSession session) {
-        Member loginUser = (Member) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute("loginUser");
         List<Post> posts = postDao.getLikedPosts(memberId);
         if (loginUser != null) {
             int loggedInUserId = loginUser.getId();
@@ -129,8 +124,6 @@ public class DefaultPostService implements PostService {
 
     /** 관심버튼 상태의 boolean
      *
-     * enum도 괜찮긴할거같은데
-     *
      * @param postId
      * @param memberId
      * @return
@@ -140,7 +133,36 @@ public class DefaultPostService implements PostService {
         return postDao.isLiked(postId, memberId);
     }
 
+    /** 관심 개수 조회
+     *
+     * @param postId
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
 
+    public int getLikeCount(int postId) {
+        return postDao.getLikeCount(postId);
+    }
+
+
+    /** 유저가 관심을 눌렀을때, 관심 개수 변경
+     *
+     * @param postId
+     * @param memberId
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
+    public boolean postLike(int postId, int memberId) {
+        boolean liked = postDao.isLiked(postId, memberId);
+        if (liked) {
+            postDao.deleteLike(postId, memberId);
+            postDao.updateLikeCount(postId, -1);
+        } else {
+            postDao.insertLike(postId, memberId);
+            postDao.updateLikeCount(postId, 1);
+        }
+        return !liked;
+    }
 
     /** 관심버튼을 눌렀을때 상태값을 변경해주는 기능
      *
@@ -151,7 +173,7 @@ public class DefaultPostService implements PostService {
      */
     public Post setSessionStatus(int id, HttpSession session) {
         Post post = postDao.findBy(id);
-        Member loginUser = (Member) session.getAttribute("loginUser");
+        User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser != null) {
             int loggedInUserId = loginUser.getId();
             boolean isLiked = postDao.isLiked(id, loggedInUserId);
