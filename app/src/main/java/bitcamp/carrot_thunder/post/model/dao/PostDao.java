@@ -3,11 +3,16 @@ package bitcamp.carrot_thunder.post.model.dao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
+
 public interface PostDao {
+
+
     int insert(Post post);
     Post findBy(int id);
     int updateCount(int no);
@@ -33,5 +38,7 @@ public interface PostDao {
     boolean isBookmarked(@Param("postId") int postId, @Param("memberId") int memberId);
     List<Post> getBookmarkedPosts(int memberId);
     List<Post> getMyPosts(int memberId);
+
+    Optional<Post> findPostDetailById(int id) throws Exception;
 
 }

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.MatrixVariable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/post")
 public class PostController {
 
-  @Autowired
   PostService postService;
 
   @Autowired
@@ -37,6 +35,7 @@ public class PostController {
 
   @Autowired
   DefaultNotificationService defaultNotificationService;
+
 
   @GetMapping("form")
   public void form() {
@@ -61,6 +60,8 @@ public class PostController {
         attachedFiles.add(attachedFile);
       }
     }
+
+
     post.setAttachedFiles(attachedFiles);
 
     postService.add(post);
@@ -94,18 +95,24 @@ public class PostController {
 
   }
 
-  @GetMapping("detail/{category}/{id}")
-  public String detail(@PathVariable int id, Model model, HttpSession session) throws Exception {
-    System.out.println("detail 호출! PostController");
-    Post post = postService.setSessionStatus(id, session);
-    Member loginUser = (Member) session.getAttribute("loginUser");
-    boolean isLoggedIn = (loginUser != null);
-    model.addAttribute("isLoggedIn", isLoggedIn);
-    if (post != null) {
-      model.addAttribute("post", post);
+
+    /**
+     *
+     *
+     * @param id
+     * @param session
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
+
+    @GetMapping("detail/{id}")
+    public String detail(@PathVariable int id, Model model, HttpSession session) throws Exception {
+
+        Post post = postService.getPostDetailById(id);
+        model.addAttribute("post", post);
+        return "post/detail";
+
     }
-    return "post/detail";
-  }
 
   @PostMapping("update")
   public String update(Post post, MultipartFile[] files, HttpSession session) throws Exception {
