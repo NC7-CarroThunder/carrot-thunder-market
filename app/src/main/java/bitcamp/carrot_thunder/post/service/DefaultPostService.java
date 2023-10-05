@@ -1,5 +1,6 @@
 package bitcamp.carrot_thunder.post.service;
 
+import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
@@ -187,7 +188,7 @@ public class DefaultPostService implements PostService {
      *
      * @param id
      * @return
-     * @throws Exception ( 난중에 처리 )
+     * @throws Exception
      */
     @Override
     public Post getPostDetailById(int id) throws Exception {
@@ -196,7 +197,7 @@ public class DefaultPostService implements PostService {
         if(post.isPresent()) {
             return post.get();
         }
-        throw new Exception();
+        throw NotFoundPostException.EXCEPTION;
     }
 
 
