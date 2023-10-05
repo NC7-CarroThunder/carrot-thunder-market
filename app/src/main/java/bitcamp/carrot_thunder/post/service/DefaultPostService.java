@@ -122,7 +122,7 @@ public class DefaultPostService implements PostService {
         return posts;
     }
 
-    /** 관심버튼 상태의 boolean
+    /** 관심 여부 확인 기능
      *
      * @param postId
      * @param memberId
