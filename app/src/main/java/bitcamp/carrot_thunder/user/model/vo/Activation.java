@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.user.model.vo;
 
-public enum Role {
+public enum Activation {
 
-  MEMBER, ADMIN
+    YES,NO
 }

@@ -1,9 +1,9 @@
-package bitcamp.carrot_thunder.member.service;
+package bitcamp.carrot_thunder.user.service;
 
-import bitcamp.carrot_thunder.member.model.dao.UserDao;
-import bitcamp.carrot_thunder.member.model.vo.Member;
-import bitcamp.carrot_thunder.member.model.vo.Notification;
-import bitcamp.carrot_thunder.member.repository.EmitterRepository;
+import bitcamp.carrot_thunder.user.model.dao.UserDao;
+import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.user.model.vo.Notification;
+import bitcamp.carrot_thunder.user.repository.EmitterRepository;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class DefaultNotificationService implements NotificationService {
   private final UserDao memberDao;
 
   public void send(String content, int receiverId) {
-    Member member = memberDao.findBy(receiverId);
+    User member = memberDao.findBy(receiverId);
     if (member == null) {
       throw new RuntimeException("Member not found with ID: " + receiverId);
     }

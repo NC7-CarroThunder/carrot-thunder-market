@@ -1,4 +1,4 @@
-package bitcamp.carrot_thunder.member.controller;
+package bitcamp.carrot_thunder.user.controller;
 
 
 import org.springframework.stereotype.Controller;

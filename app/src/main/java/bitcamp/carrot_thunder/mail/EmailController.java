@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.mail;
 
-import bitcamp.carrot_thunder.member.model.vo.Member;
+import bitcamp.carrot_thunder.user.model.vo.User;
 import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +14,7 @@ public class EmailController {
   private EmailService emailService;
 
   @PostMapping("/email-welcome")
-  public String sendWelcomeEmail(@RequestBody Member member) throws MessagingException {
+  public String sendWelcomeEmail(@RequestBody User member) throws MessagingException {
     emailService.sendWelcomeEmail(member);
     return "redirect:/";
   }
