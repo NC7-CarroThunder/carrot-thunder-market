@@ -1,6 +1,7 @@
 package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
 import bitcamp.carrot_thunder.user.model.vo.Role;
