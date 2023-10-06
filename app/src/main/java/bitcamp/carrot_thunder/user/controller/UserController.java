@@ -68,8 +68,8 @@ public class UserController {
 
   // 로그인
   @PostMapping("/users/login")
-  //@ResponseBody
-  public String login(
+  @ResponseBody
+  public String login(@RequestBody
           LoginRequestDto loginInfo,
           HttpServletResponse response) throws Exception {
 

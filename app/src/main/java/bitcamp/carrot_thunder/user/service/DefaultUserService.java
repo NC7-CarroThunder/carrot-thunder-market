@@ -30,7 +30,6 @@ public class DefaultUserService implements UserService {
 
   @Override
   public String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
-    System.out.println(passwordEncoder.encode("1234"));
     User loginUser = this.get(loginInfo.getEmail());
     System.out.println(loginUser);
 
