@@ -1,6 +1,7 @@
 package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
 import bitcamp.carrot_thunder.user.model.vo.Role;
@@ -30,9 +31,7 @@ public class DefaultUserService implements UserService {
 
   @Override
   public String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
-    System.out.println(passwordEncoder.encode("1234"));
     User loginUser = this.get(loginInfo.getEmail());
-    System.out.println(loginUser);
 
     if (loginUser == null) {
       //model.addAttribute("refresh", "1;url=form");
@@ -53,11 +52,19 @@ public class DefaultUserService implements UserService {
 
     return "redirect:/";
 
+  }
 
+  public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception {
+    this.updatePasswordByName(userDetails.getUsername(),passwordEncoder.encode(password));
+    return "비밀번호 변경 완료";
   }
 
 
-
+  @Transactional
+  @Override
+  public void updatePasswordByName(String nickName, String password) throws Exception {
+    userDao.updatePasswordByName(nickName, password);
+  }
 
 
   @Transactional
@@ -91,6 +98,7 @@ public class DefaultUserService implements UserService {
   public int update(User member) throws Exception {
     return userDao.update(member);
   }
+
 
   @Transactional
   @Override
