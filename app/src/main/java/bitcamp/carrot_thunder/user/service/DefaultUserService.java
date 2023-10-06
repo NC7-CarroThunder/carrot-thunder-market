@@ -31,7 +31,6 @@ public class DefaultUserService implements UserService {
   @Override
   public String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
     User loginUser = this.get(loginInfo.getEmail());
-    System.out.println(loginUser);
 
     if (loginUser == null) {
       //model.addAttribute("refresh", "1;url=form");
@@ -52,11 +51,19 @@ public class DefaultUserService implements UserService {
 
     return "redirect:/";
 
+  }
 
+  public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception {
+    this.updatePasswordByName(userDetails.getUsername(),passwordEncoder.encode(password));
+    return "비밀번호 변경 완료";
   }
 
 
-
+  @Transactional
+  @Override
+  public void updatePasswordByName(String nickName, String password) throws Exception {
+    userDao.updatePasswordByName(nickName, password);
+  }
 
 
   @Transactional

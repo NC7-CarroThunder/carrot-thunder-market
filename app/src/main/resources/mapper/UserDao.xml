@@ -78,6 +78,18 @@
     email=#{email}
   </select>
 
+  <update id="updatePasswordByName" parameterType="string">
+    update tbl_user set
+    ,password=#{password}
+    ,intro=#{intro}
+    <if test="photo != null">
+      ,photo=#{photo}
+    </if>
+    ,tel=#{tel}
+    where
+    id=#{id}
+  </update>
+
   <update id="update" parameterType="user">
     update tbl_user set
     nickname=#{nickName}

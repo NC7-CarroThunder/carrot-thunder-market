@@ -18,6 +18,7 @@ public interface UserDao {
       @Param("email") String email,
       @Param("password") String password);
   int update(User member);
+  void updatePasswordByName(String nickName, String password);
   int delete(int no);
 
   void insertFollow(int followerId, int followingId);
