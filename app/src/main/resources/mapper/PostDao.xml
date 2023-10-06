@@ -1,278 +1,65 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
 
-  <resultMap type="post" id="postMap">
-    <id column="post_id" property="id"/>
-    <result column="title" property="title"/>
-    <result column="content" property="content"/>
-    <result column="view_count" property="viewCount"/>
-    <result column="dealing_type" property="dealingType"/>
-    <result column="item_status" property="itemStatus"/>
-    <result column="price" property="price"/>
-    <result column="address" property="address"/>
-    <result column="item_category" property="itemCategory"/>
-    <result column="created_at" property="createdAt"/>
+    <resultMap type="post" id="articleMap">
 
-    <association property="user" javaType="User">
-      <id column="id" property="id"/>
-      <result column="photo" property="photo"/>
-      <result column="nickname" property="nickName"/>
-    </association>
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="item_category" property="itemCategory"/>
+        <result column="item_status" property="itemStatus"/>
+        <result column="dealing_type" property="dealingType"/>
+        <result column="address" property="address"/>
+        <result column="price" property="price"/>
+        <result column="like_count" property="likeCount"/>
+        <association property="user" javaType="User">
+            <id column="user_id" property="id"/>
+            <result column="nickname" property="nickName"/>
+        </association>
+        <collection property="attachedFiles" ofType="attachedFile">
+            <id column="id" property="id"/>
+            <result column="filepath" property="filePath"/>
+            <result column="post_id" property="postId"/>
+        </collection>  </resultMap>
+    <resultMap type="attachedFile" id="attachedFileMap">
+        <id column="id" property="id"/>
+        <result column="filepath" property="filePath"/>
+        <result column="post_id" property="postId"/>
+    </resultMap>
+    <insert id="insert" parameterType="post" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO tbl_article(title, content, view_count, item_category, dealing_type, item_status, price, address, user_id)    VALUES(#{title}, #{content}, #{viewCount}, #{itemCategory}, #{dealingType}, #{itemStatus}, #{price}, #{address}, #{userId})  </insert>
 
-    <collection property="attachedFiles" ofType="attachedFile">
-      <id column="id" property="id"/>
-      <result column="filepath" property="filePath"/>
-    </collection>
-  </resultMap>
-
-<!--  <resultMap id="commentMap" type="Comment">-->
-<!--    <id property="id" column="cmt_id"/>-->
-<!--    <result property="content" column="content"/>-->
-<!--  </resultMap>-->
-
-<!--  <resultMap type="post" id="bookmarkMap">-->
-<!--    <id column="post_id" property="id"/>-->
-<!--    <result column="member_id" property="memberId"/>-->
-<!--  </resultMap>-->
-
-  <resultMap type="attachedFile" id="attachedFileMap">
-    <id column="id" property="id"/>
-    <result column="filepath" property="filePath"/>
-    <result column="post_id" property="postId"/>
-  </resultMap>
-
-  <insert id="insert" parameterType="post"
-    useGeneratedKeys="true" keyColumn="post_id" keyProperty="id">
-    insert into post(title,content,view_count,item_category,dealing_type,item_status,price,address,user_id)
-    values(#{title},#{content},#{viewCount},#{itemCategory},#{dealingType},#{itemStatus},#{price},#{address},#{user.id})
-  </insert>
-
-  <insert id="insertFiles" parameterType="post">
-    insert into file(filepath, post_id)
-    values
-    <foreach collection="attachedFiles" item="file" separator=",">
-      (#{file.filePath}, #{id})
-    </foreach>
-  </insert>
-
-<!--  <select id="findBy" resultMap="postMap" parameterType="int">-->
-<!--    select-->
-<!--    p.post_id,-->
-<!--    m.nickname,-->
-<!--    m.member_id,-->
-<!--    m.photo,-->
-<!--    p.title,-->
-<!--    p.content,-->
-<!--    p.hashTag,-->
-<!--    p.created_at,-->
-<!--    f.file_id,-->
-<!--    f.filepath,-->
-<!--    like_count-->
-<!--    from-->
-<!--    post p inner join member m on p.member_id=m.member_id-->
-<!--    left outer join file f on p.post_id=f.post_id-->
-<!--    where-->
-<!--    p.post_id=#{postId}-->
-<!--  </select>-->
-
-<!--  <select id="findAll" parameterType="int" resultMap="postMap">-->
-<!--    SELECT-->
-<!--    p.post_id,-->
-<!--    m.nickname,-->
-<!--    m.member_id,-->
-<!--    m.photo,-->
-<!--    p.title,-->
-<!--    p.content,-->
-<!--    p.hashTag,-->
-<!--    p.created_at,-->
-<!--    f.file_id,-->
-<!--    f.filepath,-->
-<!--    like_count-->
-<!--    FROM-->
-<!--    post p inner join member m on p.member_id=m.member_id-->
-<!--    left outer join file f on p.post_id=f.post_id-->
-<!--    ORDER BY-->
-<!--    p.post_id DESC-->
-<!--  </select>-->
-
-  <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
-    SELECT
-    file_id,
-    filepath,
-    post_id
-    FROM
-    file
-    WHERE
-    file_id=#{id}
-  </select>
-
-<!--  <select id="getMyPosts" resultMap="postMap">-->
-<!--    select-->
-<!--    p.post_id,-->
-<!--    m.nickname,-->
-<!--    m.member_id,-->
-<!--    p.title,-->
-<!--    p.content,-->
-<!--    p.hashTag,-->
-<!--    p.created_at,-->
-<!--    f.file_id,-->
-<!--    f.filepath,-->
-<!--    like_count-->
-<!--    from-->
-<!--    post p inner join member m on p.member_id=m.member_id-->
-<!--    left outer join file f on p.post_id=f.post_id-->
-<!--    where-->
-<!--    p.member_id=#{memberId}-->
-<!--    order by-->
-<!--    p.post_id desc;-->
-<!--  </select>-->
-
-  <delete id="deleteFile" parameterType="int">
-    delete from file
-    where
-    file_id=#{id}
-  </delete>
-
-  <delete id="deleteFiles" parameterType="int">
-    delete from file
-    where
-    post_id=#{postId}
-  </delete>
-
-  <update id="update" parameterType="post">
-    update post set
-    title=#{title},
-    content=#{content}
-    where
-    post_id=#{id}
-  </update>
-
-  <delete id="delete" parameterType="int">
-    delete from post
-    where
-    post_id=#{id}
-  </delete>
-
-  <delete id="deleteLikes" parameterType="int">
-    delete from like_list
-    where
-    post_id=#{postId}
-  </delete>
-
-  <delete id="deleteBookmarks" parameterType="int">
-    delete from bookmark_list
-    where
-    post_id=#{postId}
-  </delete>
-
-  <update id="updateLikeCount">
-    UPDATE
-    post
-    SET
-    like_count = like_count + #{amount}
-    WHERE
-    post_id = #{postId}
-  </update>
-
-  <insert id="insertLike">
-    INSERT INTO
-    like_list (post_id, member_id)
-    VALUES (#{postId}, #{memberId})
-  </insert>
-
-  <delete id="deleteLike">
-    DELETE FROM
-    like_list
-    WHERE
-    post_id = #{postId} AND member_id = #{memberId}
-  </delete>
-
-  <select id="isLiked" resultType="boolean">
-    SELECT
-    COUNT(*)
-    FROM like_list
-    WHERE
-    post_id = #{postId} AND member_id = #{memberId}
-  </select>
-
-  <select id="getLikeCount" resultType="int">
-    SELECT
-    COUNT(*)
-    FROM
-    like_list
-    WHERE
-    post_id = #{postId}
-  </select>
-
-<!--  <select id="getLikedPosts" resultMap="postMap">-->
-<!--    SELECT-->
-<!--    p.post_id,-->
-<!--    m.nickname,-->
-<!--    m.member_id,-->
-<!--    p.title,-->
-<!--    p.content,-->
-<!--    p.hashtag,-->
-<!--    p.created_at,-->
-<!--    f.file_id,-->
-<!--    f.filepath-->
-<!--    FROM-->
-<!--    post p-->
-<!--    JOIN like_list l ON p.post_id = l.post_id-->
-<!--    JOIN member m ON p.member_id = m.member_id-->
-<!--    LEFT JOIN file f ON p.post_id = f.post_id-->
-<!--    WHERE-->
-<!--    l.member_id = #{memberId}-->
-<!--    ORDER BY-->
-<!--    p.post_id DESC-->
-<!--  </select>-->
-
-<!--  <insert id="insertBookmark" parameterType="map">-->
-<!--    INSERT INTO bookmark_list (post_id, member_id)-->
-<!--    VALUES (#{postId}, #{memberId})-->
-<!--    ON DUPLICATE KEY UPDATE-->
-<!--    post_id = VALUES(post_id), member_id = VALUES(member_id);-->
-<!--  </insert>-->
+    <insert id="insertFiles" parameterType="post">
+        INSERT INTO file(filepath, post_id)    VALUES    <foreach collection="attachedFiles" item="file" separator=",">
+        (#{file.filePath}, #{id})    </foreach>  </insert>
+    <select id="findBy" resultMap="articleMap" parameterType="int">    SELECT    a.id,    u.nickname,    u.id,    a.title,    a.content,    a.created_at,    a.dealing_type,    a.item_category,    a.item_status,    f.id,    f.filepath    FROM    tbl_article a    INNER JOIN tbl_user u ON a.user_id = u.id    LEFT JOIN tbl_file f ON a.id = f.article_id    WHERE    a.id=#{postId}  </select>
+    <select id="findAll" resultMap="articleMap">    SELECT    a.id,    u.nickname,    u.id,    a.title,    a.content,    a.view_count,    a.created_at,    a.dealing_type,    a.item_category,    a.item_status,    a.address,    a.price,    f.id,    f.filepath    FROM    tbl_article a    INNER JOIN tbl_user u ON a.user_id = u.id    LEFT OUTER JOIN tbl_file f ON a.id = f.article_id    ORDER BY    a.id DESC  </select>
 
 
-<!--  <delete id="deleteBookmark">-->
-<!--    DELETE FROM-->
-<!--    bookmark_list-->
-<!--    WHERE-->
-<!--    post_id = #{postId} AND member_id = #{memberId}-->
-<!--  </delete>-->
+    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">    SELECT    file_id,    filepath,    post_id    FROM    file    WHERE    file_id=#{id}  </select>
+    <select id="getMyPosts" resultMap="articleMap">    SELECT    a.id,    u.nickname,    u.id,    a.title,    a.content,    a.created_at,    a.dealing_type,    a.item_category,    a.item_status,    f.id,    f.filepath,    a.like_count    FROM    tbl_article a    INNER JOIN tbl_user u ON a.user_id = u.id    LEFT OUTER JOIN file f ON a.id = f.post_id    WHERE    a.user_id = #{userId}    ORDER BY    a.id DESC;  </select>
 
-<!--  <select id="isBookmarked" resultType="boolean">-->
-<!--    SELECT-->
-<!--    COUNT(*)-->
-<!--    FROM bookmark_list-->
-<!--    WHERE-->
-<!--    post_id = #{postId} AND member_id = #{memberId}-->
-<!--  </select>-->
 
-<!--  <select id="getBookmarkedPosts" resultMap="postMap">-->
-<!--    SELECT-->
-<!--    p.post_id,-->
-<!--    m.nickname,-->
-<!--    m.member_id,-->
-<!--    p.title,-->
-<!--    p.content,-->
-<!--    p.hashtag,-->
-<!--    p.created_at,-->
-<!--    f.file_id,-->
-<!--    f.filepath-->
-<!--    FROM-->
-<!--    post p-->
-<!--    JOIN bookmark_list b ON p.post_id = b.post_id-->
-<!--    JOIN member m ON p.member_id = m.member_id-->
-<!--    LEFT JOIN file f ON p.post_id = f.post_id-->
-<!--    WHERE-->
-<!--    b.member_id = #{memberId}-->
-<!--    ORDER BY-->
-<!--    p.post_id DESC-->
-<!--  </select>-->
+    <update id="updateCount" parameterType="int">    update tbl_article set    view_count=view_count + 1    where    id=#{no}  </update>
+    <delete id="deleteFile" parameterType="int">    delete from file    where    file_id=#{id}  </delete>
+    <delete id="deleteFiles" parameterType="int">    delete from file    where    article_id=#{postId}  </delete>
+    <update id="update" parameterType="post">    update tbl_article set    title=#{title},    content=#{content}    where    id=#{id}  </update>
+    <delete id="delete" parameterType="int">    delete from tbl_article    where    id=#{id}  </delete>
 
+    <delete id="deleteLikes" parameterType="int">    delete from like_list    where    article_id=#{postId}  </delete>
+
+    <update id="updateLikeCount">    UPDATE    tbl_article    SET    like_count = like_count + #{amount}    WHERE    id = #{postId}  </update>
+
+    <insert id="insertLike">    INSERT INTO    like_list (article_id, member_id)    VALUES (#{postId}, #{memberId})  </insert>
+    <delete id="deleteLike">    DELETE FROM    like_list    WHERE    article_id = #{postId} AND member_id = #{memberId}  </delete>
+
+    <select id="isLiked" resultType="boolean">    SELECT    COUNT(*)    FROM like_list    WHERE    article_id = #{postId} AND member_id = #{memberId}  </select>
+
+    <select id="getLikeCount" resultType="int">    SELECT    COUNT(*)    FROM    like_list    WHERE    article_id = #{postId}  </select>
+
+    <select id="getLikedPosts" resultMap="articleMap">    SELECT    a.id,    u.nickname,    u.id as user_id,    a.title,    a.content,    a.created_at,    a.dealing_type,    a.item_category,    a.item_status,    f.file_id,    f.filepath    FROM    tbl_article a    JOIN like_list l ON a.id = l.article_id    JOIN tbl_user u ON a.user_id = u.id    LEFT JOIN file f ON a.id = f.article_id    WHERE    l.user_id = #{userId}    ORDER BY    a.id DESC  </select>
 
 </mapper>

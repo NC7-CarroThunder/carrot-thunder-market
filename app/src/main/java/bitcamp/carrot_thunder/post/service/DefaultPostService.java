@@ -5,6 +5,8 @@ import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpSession;
@@ -92,10 +94,9 @@ public class DefaultPostService implements PostService {
      *
      * @param fileId
      * @return
-     * @throws Exception ( 난중에 처리 )
      */
 
-    public int deleteAttachedFile(int fileId) throws Exception {
+    public int deleteAttachedFile(int fileId)  {
         return postDao.deleteFile(fileId);
     }
 
@@ -138,7 +139,6 @@ public class DefaultPostService implements PostService {
      *
      * @param postId
      * @return
-     * @throws Exception ( 난중에 처리 )
      */
 
     public int getLikeCount(int postId) {
@@ -151,7 +151,6 @@ public class DefaultPostService implements PostService {
      * @param postId
      * @param memberId
      * @return
-     * @throws Exception ( 난중에 처리 )
      */
     public boolean postLike(int postId, int memberId) {
         boolean liked = postDao.isLiked(postId, memberId);
@@ -204,15 +203,32 @@ public class DefaultPostService implements PostService {
 
 
 
-    /**
+     /**
      * 나의 게시글 조회 ( 굳이 여기에 있어야할까 )
-     *
-     *
-     */
-    @Transactional
-  public List<Post> getMyPosts(int memberId) {
-    return postDao.getMyPosts(memberId);
-  }
+       *
+        *
+       */
+     @Transactional
+    public List<Post> getMyPosts(int memberId) {
+      return postDao.getMyPosts(memberId);
+    }
+
+    public List<Post> searchPosts(String keyword) {
+        List<Post> posts = postDao.findAll();
+        List<Post> searchResults = new ArrayList<>();
+
+        for (Post post : posts) {
+            if (post.getTitle().contains(keyword) || post.getContent().contains(keyword)) {
+                searchResults.add(post);
+            }
+        }
+
+        return searchResults;
+    }
+
+
+
+
 }
 
 

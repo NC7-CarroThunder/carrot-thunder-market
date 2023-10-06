@@ -14,20 +14,15 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.MatrixVariable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/post")
 public class PostController {
 
+
+  @Autowired
   PostService postService;
 
   @Autowired
@@ -46,7 +41,7 @@ public class PostController {
 
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
-      return "/member/form";
+      return "/user/form";
     }
     post.setUser(loginUser);
 
@@ -54,7 +49,7 @@ public class PostController {
     for (MultipartFile part : files) {
       if (part.getSize() > 0) {
         String uploadFileUrl = ncpObjectStorageService.uploadFile(
-            "bitcamp-nc7-bucket-16", "post/", part);
+            "bitcamp-nc7-bucket-24", "post/", part);
         AttachedFile attachedFile = new AttachedFile();
         attachedFile.setFilePath(uploadFileUrl);
         attachedFiles.add(attachedFile);
@@ -65,14 +60,14 @@ public class PostController {
     post.setAttachedFiles(attachedFiles);
 
     postService.add(post);
-    return "redirect:/post/list?category=" + post.getDealingType();
+    return "redirect:/post/list";
   }
 
-  @GetMapping("delete")
-  public String delete(int id, int category, HttpSession session) throws Exception {
+  @DeleteMapping ("/posts/{postID}")
+  public String deletePost(@PathVariable int id, HttpSession session) throws Exception {
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
-      return "redirect:/member/form";
+      return "redirect:/user/form";
     }
 
     Post p = postService.get(id);
@@ -81,32 +76,27 @@ public class PostController {
       throw new Exception("해당 번호의 게시글이 없거나 삭제 권한이 없습니다.");
     } else {
       postService.delete(p.getId());
-      return "redirect:/post/list?category=" + category;
+      return "redirect:/post/list";
     }
   }
 
-  @GetMapping("list")
-  public void list(
-      @RequestParam(name = "search", required = false)
-      String searchKeyword,
-      Model model, HttpSession session) throws Exception {
-    model.addAttribute("list", postService.list(session));
-    model.addAttribute("searchKeyword", searchKeyword);
-
-  }
+    @GetMapping("list")
+    public String list(Model model, HttpSession session) throws Exception {
+        model.addAttribute("list", postService.list(session));
+        return "post/list";
+    }
 
 
-    /**
+    /** 게시글 상세정보 컨트롤러
      *
      *
      * @param id
-     * @param session
      * @return
      * @throws Exception ( 난중에 처리 )
      */
 
     @GetMapping("detail/{id}")
-    public String detail(@PathVariable int id, Model model, HttpSession session) throws Exception {
+    public String detail(@PathVariable int id, Model model) throws Exception {
 
         Post post = postService.getPostDetailById(id);
         model.addAttribute("post", post);
@@ -130,7 +120,7 @@ public class PostController {
     for (MultipartFile part : files) {
       if (part.getSize() > 0) {
         String uploadFileUrl = ncpObjectStorageService.uploadFile(
-            "bitcamp-nc7-bucket-16", "post/", part);
+            "bitcamp-nc7-bucket-24", "post/", part);
         AttachedFile attachedFile = new AttachedFile();
         attachedFile.setFilePath(uploadFileUrl);
         attachedFiles.add(attachedFile);
@@ -139,11 +129,11 @@ public class PostController {
     post.setAttachedFiles(attachedFiles);
 
     postService.update(post);
-    return "redirect:/post/list?category=" + p.getDealingType();
+    return "redirect:post/list";
 
   }
 
-  @GetMapping("fileDelete/{attachedFile}") // 예) .../fileDelete/attachedFile;no=30
+  @GetMapping("fileDelete/{attachedFile}")
   public String fileDelete(
       @MatrixVariable("id") int id,
       HttpSession session) throws Exception {
@@ -153,10 +143,8 @@ public class PostController {
       return "redirect:/auth/form";
     }
 
-    Post post = null;
-
     AttachedFile attachedFile = postService.getAttachedFile(id);
-    post = postService.get(attachedFile.getPostId());
+      Post post = postService.get(attachedFile.getPostId());
     if (post.getUser().getId() != loginUser.getId()) {
       throw new Exception("게시글 변경 권한이 없습니다!");
     }
@@ -164,9 +152,15 @@ public class PostController {
     if (postService.deleteAttachedFile(id) == 0) {
       throw new Exception("해당 번호의 첨부파일이 없다.");
     } else {
-      return "redirect:/post/detail/" + post.getDealingType() + "/" + post.getId();
+      return "redirect:/post/detail/" + "/" + post.getId();
     }
   }
+
+
+
+
+
+
 
   @PostMapping("/{postId}/like")
   @ResponseBody
@@ -237,4 +231,15 @@ public class PostController {
   }
 
 
+
+    @GetMapping("/search")
+    public String searchPosts(@RequestParam(name = "keyword") String keyword, Model model) {
+        List<Post> searchResults = postService.searchPosts(keyword);
+        model.addAttribute("searchResults", searchResults);
+        model.addAttribute("keyword", keyword);
+        return "/post/search_results";
+    }
 }
+
+
+

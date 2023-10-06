@@ -32,6 +32,7 @@ public interface PostService {
 
     List<Post> getMyPosts(int memberId);
 
+    List<Post> searchPosts(String keyword);
 
 
 

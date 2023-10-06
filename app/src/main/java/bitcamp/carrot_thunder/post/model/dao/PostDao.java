@@ -33,6 +33,6 @@ public interface PostDao {
     List<Post> getLikedPosts(int memberId);
     List<Post> getMyPosts(int memberId);
 
-    Optional<Post> findPostDetailById(int id) throws Exception;
+    Optional<Post> findPostDetailById(int id);
 
 }
