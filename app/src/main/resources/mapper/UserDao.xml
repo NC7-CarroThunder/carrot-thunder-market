@@ -23,7 +23,7 @@
     values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
-  <select id="findAll" resultMap="memberMap">
+  <select id="findAll" resultMap="userMap">
     select
     id,
     role,
@@ -60,7 +60,6 @@
     email=#{email}
     and password=sha1(#{password})
   </select>
-
   <select id="findByName" resultMap="userMap">
     select
     *
@@ -68,7 +67,15 @@
     tbl_user
     where
     name=#{name}
-    and password=sha1(#{password})
+  </select>
+
+  <select id="findByEmail" resultMap="userMap">
+    select
+    *
+    from
+    tbl_user
+    where
+    email=#{email}
   </select>
 
   <update id="update" parameterType="user">

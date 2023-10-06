@@ -9,11 +9,12 @@ import javax.servlet.http.HttpSession;
 
 public interface UserService {
 
-    boolean login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception;
+    String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception;
     int add(User member) throws Exception;
     List<User> list() throws Exception;
     User get(int memberId) throws Exception;
     User get(String email, String password) throws Exception;
+    User get(String email) throws Exception;
     int update(User member) throws Exception;
     int delete(int memberId) throws Exception;
 

@@ -3,6 +3,7 @@ package bitcamp.carrot_thunder.user.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -34,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
 
   private final EmailService emailService;
@@ -65,23 +67,14 @@ public class UserController {
   }
 
   // 로그인
-  @PostMapping("login")
+  @PostMapping("/users/login")
+  //@ResponseBody
   public String login(
           LoginRequestDto loginInfo,
           HttpServletResponse response) throws Exception {
 
-    User loginUser = userService.get(loginInfo.getEmail(), loginInfo.getPassword());
-    if (loginUser == null) {
-      //model.addAttribute("refresh", "1;url=form");
-      throw new Exception("회원 정보가 일치하지 않습니다.");
-      //return "redirect:/member/form";
-    }
+    return userService.login(loginInfo,response);
 
-    if (loginUser.getRole() == Role.ADMIN) {
-      System.out.println(loginUser.getRole());
-      return "redirect:/admin/form";
-    }
-    return "redirect:/";
   }
 
   // 로그아웃

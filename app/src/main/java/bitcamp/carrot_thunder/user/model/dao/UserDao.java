@@ -13,6 +13,7 @@ public interface UserDao {
   List<User> findAll();
   User findBy(int memberId);
   User findByName(String name);
+  User findByEmail(String email);
   User findByEmailAndPassword(
       @Param("email") String email,
       @Param("password") String password);
