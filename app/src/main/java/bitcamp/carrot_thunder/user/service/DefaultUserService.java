@@ -99,6 +99,7 @@ public class DefaultUserService implements UserService {
     return userDao.update(member);
   }
 
+
   @Transactional
   @Override
   public int delete(int memberId) throws Exception {
