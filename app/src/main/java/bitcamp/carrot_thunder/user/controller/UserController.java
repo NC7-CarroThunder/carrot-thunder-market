@@ -11,6 +11,7 @@ import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
+import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class UserController {
   UserService userService;
 
   @Autowired
+  KakaoService kakaoService;
+
+  @Autowired
   NcpObjectStorageService ncpObjectStorageService;
 
   @Autowired
@@ -80,6 +84,24 @@ public class UserController {
   public String patch(@AuthenticationPrincipal UserDetailsImpl userDetails,String password) throws Exception {
     return userService.patchPassword(userDetails, password);
   }
+
+
+  // 카카오 로그인 관련 컨트롤러
+  @GetMapping("users//kakao/callback")
+  @ResponseBody
+  public String kakaoLogin(String code, HttpServletResponse response) throws Exception{
+    //1. 받은 코드 기반으로 토큰을 구한다.
+
+    //String response = kakaoService.getToken(code);
+
+    //2. 받은 토큰 기반으로 사용자 정보를 추가한다.
+
+    //3. 사용자 정보를 기반으로 유저를 가져온다(필요시 추가)
+
+    //4. jwt토큰 태워서 보낸다.
+    return "";
+  }
+
 
 
 

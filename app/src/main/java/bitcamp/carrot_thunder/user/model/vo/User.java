@@ -28,4 +28,12 @@ public class User implements Serializable {
   private @Setter String photo;
   private int point;
 
+  public User(String email, String encodedPassword, String nickName, String phone,String address, String detailAddress) {
+    this.email = email;
+    this.password = encodedPassword;
+    this.nickName = nickName;
+    this.phone = phone;
+    this.address = address;
+    this.detailAddress = detailAddress;
+  }
 }
