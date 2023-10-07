@@ -14,6 +14,9 @@ import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,8 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +40,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,19 +93,16 @@ public class UserController {
 
 
   // 카카오 로그인 관련 컨트롤러
-  @GetMapping("users//kakao/callback")
-  @ResponseBody
-  public String kakaoLogin(String code, HttpServletResponse response) throws Exception{
-    //1. 받은 코드 기반으로 토큰을 구한다.
+  @GetMapping("/users/kakao/callback")
+  public String kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+    // code : 카카오 서버로부터 받은 인가 코드
+    String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
+    // Cookie 생성 및 직접 브라우저에 Set
+    Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
+    cookie.setPath("/");
+    response.addCookie(cookie);
 
-    //String response = kakaoService.getToken(code);
-
-    //2. 받은 토큰 기반으로 사용자 정보를 추가한다.
-
-    //3. 사용자 정보를 기반으로 유저를 가져온다(필요시 추가)
-
-    //4. jwt토큰 태워서 보낸다.
-    return "";
+    return "로그인 완료";
   }
 
 

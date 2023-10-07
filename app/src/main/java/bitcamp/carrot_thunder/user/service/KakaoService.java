@@ -47,9 +47,9 @@ public class KakaoService {
 
         // 4. JWT 토큰 반환
         String createToken =  jwtUtil.createToken(kakaoUser.getNickName());
-//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return createToken;
+        return "소셜로그인 가입 완료";
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -62,7 +62,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoApiKey);
-        body.add("redirect_uri", "http://localhost/api/users/kakao/callback");
+        body.add("redirect_uri", "http://localhost:8888/api/users/kakao/callback");
         body.add("code", code);
 
         // HTTP 요청 보내기
