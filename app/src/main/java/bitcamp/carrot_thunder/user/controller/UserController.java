@@ -15,6 +15,7 @@ import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -94,15 +95,13 @@ public class UserController {
 
   // 카카오 로그인 관련 컨트롤러
   @GetMapping("/users/kakao/callback")
-  public String kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+  public void kakaoCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
     // code : 카카오 서버로부터 받은 인가 코드
     String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
     // Cookie 생성 및 직접 브라우저에 Set
-    Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
-    cookie.setPath("/");
-    response.addCookie(cookie);
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,createToken);
+    response.sendRedirect("http://localhost:3000");
 
-    return "로그인 완료";
   }
 
 
