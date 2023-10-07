@@ -1,8 +1,10 @@
 package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
+import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
@@ -28,18 +30,42 @@ public class DefaultUserService implements UserService {
 
 
   @Override
-  public boolean login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
+  public String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
+    User loginUser = this.get(loginInfo.getEmail());
 
-    User user = this.get(loginInfo.getEmail(),loginInfo.getPassword());
-    if (user == null) {
-      return false;
+    if (loginUser == null) {
+      //model.addAttribute("refresh", "1;url=form");
+      throw new Exception("등록된 사용자가 없습니다.");
+      //return "redirect:/member/form";
     }
-    //TODO :
-    //스프링시큐리티에로그인 알림
-    //토큰값 갱신? 등 뭐 어쩌고저쩌고
 
-    return true;
+    if (!passwordEncoder.matches(loginInfo.getPassword(),loginUser.getPassword())) {
+      throw new IllegalArgumentException("비밀 번호가 옳지 않습니다.");
+    }
+
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(loginUser.getNickName()));
+
+    if (loginUser.getRole() == Role.ADMIN) {
+      System.out.println(loginUser.getRole());
+      return "redirect:/admin/form";
+    }
+
+    return "redirect:/";
+
   }
+
+  public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception {
+    this.updatePasswordByName(userDetails.getUsername(),passwordEncoder.encode(password));
+    return "비밀번호 변경 완료";
+  }
+
+
+  @Transactional
+  @Override
+  public void updatePasswordByName(String nickName, String password) throws Exception {
+    userDao.updatePasswordByName(nickName, password);
+  }
+
 
   @Transactional
   @Override
@@ -62,11 +88,17 @@ public class DefaultUserService implements UserService {
     return userDao.findByEmailAndPassword(email, password);
   }
 
+  @Override
+  public User get(String email) throws Exception {
+    return userDao.findByEmail(email);
+  }
+
   @Transactional
   @Override
   public int update(User member) throws Exception {
     return userDao.update(member);
   }
+
 
   @Transactional
   @Override

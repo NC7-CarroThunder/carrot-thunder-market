@@ -13,10 +13,12 @@ public interface UserDao {
   List<User> findAll();
   User findBy(int memberId);
   User findByName(String name);
+  User findByEmail(String email);
   User findByEmailAndPassword(
       @Param("email") String email,
       @Param("password") String password);
   int update(User member);
+  void updatePasswordByName(String nickName, String password);
   int delete(int no);
 
   void insertFollow(int followerId, int followingId);
