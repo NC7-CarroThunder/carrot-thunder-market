@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,13 +107,8 @@ public class UserController {
   }
 
 
-    //2. 받은 토큰 기반으로 사용자 정보를 추가한다.
 
-    //3. 사용자 정보를 기반으로 유저를 가져온다(필요시 추가)
 
-    //4. jwt토큰 태워서 보낸다.
-    return "";
-  }
 //  // 로그아웃
 //  @GetMapping("/logout")
 //  public String logout(HttpSession session) throws Exception {
