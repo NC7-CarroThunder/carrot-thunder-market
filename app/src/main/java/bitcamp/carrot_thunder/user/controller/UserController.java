@@ -7,6 +7,7 @@ import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
@@ -21,6 +22,8 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +90,7 @@ public class UserController {
 
 
   // 카카오 로그인 관련 컨트롤러
-  @GetMapping("users//kakao/callback")
+  @GetMapping("/users/kakao/callback")
   @ResponseBody
   public String kakaoLogin(String code, HttpServletResponse response) throws Exception{
     //1. 받은 코드 기반으로 토큰을 구한다.
@@ -101,10 +104,6 @@ public class UserController {
     //4. jwt토큰 태워서 보낸다.
     return "";
   }
-
-
-
-
 //  // 로그아웃
 //  @GetMapping("/logout")
 //  public String logout(HttpSession session) throws Exception {
@@ -115,15 +114,20 @@ public class UserController {
 
 
   // 회원가입
-  @PostMapping("add")
-  public String add(User member) throws Exception {
-    userService.add(member);
-
-    // 회원가입 이메일 전송
-    emailService.sendWelcomeEmail(member);
-
-    return "redirect:form";
+  @PostMapping("/users/signup")
+  @ResponseBody
+  public int signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
+    return userService.signup(signupRequestDto,response);
   }
+//  @PostMapping("add")
+//  public String add(User member) throws Exception {
+//    userService.add(member);
+//
+//    // 회원가입 이메일 전송
+//    emailService.sendWelcomeEmail(member);
+//
+//    return "redirect:form";
+//  }
 
   @GetMapping("delete")
   public String delete(int id, Model model) throws Exception {

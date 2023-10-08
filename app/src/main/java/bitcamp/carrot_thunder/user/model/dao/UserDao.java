@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserDao {
 
-  int insert(User member);
+  int insert(User user);
   List<User> findAll();
   User findBy(int memberId);
   User findByName(String name);
