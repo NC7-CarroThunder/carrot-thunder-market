@@ -47,7 +47,7 @@ public class SecurityConfig {
         //
 
 //        http.authorizeRequests()
-////                .antMatchers("/api/user/signup").permitAll()
+////                .antMatchers("/api/user/signup").permitAll() // 회원가입과 로그인은 허용
 ////                .antMatchers("/api/user/login").permitAll()
 //                .antMatchers("**").permitAll()
 //                .antMatchers().authenticated()
@@ -80,7 +80,7 @@ public class SecurityConfig {
 
         // 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
         // 만약 지정하지 않는다면, Authorization 헤더 내의 토큰 값을 사용할 수 없음
-        config.addExposedHeader(jwtUtil.AUTHORIZATION_HEADER);
+
 
         // 본 요청에 허용할 HTTP method(예비 요청에 대한 응답 헤더에 추가됨)
         config.addAllowedMethod("*");
