@@ -1,6 +1,10 @@
 package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.post.dto.ResponseDto;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
@@ -10,8 +14,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -104,33 +110,18 @@ public class PostController {
 
     }
 
-  @PostMapping("update")
-  public String update(Post post, MultipartFile[] files, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/auth/form";
-    }
+  @PutMapping("/{postId}")
+  public ResponseDto<PostResponseDto> updatePost(
+          @PathVariable int postId,
+          @RequestBody PostUpdateRequestDto postUpdateRequestDto,
+          @RequestParam(required = false) List<MultipartFile> multipartFiles,
+          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    User user = userDetails.getUser();
+    List<String> remainingImages = postUpdateRequestDto.getAttachedFilesPaths().stream()
+            .map(AttachedFile::getFilename)
+            .collect(Collectors.toList());
 
-    Post p = postService.get(post.getId());
-    if (p == null || p.getUser().getId() != loginUser.getId()) {
-      throw new Exception("게시글이 존재하지 않거나 변경 권한이 없습니다.");
-    }
-
-    ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
-    for (MultipartFile part : files) {
-      if (part.getSize() > 0) {
-        String uploadFileUrl = ncpObjectStorageService.uploadFile(
-            "bitcamp-nc7-bucket-24", "post/", part);
-        AttachedFile attachedFile = new AttachedFile();
-        attachedFile.setFilePath(uploadFileUrl);
-        attachedFiles.add(attachedFile);
-      }
-    }
-    post.setAttachedFiles(attachedFiles);
-
-    postService.update(post);
-    return "redirect:post/list";
-
+    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, user, remainingImages, multipartFiles));
   }
 
   @GetMapping("fileDelete/{attachedFile}")

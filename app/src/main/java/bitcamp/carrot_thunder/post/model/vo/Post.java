@@ -1,5 +1,6 @@
 package bitcamp.carrot_thunder.post.model.vo;
 
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.DealingType;
 import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
@@ -39,6 +40,13 @@ public class Post implements Serializable {
 
     private int likeCount;
     private boolean liked;
+
+    public void update(PostUpdateRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.price = requestDto.getPrice();
+        this.address = requestDto.getAddress();
+    }
 
 
 

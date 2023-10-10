@@ -35,4 +35,8 @@ public interface PostDao {
 
     Optional<Post> findPostDetailById(int id);
 
+
+    Optional<Object> findById(int postId);
+
+    List<AttachedFile> findImagesByPostId(int postId);
 }

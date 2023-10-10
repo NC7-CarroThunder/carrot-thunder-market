@@ -1,24 +1,34 @@
 package bitcamp.carrot_thunder.post.service;
 
+import bitcamp.carrot_thunder.NcpObjectStorageService;
+import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
 public class DefaultPostService implements PostService {
 
+
+    @Autowired
     PostDao postDao;
+
+    @Autowired
+
 
     public DefaultPostService(PostDao postDao) {
         this.postDao = postDao;
@@ -39,14 +49,44 @@ public class DefaultPostService implements PostService {
         return postDao.findBy(postId);
     }
 
+
     @Transactional
-    public int update(Post post) throws Exception {
-        int count = postDao.update(post);
-        if (count > 0 && post.getAttachedFiles().size() > 0) {
+    public PostResponseDto updatePost(int postId, PostUpdateRequestDto postUpdateRequestDto, User user, List<String> remainingImages, List<MultipartFile> multipartFiles) {
+        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
+
+        if (user.getId() != post.getUser().getId()) {
+            throw new IllegalArgumentException("유저 불일치");
+        }
+
+        if (post.getAttachedFiles().size() > 0) {
             postDao.insertFiles(post);
         }
-        return count;
+
+        post.update(postUpdateRequestDto);
+
+        handleImageUpdates(post, remainingImages);
+
+
+        return PostResponseDto.of(post);
     }
+
+    public List<String> handleImageUpdates(Post post, List<String> remainingImages) {
+        List<AttachedFile> attachedFilesfiles = postDao.findImagesByPostId(post.getId());
+
+        NcpConfig ncpConfig = new NcpConfig();
+        NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
+        for (AttachedFile attachedFile : attachedFilesfiles) {
+            if (!remainingImages.contains(attachedFile.getFilename())) {
+                // S3에서 이미지 삭제
+                ncpObjectStorageService.deleteFile("bucket-name", "images/" + attachedFile.getFilename());
+                // DB에서 이미지 삭제
+                postDao.deleteFile(attachedFile.getId());
+            }
+        }
+        return remainingImages;
+    }
+
+
 
 
     @Transactional(readOnly = true)
@@ -200,18 +240,12 @@ public class DefaultPostService implements PostService {
     }
 
 
-
-
-
-     /**
-     * 나의 게시글 조회 ( 굳이 여기에 있어야할까 )
-       *
-        *
-       */
-     @Transactional
-    public List<Post> getMyPosts(int memberId) {
-      return postDao.getMyPosts(memberId);
-    }
+    /**
+     * 게시글 검색 기능
+     *
+     * @param keyword
+     * @return
+     */
 
     public List<Post> searchPosts(String keyword) {
         List<Post> posts = postDao.findAll();
@@ -225,6 +259,18 @@ public class DefaultPostService implements PostService {
 
         return searchResults;
     }
+
+
+     /**
+     * 나의 게시글 조회 ( 굳이 여기에 있어야할까 )
+       *
+        *
+       */
+     @Transactional
+    public List<Post> getMyPosts(int memberId) {
+      return postDao.getMyPosts(memberId);
+    }
+
 
 
 
