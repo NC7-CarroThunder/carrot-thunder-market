@@ -36,6 +36,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -94,14 +95,18 @@ public class UserController {
 
 
   // 카카오 로그인 관련 컨트롤러
-  @GetMapping("/users/kakao/callback")
-  @ResponseBody
-  public void kakaoCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
+  @PostMapping("/users/kakao/callback")
+  public String kakaoCallback(@RequestBody String access_token, HttpServletResponse response) throws IOException {
     // code : 카카오 서버로부터 받은 인가 코드
-    String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
+   // System.out.println(access_token);
+
+    String nickName = kakaoService.kakaoLogin(access_token, response);
+    //String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
     // Cookie 생성 및 직접 브라우저에 Set
-    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,createToken);
-    response.sendRedirect("http://localhost:3000");
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,nickName);
+    //response.sendRedirect("http://localhost:3000");
+    System.out.println(nickName);
+    return "응답완료";
 
   }
 

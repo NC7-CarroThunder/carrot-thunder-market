@@ -32,14 +32,15 @@ public class KakaoService {
     private final UserDao userDao;
     private final JwtUtil jwtUtil;
 
-    @Value("${kakao.restApi}")
-    private String kakaoApiKey;
 
-    public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public String kakaoLogin(String token, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getToken(code);
+        //String accessToken = getToken(code);
 
-        // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
+        // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기\
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(token);
+        String accessToken = jsonNode.get("token").asText();
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
         // 3. 필요시에 회원가입
@@ -49,43 +50,44 @@ public class KakaoService {
         String createToken =  jwtUtil.createToken(kakaoUser.getNickName());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-        return "소셜로그인 가입 완료";
+        return kakaoUser.getNickName();
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청
-    private String getToken(String code) throws JsonProcessingException {
-        // HTTP Header 생성
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        // HTTP Body 생성
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_code");
-        body.add("client_id", kakaoApiKey);
-        body.add("redirect_uri", "http://localhost:8888/api/users/kakao/callback");
-        body.add("code", code);
-
-        // HTTP 요청 보내기
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
-                new HttpEntity<>(body, headers);
-        RestTemplate rt = new RestTemplate();
-        ResponseEntity<String> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token",
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class
-        );
-
-        // HTTP 응답 (JSON) -> 액세스 토큰 파싱
-        String responseBody = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("access_token").asText();
-    }
+//    private String getToken(String code) throws JsonProcessingException {
+//        // HTTP Header 생성
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+//
+//        // HTTP Body 생성
+//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//        body.add("grant_type", "authorization_code");
+//        body.add("client_id", kakaoApiKey);
+//        body.add("redirect_uri", "http://localhost:8888/api/users/kakao/callback");
+//        body.add("code", code);
+//        System.out.println("인증키 : " + kakaoApiKey);
+//        // HTTP 요청 보내기
+//        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
+//                new HttpEntity<>(body, headers);
+//        RestTemplate rt = new RestTemplate();
+//        ResponseEntity<String> response = rt.exchange(
+//                "https://kauth.kakao.com/oauth/token",
+//                HttpMethod.POST,
+//                kakaoTokenRequest,
+//                String.class
+//        );
+//
+//        // HTTP 응답 (JSON) -> 액세스 토큰 파싱
+//        String responseBody = response.getBody();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        JsonNode jsonNode = objectMapper.readTree(responseBody);
+//        return jsonNode.get("access_token").asText();
+//    }
 
     // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
+        System.out.println("getKakaoUserInfo accessToken = " + accessToken);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
