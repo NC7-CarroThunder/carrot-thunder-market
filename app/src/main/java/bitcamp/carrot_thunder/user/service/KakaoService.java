@@ -134,10 +134,10 @@ public class KakaoService {
                 String email = kakaoUserInfo.getEmail();
                 String nickName = kakaoUserInfo.getNicknmae();
 
-                Optional<User> user = Optional.ofNullable(userDao.findByName(nickName));
+                Optional<User> user = Optional.ofNullable(userDao.findByNickName(nickName));
                 if (user.isPresent()) {
                     int i = 2;
-                    while (Optional.ofNullable(userDao.findByName(nickName)).isPresent()) {
+                    while (Optional.ofNullable(userDao.findByNickName(nickName)).isPresent()) {
                         i++;
                     }
                     nickName += i;

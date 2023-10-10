@@ -120,7 +120,7 @@ public class UserController {
   // 회원가입
   @PostMapping("/users/signup")
   @ResponseBody
-  public int signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
+  public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
     return userService.signup(signupRequestDto,response);
   }
 //  @PostMapping("add")

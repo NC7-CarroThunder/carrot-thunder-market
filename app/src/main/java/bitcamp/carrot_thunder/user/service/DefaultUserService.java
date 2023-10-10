@@ -9,6 +9,7 @@ import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -70,7 +71,7 @@ public class DefaultUserService implements UserService {
 
   @Transactional
   @Override
-  public int signup(@Valid SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception{
+  public String signup(@Valid SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception{
     String email = signupRequestDto.getEmail();
     String password = passwordEncoder.encode(signupRequestDto.getPassword());
     String nickname = signupRequestDto.getNickname();
@@ -78,20 +79,18 @@ public class DefaultUserService implements UserService {
     String address = signupRequestDto.getAddress();
     String detail_address = signupRequestDto.getDetailAddress();
 
-//    Optional<User> foundUsername = userRepository.findBy(nickname);
-//    if (foundUsername.isPresent()) {
-//      throw new IllegalArgumentException("이미 가입된 사용지입니다.");
-////            return "이미 가입된 사용자입니다.";
-//    }
-//    Optional<User> foundNickname = userRepository.findByNickName(nickname);
-//    if (foundNickname.isPresent()) {
-//      throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-//    }
+    Optional<User> foundEmail = Optional.ofNullable(userDao.findByEmail(email));
+    if (foundEmail.isPresent()) {
+      throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
+    }
+    Optional<User> foundNickname = Optional.ofNullable(userDao.findByNickName(nickname));
+    if (foundNickname.isPresent()) {
+      throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+    }
 
     User user = new User(email, password, nickname, phone, address, detail_address);
-//    userRepository.save(user);
-    //return "회원가입 완료";
-    return userDao.insert(user);
+    userDao.signup(user);
+    return "회원가입 완료";
   }
 //  @Transactional
 //  @Override

@@ -14,7 +14,7 @@ public interface UserService {
     public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception;
     String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception;
 
-    int signup(SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception;
+    String signup(SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception;
     // int add(User member) throws Exception;
     List<User> list() throws Exception;
     User get(int memberId) throws Exception;
