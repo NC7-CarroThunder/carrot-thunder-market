@@ -9,14 +9,19 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserDao {
 
-  int insert(User member);
+  int insert (User user);
+  // 회원 가입
+  int signup(User user);
   List<User> findAll();
-  User findBy(int memberId);
-  User findByName(String name);
+  User findBy(int userId);
+  // 닉네임 중복 검사
+  User findByNickName(String nickname);
+  // 이메일 중복 검사
   User findByEmail(String email);
   User findByEmailAndPassword(
       @Param("email") String email,
       @Param("password") String password);
+
   int update(User member);
   void updatePasswordByName(String nickName, String password);
   int delete(int no);

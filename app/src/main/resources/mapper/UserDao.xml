@@ -23,6 +23,11 @@
     values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
+  <insert id="signup" parameterType="user">
+    insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
+    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
+  </insert>
+
   <select id="findAll" resultMap="userMap">
     select
     id,
@@ -59,6 +64,15 @@
     where
     email=#{email}
     and password=sha1(#{password})
+  </select>
+
+  <select id="findByNickName" resultMap="userMap">
+    select
+    *
+    from
+    tbl_user
+    where
+    nickname=#{nickName}
   </select>
   <select id="findByName" resultMap="userMap">
     select

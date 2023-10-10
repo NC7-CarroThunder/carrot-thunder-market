@@ -7,12 +7,18 @@ import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
+import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +36,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +64,9 @@ public class UserController {
 
   @Autowired
   UserService userService;
+
+  @Autowired
+  KakaoService kakaoService;
 
   @Autowired
   NcpObjectStorageService ncpObjectStorageService;
@@ -82,6 +94,24 @@ public class UserController {
   }
 
 
+  // 카카오 로그인 관련 컨트롤러
+  @PostMapping("/users/kakao/callback")
+  public String kakaoCallback(@RequestBody String access_token, HttpServletResponse response) throws IOException {
+    // code : 카카오 서버로부터 받은 인가 코드
+   // System.out.println(access_token);
+
+    String nickName = kakaoService.kakaoLogin(access_token, response);
+    //String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
+    // Cookie 생성 및 직접 브라우저에 Set
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,nickName);
+    //response.sendRedirect("http://localhost:3000");
+    System.out.println(nickName);
+    return "응답완료";
+
+  }
+
+
+
 
 //  // 로그아웃
 //  @GetMapping("/logout")
@@ -93,15 +123,20 @@ public class UserController {
 
 
   // 회원가입
-  @PostMapping("add")
-  public String add(User member) throws Exception {
-    userService.add(member);
-
-    // 회원가입 이메일 전송
-    emailService.sendWelcomeEmail(member);
-
-    return "redirect:form";
+  @PostMapping("/users/signup")
+  @ResponseBody
+  public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
+    return userService.signup(signupRequestDto,response);
   }
+//  @PostMapping("add")
+//  public String add(User member) throws Exception {
+//    userService.add(member);
+//
+//    // 회원가입 이메일 전송
+//    emailService.sendWelcomeEmail(member);
+//
+//    return "redirect:form";
+//  }
 
   @GetMapping("delete")
   public String delete(int id, Model model) throws Exception {

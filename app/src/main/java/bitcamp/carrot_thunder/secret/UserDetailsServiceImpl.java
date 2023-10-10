@@ -20,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String nickName) throws UsernameNotFoundException {
         try {
-            User user = userDao.findByName(nickName);
+            User user = userDao.findByNickName(nickName);
             return new UserDetailsImpl(user, user.getNickName());
         } catch (UsernameNotFoundException e) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다");
