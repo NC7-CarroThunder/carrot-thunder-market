@@ -1,9 +1,10 @@
 package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
-import bitcamp.carrot_thunder.post.dto.PostResponseDto;
-import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
-import bitcamp.carrot_thunder.post.dto.ResponseDto;
+import bitcamp.carrot_thunder.dto.PostListResponseDto;
+import bitcamp.carrot_thunder.dto.PostResponseDto;
+import bitcamp.carrot_thunder.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -69,22 +69,6 @@ public class PostController {
     return "redirect:/post/list";
   }
 
-  @DeleteMapping ("/posts/{postID}")
-  public String deletePost(@PathVariable int id, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/user/form";
-    }
-
-    Post p = postService.get(id);
-
-    if (p == null || p.getUser().getId() != loginUser.getId()) {
-      throw new Exception("해당 번호의 게시글이 없거나 삭제 권한이 없습니다.");
-    } else {
-      postService.delete(p.getId());
-      return "redirect:/post/list";
-    }
-  }
 
     @GetMapping("list")
     public String list(Model model, HttpSession session) throws Exception {
@@ -93,65 +77,48 @@ public class PostController {
     }
 
 
+
     /** 게시글 상세정보 컨트롤러
      *
      *
-     * @param id
+     * @param postId
+     * @param userDetails
      * @return
-     * @throws Exception ( 난중에 처리 )
      */
 
-    @GetMapping("detail/{id}")
-    public String detail(@PathVariable int id, Model model) throws Exception {
 
-        Post post = postService.getPostDetailById(id);
-        model.addAttribute("post", post);
-        return "post/detail";
-
+    @GetMapping("/posts/{postId}")
+    public ResponseDto<PostResponseDto> getPost(@PathVariable int postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseDto.success(postService.getPost(postId, userDetails));
     }
 
-  @PutMapping("/{postId}")
+
+
+    /** 게시글 수정 컨트롤러
+     *
+     *
+     * @param postId
+     * @param postUpdateRequestDto
+     * @param userDetails
+     * @param multipartFiles
+     * @return
+     */
+
+    @PutMapping("/{postId}")
   public ResponseDto<PostResponseDto> updatePost(
           @PathVariable int postId,
           @RequestBody PostUpdateRequestDto postUpdateRequestDto,
           @RequestParam(required = false) List<MultipartFile> multipartFiles,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    User user = userDetails.getUser();
-    List<String> remainingImages = postUpdateRequestDto.getAttachedFilesPaths().stream()
-            .map(AttachedFile::getFilename)
-            .collect(Collectors.toList());
 
-    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, user, remainingImages, multipartFiles));
+
+    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser(), multipartFiles));
   }
 
-  @GetMapping("fileDelete/{attachedFile}")
-  public String fileDelete(
-      @MatrixVariable("id") int id,
-      HttpSession session) throws Exception {
-
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/auth/form";
+    @DeleteMapping("/posts/{postId}")
+    public ResponseDto<Integer> deletePost(@PathVariable int postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
     }
-
-    AttachedFile attachedFile = postService.getAttachedFile(id);
-      Post post = postService.get(attachedFile.getPostId());
-    if (post.getUser().getId() != loginUser.getId()) {
-      throw new Exception("게시글 변경 권한이 없습니다!");
-    }
-
-    if (postService.deleteAttachedFile(id) == 0) {
-      throw new Exception("해당 번호의 첨부파일이 없다.");
-    } else {
-      return "redirect:/post/detail/" + "/" + post.getId();
-    }
-  }
-
-
-
-
-
-
 
   @PostMapping("/{postId}/like")
   @ResponseBody

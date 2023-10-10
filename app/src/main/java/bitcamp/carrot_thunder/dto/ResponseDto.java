@@ -1,4 +1,4 @@
-package bitcamp.carrot_thunder.post.dto;
+package bitcamp.carrot_thunder.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

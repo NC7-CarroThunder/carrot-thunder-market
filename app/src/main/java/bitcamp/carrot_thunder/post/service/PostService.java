@@ -1,8 +1,10 @@
 package bitcamp.carrot_thunder.post.service;
 
-import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.dto.PostResponseDto;
+import bitcamp.carrot_thunder.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +23,8 @@ public interface PostService {
 
     AttachedFile getAttachedFile(int fileId) throws Exception;
 
-    int delete(int postId) throws Exception;
+    int deletePost(int postId,User user);
 
-    int deleteAttachedFile(int fileId) throws Exception;
 
     boolean postLike(int postId, int memberId) throws Exception;
 
@@ -35,11 +36,12 @@ public interface PostService {
 
     Post setSessionStatus(int id, HttpSession session) throws Exception;
 
-    Post getPostDetailById(int id) throws Exception;
 
     List<Post> getMyPosts(int memberId);
 
+    PostResponseDto getPost(int postId, UserDetailsImpl userDetails);
+
     List<Post> searchPosts(String keyword);
 
-    Object updatePost(int postId, PostUpdateRequestDto postUpdateRequestDto, User user, List<String> remainingImages, List<MultipartFile> multipartFiles);
+    Object updatePost(int postId, PostUpdateRequestDto requestDto, User user, List<MultipartFile> multipartFiles);
 }
