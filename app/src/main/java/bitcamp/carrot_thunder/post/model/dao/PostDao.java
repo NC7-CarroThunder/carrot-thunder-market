@@ -13,30 +13,30 @@ import org.apache.ibatis.annotations.Param;
 public interface PostDao {
 
 
-    int insert(Post post);
-    Post findBy(int id);
-    int updateCount(int no);
-    int insertFiles(Post post);
-    int update(Post post);
-    AttachedFile findFileBy(int id);
+    Long insert(Post post);
+    Post findBy(Long id);
+    Long updateCount(Long no);
+    Long insertFiles(Post post);
+    Long update(Post post);
+    AttachedFile findFileByfileId(Long fileid);
     List<Post> findAll();
-    int delete(int id);
-    int deleteFile(int fileId);
-    int deleteFiles(int postId);
+    Long delete(Long id);
+    Long deleteFile(Long fileId);
+    Long deleteFiles(Long postId);
 
-    int deleteLikes(int postId);
-    int updateLikeCount(@Param("postId") int postId, @Param("amount") int amount);
-    int insertLike(@Param("postId") int postId, @Param("memberId") int memberId);
-    int deleteLike(@Param("postId") int postId, @Param("memberId") int memberId);
-    boolean isLiked(@Param("postId") int postId, @Param("memberId") int memberId);
-    int getLikeCount(int postId);
-    List<Post> getLikedPosts(int memberId);
-    List<Post> getMyPosts(int memberId);
+    Long deleteLikes(Long postId);
+    Long updateLikeCount(@Param("postId") Long postId, @Param("amount") int amount);
+    Long insertLike(@Param("postId") Long postId, @Param("memberId") Long memberId);
+    Long deleteLike(@Param("postId") Long postId, @Param("memberId") Long memberId);
+    boolean isLiked(@Param("postId") Long postId, @Param("memberId") Long memberId);
+    Long getLikeCount(Long postId);
+    List<Post> getLikedPosts(Long memberId);
+    List<Post> getMyPosts(Long memberId);
 
-    Optional<Post> findPostDetailById(int id);
+    Optional<Post> findPostDetailById(Long id);
 
 
-    Optional<Object> findById(int postId);
+    Optional<Object> findById(Long postId);
 
-    List<AttachedFile> findImagesByPostId(int postId);
+    List<AttachedFile> findImagesByPostId(Long postId);
 }

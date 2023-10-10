@@ -13,35 +13,32 @@ import javax.servlet.http.HttpSession;
 
 
 public interface PostService {
-    int add(Post post) throws Exception;
+    Long add(Post post) throws Exception;
 
-    int increaseViewCount(int postId) throws Exception;
+    Long increaseViewCount(Long postId) throws Exception;
 
-    Post get(int id) throws Exception;
+    Post get(Long id) throws Exception;
 
     List<Post> list(HttpSession session) throws Exception;
 
-    AttachedFile getAttachedFile(int fileId) throws Exception;
+    AttachedFile getAttachedFile(Long fileId) throws Exception;
 
-    int deletePost(int postId,User user);
-
-
-    boolean postLike(int postId, int memberId) throws Exception;
-
-    List<Post> getLikedPosts(int memberId, HttpSession session) throws Exception;
-
-    int getLikeCount(int postId) throws Exception;
-
-    boolean isLiked(int postId, int memberId);
-
-    Post setSessionStatus(int id, HttpSession session) throws Exception;
+    Long deletePost(Long postId,User user);
 
 
-    List<Post> getMyPosts(int memberId);
+    boolean postLike(Long postId, Long memberId) throws Exception;
 
-    PostResponseDto getPost(int postId, UserDetailsImpl userDetails);
+    List<Post> getLikedPosts(Long memberId, HttpSession session) throws Exception;
+
+    Long getLikeCount(Long postId) throws Exception;
+
+    boolean isLiked(Long postId, Long memberId);
+
+    Post setSessionStatus(Long id, HttpSession session) throws Exception;
+
+    PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
 
     List<Post> searchPosts(String keyword);
 
-    Object updatePost(int postId, PostUpdateRequestDto requestDto, User user, List<MultipartFile> multipartFiles);
+    Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user, List<MultipartFile> multipartFiles);
 }

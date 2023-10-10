@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-@RequestMapping("/post")
+@RequestMapping("/api")
 public class PostController {
 
 
@@ -70,7 +70,7 @@ public class PostController {
   }
 
 
-    @GetMapping("list")
+    @GetMapping("/list")
     public String list(Model model, HttpSession session) throws Exception {
         model.addAttribute("list", postService.list(session));
         return "post/list";
@@ -88,7 +88,7 @@ public class PostController {
 
 
     @GetMapping("/posts/{postId}")
-    public ResponseDto<PostResponseDto> getPost(@PathVariable int postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseDto.success(postService.getPost(postId, userDetails));
     }
 
@@ -106,7 +106,7 @@ public class PostController {
 
     @PutMapping("/{postId}")
   public ResponseDto<PostResponseDto> updatePost(
-          @PathVariable int postId,
+          @PathVariable Long postId,
           @RequestBody PostUpdateRequestDto postUpdateRequestDto,
           @RequestParam(required = false) List<MultipartFile> multipartFiles,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -116,13 +116,13 @@ public class PostController {
   }
 
     @DeleteMapping("/posts/{postId}")
-    public ResponseDto<Integer> deletePost(@PathVariable int postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseDto<Long> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
     }
 
   @PostMapping("/{postId}/like")
   @ResponseBody
-  public Map<String, Object> postLike(@PathVariable int postId, HttpSession session)
+  public Map<String, Object> postLike(@PathVariable Long postId, HttpSession session)
       throws Exception {
     Map<String, Object> response = new HashMap<>();
     User loginUser = (User) session.getAttribute("loginUser");
@@ -130,9 +130,9 @@ public class PostController {
       response.put("status", "notLoggedIn");
       return response;
     }
-    int memberId = loginUser.getId();
+    Long memberId = loginUser.getId();
     boolean isLiked = postService.postLike(postId, memberId);
-    int newLikeCount = postService.getLikeCount(postId);
+    Long newLikeCount = postService.getLikeCount(postId);
     response.put("newIsLiked", isLiked);
     response.put("newLikeCount", newLikeCount);
 
@@ -156,7 +156,7 @@ public class PostController {
     if (loginUser == null) {
       return "redirect:/member/form";
     }
-    int memberId = loginUser.getId();
+    Long memberId = loginUser.getId();
     List<Post> posts = postService.getLikedPosts(memberId, session);
     model.addAttribute("likedPosts", posts);
     return "/post/likeList";
@@ -164,19 +164,19 @@ public class PostController {
 
   @PostMapping("/getLikeStatus")
   @ResponseBody
-  public Map<Integer, Map<String, Object>> getLikeStatus(@RequestBody List<Integer> postIds,
+  public Map<Long, Map<String, Object>> getLikeStatus(@RequestBody List<Long> postIds,
       HttpSession session)
       throws Exception {
     System.out.println("좋아요 상태 정보 업데이트!");
     User loginUser = (User) session.getAttribute("loginUser");
-    Map<Integer, Map<String, Object>> response = new HashMap<>();
+    Map<Long, Map<String, Object>> response = new HashMap<>();
 
     if (loginUser != null) {
-      int memberId = loginUser.getId();
+      Long memberId = loginUser.getId();
 
-      for (int postId : postIds) {
+      for (Long postId : postIds) {
         boolean isLiked = postService.isLiked(postId, memberId);
-        int likeCount = postService.getLikeCount(postId);
+        Long likeCount = postService.getLikeCount(postId);
 
         Map<String, Object> postStatus = new HashMap<>();
         postStatus.put("isLiked", isLiked);

@@ -19,7 +19,7 @@ import java.util.List;
 public class PostResponseDto {
 
   private User user;
-  private int postid;
+  private Long postid;
   private String title;
   private String content;
   private int viewCount;

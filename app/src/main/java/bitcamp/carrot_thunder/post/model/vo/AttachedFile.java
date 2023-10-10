@@ -14,9 +14,9 @@ public class AttachedFile implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private int id;
+  private Long id;
   @Setter private String filePath;
-  private int postId;
+  private Long postId;
 
   public String getFilename() {
     // 파일 경로에서 파일 이름만 추출하여 반환

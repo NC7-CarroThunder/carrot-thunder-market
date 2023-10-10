@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 public class PostListResponseDto {
 
   private User user;
-  private int postid;
+  private Long postid;
   private String title;
   private int viewCount;
   private Timestamp createdAt;
