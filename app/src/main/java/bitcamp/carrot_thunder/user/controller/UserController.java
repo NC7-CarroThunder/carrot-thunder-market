@@ -3,14 +3,22 @@ package bitcamp.carrot_thunder.user.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.mail.EmailService;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
+import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,23 +26,30 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Controller
-@RequestMapping("/users")
+@RestController
+@RequestMapping("/api")
 public class UserController {
 
   private final EmailService emailService;
@@ -51,6 +66,9 @@ public class UserController {
   UserService userService;
 
   @Autowired
+  KakaoService kakaoService;
+
+  @Autowired
   NcpObjectStorageService ncpObjectStorageService;
 
   @Autowired
@@ -59,54 +77,65 @@ public class UserController {
   @Autowired
   private DefaultNotificationService defaultNotificationService;
 
-  @GetMapping("form")
-  public void form(@CookieValue(required = false) String email, Model model) {
-    model.addAttribute("email", email);
-  }
 
   // 로그인
-  @PostMapping("login")
-  public String login(
+  @PostMapping("/users/login")
+  @ResponseBody
+  public String login(@RequestBody
           LoginRequestDto loginInfo,
           HttpServletResponse response) throws Exception {
-
-    User loginUser = userService.get(loginInfo.getEmail(), loginInfo.getPassword());
-    if (loginUser == null) {
-      //model.addAttribute("refresh", "1;url=form");
-      throw new Exception("회원 정보가 일치하지 않습니다.");
-      //return "redirect:/member/form";
-    }
-
-    if (loginUser.getRole() == Role.ADMIN) {
-      System.out.println(loginUser.getRole());
-      return "redirect:/admin/form";
-    }
-    return "redirect:/";
+    return userService.login(loginInfo,response);
   }
 
-  // 로그아웃
-  @GetMapping("/logout")
-  public String logout(HttpSession session) throws Exception {
-
-    session.invalidate();
-    return "redirect:/";
+  @PatchMapping("/users/patch")
+  @ResponseBody
+  public String patch(@AuthenticationPrincipal UserDetailsImpl userDetails,String password) throws Exception {
+    return userService.patchPassword(userDetails, password);
   }
 
-  @GetMapping("join")
-  public void join() {
+
+  // 카카오 로그인 관련 컨트롤러
+  @PostMapping("/users/kakao/callback")
+  public String kakaoCallback(@RequestBody String access_token, HttpServletResponse response) throws IOException {
+    // code : 카카오 서버로부터 받은 인가 코드
+   // System.out.println(access_token);
+
+    String nickName = kakaoService.kakaoLogin(access_token, response);
+    //String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
+    // Cookie 생성 및 직접 브라우저에 Set
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,nickName);
+    //response.sendRedirect("http://localhost:3000");
+    System.out.println(nickName);
+    return "응답완료";
 
   }
+
+
+
+//  // 로그아웃
+//  @GetMapping("/logout")
+//  public String logout(HttpSession session) throws Exception {
+//
+//    session.invalidate();
+//    return "redirect:/";
+//  }
+
 
   // 회원가입
-  @PostMapping("add")
-  public String add(User user) throws Exception {
-    userService.add(user);
-
-    // 회원가입 이메일 전송
-    emailService.sendWelcomeEmail(user);
-
-    return "redirect:form";
+  @PostMapping("/users/signup")
+  @ResponseBody
+  public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
+    return userService.signup(signupRequestDto,response);
   }
+//  @PostMapping("add")
+//  public String add(User member) throws Exception {
+//    userService.add(member);
+//
+//    // 회원가입 이메일 전송
+//    emailService.sendWelcomeEmail(member);
+//
+//    return "redirect:form";
+//  }
 
   @GetMapping("delete")
   public String delete(Long userId, Model model) throws Exception {
