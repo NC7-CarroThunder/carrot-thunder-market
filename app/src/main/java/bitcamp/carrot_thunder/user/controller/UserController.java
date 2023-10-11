@@ -112,13 +112,13 @@ public class UserController {
 
 
 
-//  // 로그아웃
-//  @GetMapping("/logout")
-//  public String logout(HttpSession session) throws Exception {
-//
-//    session.invalidate();
-//    return "redirect:/";
-//  }
+  // 로그아웃
+  @GetMapping("/logout")
+  public String logout(HttpSession session) throws Exception {
+
+    session.invalidate();
+    return "redirect:/";
+  }
 
 
   // 회원가입
@@ -127,15 +127,15 @@ public class UserController {
   public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
     return userService.signup(signupRequestDto,response);
   }
-//  @PostMapping("add")
-//  public String add(User member) throws Exception {
-//    userService.add(member);
-//
-//    // 회원가입 이메일 전송
-//    emailService.sendWelcomeEmail(member);
-//
-//    return "redirect:form";
-//  }
+  @PostMapping("add")
+  public String add(User user) throws Exception {
+    userService.add(user);
+
+    // 회원가입 이메일 전송
+    emailService.sendWelcomeEmail(user);
+
+    return "redirect:form";
+  }
 
   @GetMapping("delete")
   public String delete(Long userId, Model model) throws Exception {
@@ -182,7 +182,7 @@ public class UserController {
     model.addAttribute("followingsList", followingsList);
     model.addAttribute("followingsCount", followingsList.size());
 
-    model.addAttribute("member", userService.get(userId));
+    model.addAttribute("user", userService.get(userId));
     model.addAttribute("notifications", notifications);
 
     return "member/profile";
@@ -190,7 +190,7 @@ public class UserController {
 
   @GetMapping("detail/{id}")
   public String detail(@PathVariable Long userId, Model model) throws Exception {
-    model.addAttribute("member", userService.get(userId));
+    model.addAttribute("user", userService.get(userId));
     return "member/detail";
   }
 
@@ -220,49 +220,49 @@ public class UserController {
 
   }
 
-//  @PostMapping("/{memberId}/follow")
-//  @ResponseBody
-//  public Map<String, Object> memberFollow(@PathVariable Long memberId, HttpSession session)
-//      throws Exception {
-//    Map<String, Object> response = new HashMap<>();
-//    User loginUser = (User) session.getAttribute("loginUser");
-//
-//    if (loginUser == null) {
-//      response.put("status", "notLoggedIn");
-//      return response;
-//    }
-//
-//    Long currentMemberId = loginUser.getId();
-//    boolean newIsFollowed = userService.memberFollow(currentMemberId, userId);
-//    response.put("newIsFollowed", newIsFollowed);
-//    if (newIsFollowed) {
-//      User user = userService.get(memberId);
-//      if (user != null) {
-//        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
-//        defaultNotificationService.send(content, user.getId());
-//      }
-//    }
-//    return response;
-//  }
+  @PostMapping("/{memberId}/follow")
+  @ResponseBody
+  public Map<String, Object> memberFollow(@PathVariable Long userId, HttpSession session)
+      throws Exception {
+    Map<String, Object> response = new HashMap<>();
+    User loginUser = (User) session.getAttribute("loginUser");
 
-  // 팔로우 상태 확인
-//  @PostMapping("/getFollowStatus")
-//  @ResponseBody
-//  public Map<Integer, Boolean> getFollowStatus(@RequestBody List<Long> memberIds,
-//      HttpSession session)
-//      throws Exception {
-//    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
-//    User loginUser = (User) session.getAttribute("loginUser");
-//    Map<Integer, Boolean> response = new HashMap<>();
-//    if (loginUser != null) {
-//      Long currentMemberId = loginUser.getId();
-//      for (Long userId : memberIds) {
-//        boolean isFollowing = userService.isFollowed(currentMemberId, userId);
-//        response.put(userId, isFollowing);
-//      }
-//    }
-//    return response;
-//  }
+    if (loginUser == null) {
+      response.put("status", "notLoggedIn");
+      return response;
+    }
+
+    Long currentMemberId = loginUser.getId();
+    boolean newIsFollowed = userService.memberFollow(currentMemberId, userId);
+    response.put("newIsFollowed", newIsFollowed);
+    if (newIsFollowed) {
+      User user = userService.get(userId);
+      if (user != null) {
+        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
+        defaultNotificationService.send(content, user.getId());
+      }
+    }
+    return response;
+  }
+
+//   팔로우 상태 확인
+  @PostMapping("/getFollowStatus")
+  @ResponseBody
+  public Map<Long, Boolean> getFollowStatus(@RequestBody List<Long> userIds,
+      HttpSession session)
+      throws Exception {
+    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
+    User loginUser = (User) session.getAttribute("loginUser");
+    Map<Long, Boolean> response = new HashMap<>();
+    if (loginUser != null) {
+      Long currentMemberId = loginUser.getId();
+      for (Long userId : userIds) {
+        boolean isFollowing = userService.isFollowed(currentMemberId, userId);
+        response.put(userId, isFollowing);
+      }
+    }
+    return response;
+  }
 
   @GetMapping("/followers")
   public String followers(HttpSession session, Model model) throws Exception {
@@ -295,8 +295,8 @@ public class UserController {
       throw new RuntimeException("로그인이 필요합니다.");
     }
 
-    Long memberId = loginUser.getId();
-    return defaultNotificationService.connectNotification(memberId);
+    Long userId = loginUser.getId();
+    return defaultNotificationService.connectNotification(userId);
   }
 
   @PostMapping("/notifications/deleteAll")

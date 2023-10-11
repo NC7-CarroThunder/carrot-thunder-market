@@ -30,7 +30,7 @@ public class DefaultNotificationService implements NotificationService {
     }
 
     Notification notification = new Notification();
-//    notification.setMemberId(receiverId);
+    notification.setUserId(receiverId);
     notification.setContent(content);
     notification.setType(ALARM_NAME);
     notification.setRead(false);
