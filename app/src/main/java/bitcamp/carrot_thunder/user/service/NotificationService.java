@@ -7,7 +7,7 @@ public interface NotificationService {
 
   void send(String content, Long receiverId);
 
-  SseEmitter connectNotification(Long memberId);
+  SseEmitter connectNotification(Long userId);
 
   void saveNotification(Notification notification);
 }

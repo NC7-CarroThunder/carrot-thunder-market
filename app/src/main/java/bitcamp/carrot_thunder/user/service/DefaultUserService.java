@@ -92,11 +92,11 @@ public class DefaultUserService implements UserService {
     userDao.signup(user);
     return "회원가입 완료";
   }
-//  @Transactional
-//  @Override
-//  public int add(User member) throws Exception {
-//    return userDao.insert(member);
-//  }
+  @Transactional
+  @Override
+  public int add(User user) throws Exception {
+    return userDao.insert(user);
+  }
 
   @Override
   public List<User> list() throws Exception {
@@ -104,8 +104,8 @@ public class DefaultUserService implements UserService {
   }
 
   @Override
-  public User get(Long memberId) throws Exception {
-    return userDao.findBy(memberId);
+  public User get(Long userId) throws Exception {
+    return userDao.findBy(userId);
   }
 
   @Override
@@ -120,8 +120,8 @@ public class DefaultUserService implements UserService {
 
   @Transactional
   @Override
-  public int update(User member) throws Exception {
-    return userDao.update(member);
+  public int update(User user) throws Exception {
+    return userDao.update(user);
   }
 
 
@@ -131,63 +131,54 @@ public class DefaultUserService implements UserService {
     return userDao.delete(userId);
   }
 
-    @Override
-    public boolean memberFollow(int followerId, int followingId) throws Exception {
-        return false;
-    }
-
-    @Override
-    public boolean isFollowed(int followerId, int followingId) throws Exception {
-        return false;
-    }
 
 
- /* @Override
-  public boolean memberFollow(Long currentMemberId, Long memberId) throws Exception {
-    boolean isFollowed = userDao.isFollowed(currentMemberId, memberId);
+  @Override
+  public boolean memberFollow(Long currentMemberId, Long userId) throws Exception {
+    boolean isFollowed = userDao.isFollowed(currentMemberId, userId);
     if (isFollowed) {
-      userDao.deleteFollow(currentMemberId, memberId);
+      userDao.deleteFollow(currentMemberId, userId);
     } else {
-      userDao.insertFollow(currentMemberId, memberId);
+      userDao.insertFollow(currentMemberId, userId);
     }
     return !isFollowed;
   }
 
   @Override
-  public boolean isFollowed(Long currentMemberId, Long memberId) throws Exception {
-    return userDao.isFollowed(currentMemberId, memberId);
-  }*/
+  public boolean isFollowed(Long currentMemberId, Long userId) throws Exception {
+    return userDao.isFollowed(currentMemberId, userId);
+  }
 
   @Override
-  public User get(Long memberId, HttpSession session) throws Exception {
-    User member = userDao.findBy(memberId);
+  public User get(Long userId, HttpSession session) throws Exception {
+    User user = userDao.findBy(userId);
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser != null) {
 //      int loggedInUserId = loginUser.getId();
-      //member.setFollowed(userDao.isFollowed(loggedInUserId, memberId));
+      //member.setFollowed(userDao.isFollowed(loggedInUserId, userId));
     } else {
       //member.setFollowed(false);
     }
-    return member;
+    return user;
   }
 
   @Override
-  public List<User> getFollowers(Long memberId) throws Exception {
-    return userDao.getFollowers(memberId);
+  public List<User> getFollowers(Long userId) throws Exception {
+    return userDao.getFollowers(userId);
   }
 
   @Override
-  public List<User> getFollowings(Long memberId) throws Exception {
-    return userDao.getFollowings(memberId);
+  public List<User> getFollowings(Long userId) throws Exception {
+    return userDao.getFollowings(userId);
   }
 
   @Override
-  public List<Notification> getNotifications(Long memberId) throws Exception {
-    return userDao.findNotificationsByMemberId(memberId);
+  public List<Notification> getNotifications(Long userId) throws Exception {
+    return userDao.findNotificationsByUserId(userId);
   }
 
   @Override
-  public void deleteAllNotifications(Long memberId) throws Exception {
-    userDao.deleteAllNotifications(memberId);
+  public void deleteAllNotifications(Long userId) throws Exception {
+    userDao.deleteAllNotifications(userId);
   }
 }
