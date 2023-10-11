@@ -17,12 +17,12 @@ public class FindPwDao {
   public void updatePassword(String email, String newPassword) {
     String hashedPassword = findPwHashService.hashPassword(newPassword);
 
-    String sql = "UPDATE member SET password = ? WHERE email = ?";
+    String sql = "UPDATE user SET password = ? WHERE email = ?";
     jdbcTemplate.update(sql, hashedPassword, email);
   }
 
   public boolean isEmailExists(String email) {
-    String sql = "SELECT COUNT(*) FROM member WHERE email = ?";
+    String sql = "SELECT COUNT(*) FROM user WHERE email = ?";
     int count = jdbcTemplate.queryForObject(sql, Integer.class, email);
     return count > 0;
   }

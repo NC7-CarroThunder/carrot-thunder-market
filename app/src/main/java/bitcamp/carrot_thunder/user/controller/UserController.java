@@ -99,18 +99,18 @@ public class UserController {
 
   // 회원가입
   @PostMapping("add")
-  public String add(User member) throws Exception {
-    userService.add(member);
+  public String add(User user) throws Exception {
+    userService.add(user);
 
     // 회원가입 이메일 전송
-    emailService.sendWelcomeEmail(member);
+    emailService.sendWelcomeEmail(user);
 
     return "redirect:form";
   }
 
   @GetMapping("delete")
-  public String delete(int id, Model model) throws Exception {
-    if (userService.delete(id) == 0) {
+  public String delete(Long userId, Model model) throws Exception {
+    if (userService.delete(userId) == 0) {
       model.addAttribute("refresh", "2;url=../post/list");
       throw new Exception("해당 회원이 없습니다.");
     }
@@ -124,15 +124,15 @@ public class UserController {
   }
 
   @GetMapping("profile/{memberId}")
-  public String viewProfile(@PathVariable int memberId, Model model, HttpSession session)
+  public String viewProfile(@PathVariable Long userId, Model model, HttpSession session)
       throws Exception {
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser == null) {
       return "redirect:/user/form";
     }
     List<Notification> notifications;
-    if (loginUser.getId() == memberId) {
-      notifications = userService.getNotifications(memberId);
+    if (loginUser.getId() == userId) {
+      notifications = userService.getNotifications(userId);
     } else {
       notifications = new ArrayList<>();
     }
@@ -140,12 +140,12 @@ public class UserController {
     List<User> followersList;
     List<User> followingsList;
 
-    if (loginUser.getId() == memberId) {
+    if (loginUser.getId() == userId) {
       followersList = userService.getFollowers(loginUser.getId());
       followingsList = userService.getFollowings(loginUser.getId());
     } else {
-      followersList = userService.getFollowers(memberId);
-      followingsList = userService.getFollowings(memberId);
+      followersList = userService.getFollowers(userId);
+      followingsList = userService.getFollowings(userId);
     }
 
     model.addAttribute("followersList", followersList);
@@ -153,89 +153,87 @@ public class UserController {
     model.addAttribute("followingsList", followingsList);
     model.addAttribute("followingsCount", followingsList.size());
 
-    model.addAttribute("member", userService.get(memberId));
-    model.addAttribute("myPosts", postService.getMyPosts(memberId));
-    model.addAttribute("likedPosts", postService.getLikedPosts(memberId, session));
+    model.addAttribute("member", userService.get(userId));
     model.addAttribute("notifications", notifications);
 
     return "member/profile";
   }
 
   @GetMapping("detail/{id}")
-  public String detail(@PathVariable int id, Model model) throws Exception {
-    model.addAttribute("member", userService.get(id));
+  public String detail(@PathVariable Long userId, Model model) throws Exception {
+    model.addAttribute("member", userService.get(userId));
     return "member/detail";
   }
 
 
   @PostMapping("update")
   public String update(
-      User member,
+      User user,
       HttpSession session,
       MultipartFile photofile) throws Exception {
 
     if (photofile.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
           "bitcamp-nc7-bucket-16", "member/", photofile);
-      member.setPhoto(uploadFileUrl);
+      user.setPhoto(uploadFileUrl);
     } else {
       // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.
       User loginUser = (User) session.getAttribute("loginUser");
-      member.setPhoto(loginUser.getPhoto());
+      user.setPhoto(loginUser.getPhoto());
     }
 
-    if (userService.update(member) == 0) {
+    if (userService.update(user) == 0) {
       throw new Exception("회원이 없습니다.");
     } else {
-      session.setAttribute("loginUser", member);
+      session.setAttribute("loginUser", user);
       return "redirect:../post/list";
     }
 
   }
 
-  @PostMapping("/{memberId}/follow")
-  @ResponseBody
-  public Map<String, Object> memberFollow(@PathVariable int memberId, HttpSession session)
-      throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-
-    if (loginUser == null) {
-      response.put("status", "notLoggedIn");
-      return response;
-    }
-
-    int currentMemberId = loginUser.getId();
-    boolean newIsFollowed = userService.memberFollow(currentMemberId, memberId);
-    response.put("newIsFollowed", newIsFollowed);
-    if (newIsFollowed) {
-      User member = userService.get(memberId);
-      if (member != null) {
-        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
-        defaultNotificationService.send(content, member.getId());
-      }
-    }
-    return response;
-  }
+//  @PostMapping("/{memberId}/follow")
+//  @ResponseBody
+//  public Map<String, Object> memberFollow(@PathVariable Long memberId, HttpSession session)
+//      throws Exception {
+//    Map<String, Object> response = new HashMap<>();
+//    User loginUser = (User) session.getAttribute("loginUser");
+//
+//    if (loginUser == null) {
+//      response.put("status", "notLoggedIn");
+//      return response;
+//    }
+//
+//    Long currentMemberId = loginUser.getId();
+//    boolean newIsFollowed = userService.memberFollow(currentMemberId, userId);
+//    response.put("newIsFollowed", newIsFollowed);
+//    if (newIsFollowed) {
+//      User user = userService.get(memberId);
+//      if (user != null) {
+//        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
+//        defaultNotificationService.send(content, user.getId());
+//      }
+//    }
+//    return response;
+//  }
 
   // 팔로우 상태 확인
-  @PostMapping("/getFollowStatus")
-  @ResponseBody
-  public Map<Integer, Boolean> getFollowStatus(@RequestBody List<Integer> memberIds,
-      HttpSession session)
-      throws Exception {
-    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
-    User loginUser = (User) session.getAttribute("loginUser");
-    Map<Integer, Boolean> response = new HashMap<>();
-    if (loginUser != null) {
-      int currentMemberId = loginUser.getId();
-      for (int memberId : memberIds) {
-        boolean isFollowing = userService.isFollowed(currentMemberId, memberId);
-        response.put(memberId, isFollowing);
-      }
-    }
-    return response;
-  }
+//  @PostMapping("/getFollowStatus")
+//  @ResponseBody
+//  public Map<Integer, Boolean> getFollowStatus(@RequestBody List<Long> memberIds,
+//      HttpSession session)
+//      throws Exception {
+//    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    Map<Integer, Boolean> response = new HashMap<>();
+//    if (loginUser != null) {
+//      Long currentMemberId = loginUser.getId();
+//      for (Long userId : memberIds) {
+//        boolean isFollowing = userService.isFollowed(currentMemberId, userId);
+//        response.put(userId, isFollowing);
+//      }
+//    }
+//    return response;
+//  }
 
   @GetMapping("/followers")
   public String followers(HttpSession session, Model model) throws Exception {
@@ -268,7 +266,7 @@ public class UserController {
       throw new RuntimeException("로그인이 필요합니다.");
     }
 
-    int memberId = loginUser.getId();
+    Long memberId = loginUser.getId();
     return defaultNotificationService.connectNotification(memberId);
   }
 

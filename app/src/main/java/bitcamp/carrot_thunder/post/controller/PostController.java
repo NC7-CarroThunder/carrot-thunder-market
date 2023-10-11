@@ -1,9 +1,9 @@
 package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
-import bitcamp.carrot_thunder.dto.PostListResponseDto;
-import bitcamp.carrot_thunder.dto.PostResponseDto;
-import bitcamp.carrot_thunder.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
@@ -23,7 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Controller
+@RestController
 @RequestMapping("/api")
 public class PostController {
 
@@ -70,13 +70,6 @@ public class PostController {
   }
 
 
-    @GetMapping("/list")
-    public String list(Model model, HttpSession session) throws Exception {
-        model.addAttribute("list", postService.list(session));
-        return "post/list";
-    }
-
-
 
     /** 게시글 상세정보 컨트롤러
      *
@@ -116,86 +109,19 @@ public class PostController {
   }
 
     @DeleteMapping("/posts/{postId}")
-    public ResponseDto<Long> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseDto<String> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
     }
 
-  @PostMapping("/{postId}/like")
-  @ResponseBody
-  public Map<String, Object> postLike(@PathVariable Long postId, HttpSession session)
-      throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      response.put("status", "notLoggedIn");
-      return response;
-    }
-    Long memberId = loginUser.getId();
-    boolean isLiked = postService.postLike(postId, memberId);
-    Long newLikeCount = postService.getLikeCount(postId);
-    response.put("newIsLiked", isLiked);
-    response.put("newLikeCount", newLikeCount);
-
-    // 알림
-    if (isLiked) {
-      Post post = postService.get(postId);
-      if (post != null) {
-        String content = loginUser.getNickName() + "님이 당신의 게시글을 좋아합니다.";
-        defaultNotificationService.send(content, post.getUser().getId());
-      }
-    }
-
-    response.put("newIsLiked", isLiked);
-    response.put("newLikeCount", newLikeCount);
-    return response;
-  }
-
-  @GetMapping("/liked")
-  public String getLikedPosts(Model model, HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/member/form";
-    }
-    Long memberId = loginUser.getId();
-    List<Post> posts = postService.getLikedPosts(memberId, session);
-    model.addAttribute("likedPosts", posts);
-    return "/post/likeList";
-  }
-
-  @PostMapping("/getLikeStatus")
-  @ResponseBody
-  public Map<Long, Map<String, Object>> getLikeStatus(@RequestBody List<Long> postIds,
-      HttpSession session)
-      throws Exception {
-    System.out.println("좋아요 상태 정보 업데이트!");
-    User loginUser = (User) session.getAttribute("loginUser");
-    Map<Long, Map<String, Object>> response = new HashMap<>();
-
-    if (loginUser != null) {
-      Long memberId = loginUser.getId();
-
-      for (Long postId : postIds) {
-        boolean isLiked = postService.isLiked(postId, memberId);
-        Long likeCount = postService.getLikeCount(postId);
-
-        Map<String, Object> postStatus = new HashMap<>();
-        postStatus.put("isLiked", isLiked);
-        postStatus.put("likeCount", likeCount);
-
-        response.put(postId, postStatus);
-      }
-    }
-    return response;
-  }
 
 
+    @GetMapping("/search/posts")
+    public ResponseDto<List<PostListResponseDto>> searchPosts(
+                                                              @RequestParam(required = false) String keyword,
+                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    @GetMapping("/search")
-    public String searchPosts(@RequestParam(name = "keyword") String keyword, Model model) {
-        List<Post> searchResults = postService.searchPosts(keyword);
-        model.addAttribute("searchResults", searchResults);
-        model.addAttribute("keyword", keyword);
-        return "/post/search_results";
+
+        return ResponseDto.success(postService.searchPosts( keyword, userDetails));
     }
 }
 

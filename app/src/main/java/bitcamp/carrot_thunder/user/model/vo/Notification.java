@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Notification {
 
-  private int id;
-  private int memberId;
+  private Long id;
+  private Long userId;
   private String content;
   private LocalDateTime createdAt;
   private String type;

@@ -1,147 +1,166 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bitcamp.carrot_thunder.user.model.dao.UserDao">
 
-  <resultMap type="user" id="userMap">
-    <id column="id" property="id"/>
-    <result column="role" property="role"/>
-    <result column="activation" property="activation"/>
-    <result column="email" property="email"/>
-    <result column="password" property="password"/>
-    <result column="nickname" property="nickName"/>
-    <result column="phone" property="phone"/>
-    <result column="address" property="address"/>
-    <result column="detail_address" property="detailAddress"/>
-    <result column="photo" property="photo"/>
-    <result column="point" property="point"/>
-  </resultMap>
+    <resultMap type="user" id="userMap">
+        <id column="id" property="id"/>
+        <result column="role" property="role"/>
+        <result column="activation" property="activation"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickName"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="detail_address" property="detailAddress"/>
+        <result column="photo" property="photo"/>
+        <result column="point" property="point"/>
+    </resultMap>
 
-  <insert id="insert" parameterType="user">
-    insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
-    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
-  </insert>
+    <insert id="insert" parameterType="user">
+        insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
+        values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
+    </insert>
 
-  <select id="findAll" resultMap="memberMap">
-    select
-    id,
-    role,
-    activation,
-    email,
-    nickname,
-    phone,
-    address,
-    detail_address,
-    photo,
-    point
-    from
-    tbl_user
-    order by
-    role asc
-  </select>
+    <select id="findAll" resultMap="userMap">
+        select
+        id,
+        role,
+        activation,
+        email,
+        nickname,
+        phone,
+        address,
+        detail_address,
+        photo,
+        point
+        from
+        tbl_user
+        order by
+        role asc
+    </select>
 
-  <select id="findBy" parameterType="int" resultMap="userMap">
-    select
-    *
-    from
-    tbl_user
-    where
-    id=#{id}
-  </select>
-
-
-  <select id="findByEmailAndPassword" resultMap="userMap">
-    select
-    *
-    from
-    tbl_user
-    where
-    email=#{email}
-    and password=sha1(#{password})
-  </select>
-
-  <select id="findByName" resultMap="userMap">
-    select
-    *
-    from
-    tbl_user
-    where
-    name=#{name}
-    and password=sha1(#{password})
-  </select>
-
-  <update id="update" parameterType="user">
-    update tbl_user set
-    nickname=#{nickName}
-    ,password=sha1(#{password})
-    ,intro=#{intro}
-    <if test="photo != null">
-      ,photo=#{photo}
-    </if>
-    ,tel=#{tel}
-    where
-    id=#{id}
-  </update>
+    <select id="findBy" parameterType="int" resultMap="userMap">
+        select
+        *
+        from
+        tbl_user
+        where
+        id=#{id}
+    </select>
 
 
-  <delete id="delete" parameterType="int">
-    delete from tbl_user
-    where
-    id=#{id}
-  </delete>
+    <select id="findByEmailAndPassword" resultMap="userMap">
+        select
+        *
+        from
+        tbl_user
+        where
+        email=#{email}
+        and password=sha1(#{password})
+    </select>
+    <select id="findByName" resultMap="userMap">
+        select
+        *
+        from
+        tbl_user
+        where
+        name=#{name}
+    </select>
 
-  <insert id="insertFollow">
-    INSERT INTO follow (follower_member_id, following_member_id)
-    VALUES (#{followerId}, #{followingId})
-  </insert>
+    <select id="findByEmail" resultMap="userMap">
+        select
+        *
+        from
+        tbl_user
+        where
+        email=#{email}
+    </select>
 
-  <delete id="deleteFollow">
-    DELETE FROM follow
-    WHERE follower_member_id=#{followerId} AND following_member_id=#{followingId}
-  </delete>
+    <update id="updatePasswordByName" parameterType="string">
+        update tbl_user set
+        ,password=#{password}
+        ,intro=#{intro}
+        <if test="photo != null">
+            ,photo=#{photo}
+        </if>
+        ,tel=#{tel}
+        where
+        id=#{id}
+    </update>
 
-  <select id="isFollowed" resultType="boolean">
-    SELECT COUNT(*) > 0
-    FROM follow
-    WHERE follower_member_id=#{followerId} AND following_member_id=#{followingId}
-  </select>
+    <update id="update" parameterType="user">
+        update tbl_user set
+        nickname=#{nickName}
+        ,password=sha1(#{password})
+        ,intro=#{intro}
+        <if test="photo != null">
+            ,photo=#{photo}
+        </if>
+        ,tel=#{tel}
+        where
+        id=#{id}
+    </update>
 
-  <select id="getFollowers" resultType="map">
-    SELECT m.nickname AS nickName, m.photo
-    FROM follow f
-    JOIN member m ON f.follower_member_id = m.member_id
-    WHERE f.following_member_id=#{memberId}
-  </select>
 
-  <select id="getFollowings" resultType="map">
-    SELECT m.nickname AS nickName, m.photo
-    FROM follow f
-    JOIN member m ON f.following_member_id = m.member_id
-    WHERE f.follower_member_id=#{memberId}
-  </select>
+    <delete id="delete" parameterType="int">
+        delete from tbl_user
+        where
+        id=#{id}
+    </delete>
 
-  <insert id="insertNotification">
-    INSERT INTO notification (member_id, content, created_at, type, isRead)
-    VALUES (#{memberId}, #{content}, NOW(), #{type}, #{isRead})
-  </insert>
+    <insert id="insertFollow">
+        INSERT INTO follow (follower_member_id, following_member_id)
+        VALUES (#{followerId}, #{followingId})
+    </insert>
 
-  <select id="findNotificationsByMemberId"
-    resultType="bitcamp.carrot_thunder.user.model.vo.Notification">
-    SELECT * FROM notification WHERE member_id = #{memberId}
-  </select>
+    <delete id="deleteFollow">
+        DELETE FROM follow
+        WHERE follower_member_id=#{followerId} AND following_member_id=#{followingId}
+    </delete>
 
-  <update id="updateReadStatus">
-    UPDATE notification SET isRead = #{isRead} WHERE id = #{id}
-  </update>
+    <select id="isFollowed" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM follow
+        WHERE follower_member_id=#{followerId} AND following_member_id=#{followingId}
+    </select>
 
-  <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">
-    INSERT INTO notification (member_id, content, created_at, type, isRead)
-    VALUES (#{memberId}, #{content}, #{createdAt}, #{type}, #{isRead})
-  </insert>
+    <select id="getFollowers" resultType="map">
+        SELECT m.nickname AS nickName, m.photo
+        FROM follow f
+        JOIN member m ON f.follower_member_id = m.member_id
+        WHERE f.following_member_id=#{memberId}
+    </select>
 
-  <delete id="deleteAllNotifications" parameterType="int">
-    DELETE FROM notification WHERE member_id=#{memberId}
-  </delete>
+    <select id="getFollowings" resultType="map">
+        SELECT m.nickname AS nickName, m.photo
+        FROM follow f
+        JOIN member m ON f.following_member_id = m.member_id
+        WHERE f.follower_member_id=#{memberId}
+    </select>
+
+    <insert id="insertNotification">
+        INSERT INTO notification (member_id, content, created_at, type, isRead)
+        VALUES (#{memberId}, #{content}, NOW(), #{type}, #{isRead})
+    </insert>
+
+    <select id="findNotificationsByMemberId"
+            resultType="bitcamp.carrot_thunder.user.model.vo.Notification">
+        SELECT * FROM notification WHERE member_id = #{memberId}
+    </select>
+
+    <update id="updateReadStatus">
+        UPDATE notification SET isRead = #{isRead} WHERE id = #{id}
+    </update>
+
+    <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">
+        INSERT INTO notification (member_id, content, created_at, type, isRead)
+        VALUES (#{memberId}, #{content}, #{createdAt}, #{type}, #{isRead})
+    </insert>
+
+    <delete id="deleteAllNotifications" parameterType="int">
+        DELETE FROM notification WHERE member_id=#{memberId}
+    </delete>
 
 </mapper>

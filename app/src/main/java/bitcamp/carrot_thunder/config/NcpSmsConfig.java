@@ -14,74 +14,74 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "naver-cloud-sms")
 public class NcpSmsConfig {
 
-  private String accessKey;
-  private String secretKey;
-  private String serviceId;
-  private String senderPhone;
+    private String accessKey;
+    private String secretKey;
+    private String serviceId;
+    private String senderPhone;
 
-  public NcpSmsConfig() {
-    System.out.println("✅SmsConfig() executed");
-  }
+    public NcpSmsConfig() {
+        System.out.println("✅SmsConfig() executed");
+    }
 
-  public String makeSignature(Long time)
-      throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
-    String space = " ";
-    String newLine = "\n";
-    String method = "POST";
-    String url = "/sms/v2/services/" + this.serviceId + "/messages";
-    String timestamp = time.toString();
-    String accessKey = this.accessKey;
-    String secretKey = this.secretKey;
+    public String makeSignature(Long time)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
+        String space = " ";
+        String newLine = "\n";
+        String method = "POST";
+        String url = "/sms/v2/services/" + this.serviceId + "/messages";
+        String timestamp = time.toString();
+        String accessKey = this.accessKey;
+        String secretKey = this.secretKey;
 
-    String message = new StringBuilder()
-        .append(method)
-        .append(space)
-        .append(url)
-        .append(newLine)
-        .append(timestamp)
-        .append(newLine)
-        .append(accessKey)
-        .toString();
+        String message = new StringBuilder()
+                .append(method)
+                .append(space)
+                .append(url)
+                .append(newLine)
+                .append(timestamp)
+                .append(newLine)
+                .append(accessKey)
+                .toString();
 
-    SecretKeySpec signingKey = new SecretKeySpec(secretKey.getBytes("UTF-8"), "HmacSHA256");
-    Mac mac = Mac.getInstance("HmacSHA256");
-    mac.init(signingKey);
+        SecretKeySpec signingKey = new SecretKeySpec(secretKey.getBytes("UTF-8"), "HmacSHA256");
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(signingKey);
 
-    byte[] rawHmac = mac.doFinal(message.getBytes("UTF-8"));
-    String encodeBase64String = Base64.encodeBase64String(rawHmac);
+        byte[] rawHmac = mac.doFinal(message.getBytes("UTF-8"));
+        String encodeBase64String = Base64.encodeBase64String(rawHmac);
 
-    return encodeBase64String;
-  }
+        return encodeBase64String;
+    }
 
-  public String getAccessKey() {
-    return accessKey;
-  }
+    public String getAccessKey() {
+        return accessKey;
+    }
 
-  public void setAccessKey(String accessKey) {
-    this.accessKey = accessKey;
-  }
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
 
-  public String getSecretKey() {
-    return secretKey;
-  }
+    public String getSecretKey() {
+        return secretKey;
+    }
 
-  public void setSecretKey(String secretKey) {
-    this.secretKey = secretKey;
-  }
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
 
-  public String getServiceId() {
-    return serviceId;
-  }
+    public String getServiceId() {
+        return serviceId;
+    }
 
-  public void setServiceId(String serviceId) {
-    this.serviceId = serviceId;
-  }
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
 
-  public String getSenderPhone() {
-    return senderPhone;
-  }
+    public String getSenderPhone() {
+        return senderPhone;
+    }
 
-  public void setSenderPhone(String senderPhone) {
-    this.senderPhone = senderPhone;
-  }
+    public void setSenderPhone(String senderPhone) {
+        this.senderPhone = senderPhone;
+    }
 }

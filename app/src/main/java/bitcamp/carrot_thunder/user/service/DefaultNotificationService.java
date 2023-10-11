@@ -23,14 +23,14 @@ public class DefaultNotificationService implements NotificationService {
   private final EmitterRepository emitterRepository;
   private final UserDao memberDao;
 
-  public void send(String content, int receiverId) {
-    User member = memberDao.findBy(receiverId);
-    if (member == null) {
+  public void send(String content, Long receiverId) {
+    User user = memberDao.findBy(receiverId);
+    if (user == null) {
       throw new RuntimeException("Member not found with ID: " + receiverId);
     }
 
     Notification notification = new Notification();
-    notification.setMemberId(receiverId);
+//    notification.setMemberId(receiverId);
     notification.setContent(content);
     notification.setType(ALARM_NAME);
     notification.setRead(false);
@@ -53,11 +53,11 @@ public class DefaultNotificationService implements NotificationService {
     }
   }
 
-  public SseEmitter connectNotification(int memberId) {
+  public SseEmitter connectNotification(Long userId) {
     SseEmitter emitter = new SseEmitter(60L * 1000 * 60);  // 1 hour
-    emitterRepository.save(memberId, emitter);
-    emitter.onCompletion(() -> emitterRepository.delete(memberId));
-    emitter.onTimeout(() -> emitterRepository.delete(memberId));
+    emitterRepository.save(userId, emitter);
+    emitter.onCompletion(() -> emitterRepository.delete(userId));
+    emitter.onTimeout(() -> emitterRepository.delete(userId));
     return emitter;
   }
 

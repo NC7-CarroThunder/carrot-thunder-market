@@ -53,7 +53,7 @@ public class DefaultUserService implements UserService {
   }
 
   @Override
-  public User get(int memberId) throws Exception {
+  public User get(Long memberId) throws Exception {
     return userDao.findBy(memberId);
   }
 
@@ -70,13 +70,23 @@ public class DefaultUserService implements UserService {
 
   @Transactional
   @Override
-  public int delete(int memberId) throws Exception {
-    return userDao.delete(memberId);
+  public int delete(Long userId) throws Exception {
+    return userDao.delete(userId);
   }
 
+    @Override
+    public boolean memberFollow(int followerId, int followingId) throws Exception {
+        return false;
+    }
 
-  @Override
-  public boolean memberFollow(int currentMemberId, int memberId) throws Exception {
+    @Override
+    public boolean isFollowed(int followerId, int followingId) throws Exception {
+        return false;
+    }
+
+
+ /* @Override
+  public boolean memberFollow(Long currentMemberId, Long memberId) throws Exception {
     boolean isFollowed = userDao.isFollowed(currentMemberId, memberId);
     if (isFollowed) {
       userDao.deleteFollow(currentMemberId, memberId);
@@ -87,16 +97,16 @@ public class DefaultUserService implements UserService {
   }
 
   @Override
-  public boolean isFollowed(int currentMemberId, int memberId) throws Exception {
+  public boolean isFollowed(Long currentMemberId, Long memberId) throws Exception {
     return userDao.isFollowed(currentMemberId, memberId);
-  }
+  }*/
 
   @Override
-  public User get(int memberId, HttpSession session) throws Exception {
+  public User get(Long memberId, HttpSession session) throws Exception {
     User member = userDao.findBy(memberId);
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser != null) {
-      int loggedInUserId = loginUser.getId();
+//      int loggedInUserId = loginUser.getId();
       //member.setFollowed(userDao.isFollowed(loggedInUserId, memberId));
     } else {
       //member.setFollowed(false);
@@ -105,22 +115,22 @@ public class DefaultUserService implements UserService {
   }
 
   @Override
-  public List<User> getFollowers(int memberId) throws Exception {
+  public List<User> getFollowers(Long memberId) throws Exception {
     return userDao.getFollowers(memberId);
   }
 
   @Override
-  public List<User> getFollowings(int memberId) throws Exception {
+  public List<User> getFollowings(Long memberId) throws Exception {
     return userDao.getFollowings(memberId);
   }
 
   @Override
-  public List<Notification> getNotifications(int memberId) throws Exception {
+  public List<Notification> getNotifications(Long memberId) throws Exception {
     return userDao.findNotificationsByMemberId(memberId);
   }
 
   @Override
-  public void deleteAllNotifications(int memberId) throws Exception {
+  public void deleteAllNotifications(Long memberId) throws Exception {
     userDao.deleteAllNotifications(memberId);
   }
 }

@@ -9,24 +9,24 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserDao {
 
-  int insert(User member);
+  int insert(User user);
   List<User> findAll();
-  User findBy(int memberId);
+  User findBy(Long userId);
   User findByName(String name);
   User findByEmailAndPassword(
       @Param("email") String email,
       @Param("password") String password);
-  int update(User member);
-  int delete(int no);
+  int update(User user);
+  int delete(Long userId);
 
-  void insertFollow(int followerId, int followingId);
-  void deleteFollow(int followerId, int followingId);
-  boolean isFollowed(int followerId, int followingId);
-  List<User> getFollowers(int memberId);
-  List<User> getFollowings(int memberId);
+  void insertFollow(Long followerId, Long followingId);
+  void deleteFollow(Long followerId, Long followingId);
+  boolean isFollowed(Long followerId, Long followingId);
+  List<User> getFollowers(Long userId);
+  List<User> getFollowings(Long userId);
 
   int insertNotification(Notification notification);
   int updateReadStatus(int id, boolean isRead);
-  List<Notification> findNotificationsByMemberId(int memberId);
-  void deleteAllNotifications(int memberId) throws Exception;
+  List<Notification> findNotificationsByMemberId(Long userId);
+  void deleteAllNotifications(Long userId) throws Exception;
 }

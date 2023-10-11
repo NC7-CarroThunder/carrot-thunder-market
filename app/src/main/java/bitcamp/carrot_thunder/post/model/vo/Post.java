@@ -1,6 +1,6 @@
 package bitcamp.carrot_thunder.post.model.vo;
 
-import bitcamp.carrot_thunder.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 //import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import lombok.AllArgsConstructor;
