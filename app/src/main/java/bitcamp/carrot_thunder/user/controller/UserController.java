@@ -103,9 +103,9 @@ public class UserController {
     String nickName = kakaoService.kakaoLogin(access_token, response);
     //String createToken = URLEncoder.encode(kakaoService.kakaoLogin(code, response), "utf-8");
     // Cookie 생성 및 직접 브라우저에 Set
-    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,nickName);
-    //response.sendRedirect("http://localhost:3000");
-    System.out.println(nickName);
+    if (nickName.isEmpty()) {
+      //예외처리
+    }
     return "응답완료";
 
   }
