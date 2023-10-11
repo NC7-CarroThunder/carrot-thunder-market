@@ -15,7 +15,7 @@ public class User implements Serializable {
 
   public static final long serialVersionUID = 1L;
 
-  private int id;
+  private Long id;
   private Role role;
   private Activation activation;
   private String email;

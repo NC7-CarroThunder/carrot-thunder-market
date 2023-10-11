@@ -25,7 +25,7 @@ import org.springframework.web.client.RestClientException;
 public class SmsController {
 
   private final SmsService smsService;
-  private final UserService memberService;
+  private final UserService userService;
 
   @GetMapping("/send")
   public String getSmsPage() {

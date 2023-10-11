@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .build();
 
         //TODO : 단군마켓에서 설정한 securiy설정 - 참고후 커스터마이징해서 추가해야함
-       // http.csrf().disable();
+        // http.csrf().disable();
         //
 
 //        http.authorizeRequests()
@@ -80,6 +80,7 @@ public class SecurityConfig {
 
         // 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
         // 만약 지정하지 않는다면, Authorization 헤더 내의 토큰 값을 사용할 수 없음
+
 
 
         // 본 요청에 허용할 HTTP method(예비 요청에 대한 응답 헤더에 추가됨)

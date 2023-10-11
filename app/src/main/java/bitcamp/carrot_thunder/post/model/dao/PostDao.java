@@ -1,42 +1,37 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
-import java.util.List;
-
+import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
+
 public interface PostDao {
+
+
     int insert(Post post);
-    Post findBy(int id);
-    int updateCount(int no);
+    Post findBy(Long id);
+    int updateCount(Long postId);
     int insertFiles(Post post);
     int update(Post post);
-    AttachedFile findFileBy(int id);
+    AttachedFile findFileByfileId(Long fileId);
     List<Post> findAll();
-    int delete(int id);
-    int deleteFile(int fileId);
-    int deleteFiles(int postId);
+    int delete(Long id);
+    int deleteFile(Long fileId);
+    int deleteFiles(Long postId);
 
-    int deleteLikes(int postId);
-    int updateLikeCount(@Param("postId") int postId, @Param("amount") int amount);
-    int insertLike(@Param("postId") int postId, @Param("memberId") int memberId);
-    int deleteLike(@Param("postId") int postId, @Param("memberId") int memberId);
-    boolean isLiked(@Param("postId") int postId, @Param("memberId") int memberId);
-    int getLikeCount(int postId);
-    List<Post> getLikedPosts(int memberId);
-
-    int deleteBookmarks(int postId);
-    int insertBookmark(@Param("postId") int postId, @Param("memberId") int memberId);
-    int deleteBookmark(@Param("postId") int postId, @Param("memberId") int memberId);
-    boolean isBookmarked(@Param("postId") int postId, @Param("memberId") int memberId);
-    List<Post> getBookmarkedPosts(int memberId);
-    List<Post> getMyPosts(int memberId);
-
-//    List<Comment> findCommentsByPostId(int postId);
-//    void insertComment(int postId, int memberId, String content) throws Exception;
-//    void deleteComment(@Param("commentId") int commentId, @Param("memberId") int memberId);
-//    void insertComment(Comment comment);
+    int deleteLikes(Long postId);
+    int updateLikeCount(@Param("postId") Long postId, @Param("amount") int amount);
+    int insertLike(@Param("postId") Long postId, @Param("userId") Long userId);
+    int deleteLike(@Param("postId") Long postId, @Param("userId") Long userId);
+    boolean isLiked(@Param("postId") Long postId, @Param("userId") Long userId);
+    int getLikeCount(Long postId);
+    Optional<Post> findPostDetailById(Long id);
+    Optional<Object> findById(Long postId);
+    List<AttachedFile> findImagesByPostId(Long postId);
 }

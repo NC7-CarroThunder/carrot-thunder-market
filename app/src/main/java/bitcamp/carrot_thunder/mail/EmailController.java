@@ -14,8 +14,8 @@ public class EmailController {
   private EmailService emailService;
 
   @PostMapping("/email-welcome")
-  public String sendWelcomeEmail(@RequestBody User member) throws MessagingException {
-    emailService.sendWelcomeEmail(member);
+  public String sendWelcomeEmail(@RequestBody User user) throws MessagingException {
+    emailService.sendWelcomeEmail(user);
     return "redirect:/";
   }
 }

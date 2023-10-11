@@ -17,19 +17,22 @@ public interface UserService {
     String signup(SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception;
     // int add(User member) throws Exception;
     List<User> list() throws Exception;
-    User get(int memberId) throws Exception;
+    User get(Long memberId) throws Exception;
     User get(String email, String password) throws Exception;
     User get(String email) throws Exception;
     int update(User member) throws Exception;
+
+
     void updatePasswordByName(String nickName, String password) throws Exception;
     int delete(int memberId) throws Exception;
 
+
     boolean memberFollow(int followerId, int followingId) throws Exception;
     boolean isFollowed(int followerId, int followingId) throws Exception;
-    List<User> getFollowers(int memberId) throws Exception;
-    List<User> getFollowings(int memberId) throws Exception;
-    User get(int memberId, HttpSession session) throws  Exception;
+    List<User> getFollowers(Long memberId) throws Exception;
+    List<User> getFollowings(Long memberId) throws Exception;
+    User get(Long memberId, HttpSession session) throws  Exception;
 
-    List<Notification> getNotifications(int memberId) throws Exception;
-    void deleteAllNotifications(int memberId) throws Exception;
+    List<Notification> getNotifications(Long memberId) throws Exception;
+    void deleteAllNotifications(Long memberId) throws Exception;
 }

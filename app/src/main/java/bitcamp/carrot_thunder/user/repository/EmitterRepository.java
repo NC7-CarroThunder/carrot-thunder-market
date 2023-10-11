@@ -10,17 +10,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class EmitterRepository {
 
-  private final Map<Integer, SseEmitter> emitterMap = new ConcurrentHashMap<>();
+  private final Map<Long, SseEmitter> emitterMap = new ConcurrentHashMap<>();
 
-  public SseEmitter get(int memberId) {
-    return emitterMap.get(memberId);
+  public SseEmitter get(Long userId) {
+    return emitterMap.get(userId);
   }
 
-  public void save(int memberId, SseEmitter emitter) {
-    emitterMap.put(memberId, emitter);
+  public void save(Long userId, SseEmitter emitter) {
+    emitterMap.put(userId, emitter);
   }
 
-  public void delete(int memberId) {
-    emitterMap.remove(memberId);
+  public void delete(Long userId) {
+    emitterMap.remove(userId);
   }
 }

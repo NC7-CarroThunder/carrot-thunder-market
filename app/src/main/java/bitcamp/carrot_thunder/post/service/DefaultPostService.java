@@ -1,173 +1,197 @@
 package bitcamp.carrot_thunder.post.service;
 
+import bitcamp.carrot_thunder.NcpObjectStorageService;
+import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
+import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
+import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
+
+import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpSession;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Service
 public class DefaultPostService implements PostService {
 
-  PostDao postDao;
 
-  public DefaultPostService(PostDao postDao) {
-    this.postDao = postDao;
-  }
+    @Autowired
+    PostDao postDao;
 
-  @Transactional
-  @Override
-  public int add(Post post) throws Exception {
-    int count = postDao.insert(post);
-    if (post.getAttachedFiles().size() > 0) {
-      postDao.insertFiles(post);
+
+    @Transactional
+
+    public int add(Post post) throws Exception {
+        int count = postDao.insert(post);
+        if (!post.getAttachedFiles().isEmpty()) {
+            postDao.insertFiles(post);
+        }
+        return count;
     }
-    return count;
-  }
 
-  @Override
-  public Post get(int postId) throws Exception {
-    return postDao.findBy(postId);
-  }
 
-  @Transactional
-  @Override
-  public int update(Post post) throws Exception {
-    int count = postDao.update(post);
-    if (count > 0 && post.getAttachedFiles().size() > 0) {
-      postDao.insertFiles(post);
+    public Post get(Long postId) throws Exception {
+        return postDao.findBy(postId);
     }
-    return count;
-  }
 
-  @Override
-  public List<Post> list(HttpSession session) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    List<Post> posts = postDao.findAll();
-    if (loginUser != null) {
-      int loggedInUserId = loginUser.getId();
-      for (Post post : posts) {
-        boolean isLiked = postDao.isLiked(post.getId(), loggedInUserId);
-        boolean isBookmarked = postDao.isBookmarked(post.getId(), loggedInUserId);
-        //post.setLiked(isLiked);
-        //post.setBookmarked(isBookmarked);
-      }
+
+
+    @Transactional
+        public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user, List<MultipartFile> multipartFiles) {
+            Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
+
+            if (!Objects.equals(user.getId(), post.getUser().getId())) {
+                throw NotHaveAuthorityException.EXCEPTION;
+            }
+
+            List<String> remainingImages = getRemainingImages(requestDto);
+
+            if (!post.getAttachedFiles().isEmpty()) {
+                postDao.insertFiles(post);
+            }
+
+            post.update(requestDto);
+
+            handleImageUpdates(post, remainingImages);
+
+            return PostResponseDto.of(post);
+        }
+
+        private List<String> getRemainingImages(PostUpdateRequestDto postUpdateRequestDto) {
+            return postUpdateRequestDto.getAttachedFilesPaths().stream()
+                    .map(AttachedFile::getFilename)
+                    .collect(Collectors.toList());
+        }
+
+        private void handleImageUpdates(Post post, List<String> remainingImages) {
+            List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
+
+            NcpConfig ncpConfig = new NcpConfig();
+            NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
+
+            for (AttachedFile attachedFile : attachedFiles) {
+                if (!remainingImages.contains(attachedFile.getFilename())) {
+                    // S3에서 이미지 삭제
+                    ncpObjectStorageService.deleteFile("https://kr.object.ncloudstorage.com", "/carrot-thunder/article" + attachedFile.getFilename());
+                    // DB에서 이미지 삭제
+                    postDao.deleteFile(attachedFile.getId());
+                }
+            }
+        }
+
+
+
+
+    @Override
+    public List<PostListResponseDto> getPostlist(User user, UserDetailsImpl userDetails) {
+        List<Post> posts = postDao.findAll();
+        List<PostListResponseDto> dtoList = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostListResponseDto responseDto = PostListResponseDto.of(post);
+
+            if (userDetails != null) {
+                boolean isLiked = postDao.isLiked(post.getId(), user.getId());
+                responseDto.setIsLiked(isLiked);
+            }
+            dtoList.add(responseDto);
+        }
+
+        return dtoList;
     }
-    return posts;
-  }
 
-  @Override
-  public AttachedFile getAttachedFile(int fileId) throws Exception {
-    return postDao.findFileBy(fileId);
-  }
-
-  @Override
-  public int increaseViewCount(int boardNo) throws Exception {
-    return postDao.updateCount(boardNo);
-  }
-
-  @Transactional
-  @Override
-  public int delete(int postId) throws Exception {
-    postDao.deleteFiles(postId);
-    postDao.deleteLikes(postId);
-    postDao.deleteBookmarks(postId);
-    return postDao.delete(postId);
-  }
-
-  @Override
-  public int deleteAttachedFile(int fileId) throws Exception {
-    return postDao.deleteFile(fileId);
-  }
-
-  @Override
-  public int getLikeCount(int postId) {
-    return postDao.getLikeCount(postId);
-  }
-
-  @Override
-  public boolean postLike(int postId, int memberId) {
-    boolean liked = postDao.isLiked(postId, memberId);
-    if (liked) {
-      postDao.deleteLike(postId, memberId);
-      postDao.updateLikeCount(postId, -1);
-    } else {
-      postDao.insertLike(postId, memberId);
-      postDao.updateLikeCount(postId, 1);
+    public AttachedFile getAttachedFile(Long fileId) throws Exception {
+        return postDao.findFileByfileId(fileId);
     }
-    return !liked;
-  }
 
-  @Override
-  public List<Post> getLikedPosts(int memberId, HttpSession session) {
-    User loginUser = (User) session.getAttribute("loginUser");
-    List<Post> posts = postDao.getLikedPosts(memberId);
-    if (loginUser != null) {
-      int loggedInUserId = loginUser.getId();
-      for (Post post : posts) {
-        boolean isLiked = postDao.isLiked(post.getId(), loggedInUserId);
-        //post.setLiked(isLiked);
-      }
+
+
+    public int increaseViewCount(Long postId)  {
+        return postDao.updateCount(postId);
     }
-    return posts;
-  }
 
-  @Override
-  public boolean postBookmark(int postId, int memberId) {
-    boolean isBookmarked = postDao.isBookmarked(postId, memberId);
-    if (isBookmarked) {
-      postDao.deleteBookmark(postId, memberId);
-    } else {
-      postDao.insertBookmark(postId, memberId);
+
+    /**
+     * 게시글 삭제
+     *
+     * @param postId
+     * @return
+     * @throws Exception ( 난중에 처리 )
+     */
+    @Transactional
+    public String deletePost(Long postId, User user) {
+        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        if (user.getId() != post.getUser().getId()) {
+
+
+        List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
+        for (AttachedFile attachedFile : attachedFiles) {
+            if (!post.getAttachedFiles().isEmpty()) {
+
+                NcpConfig ncpConfig = new NcpConfig();
+                NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
+                ncpObjectStorageService.deleteFile("https://kr.object.ncloudstorage.com", "/carrot-thunder/article" + attachedFile.getFilename());
+                // DB에서 이미지 삭제
+                postDao.deleteFile(postId);
+            }
+            }
+        }
+
+
+        postDao.deleteLikes(postId);
+        return String.valueOf(postDao.delete(postId));
     }
-    return !isBookmarked;
-  }
 
-  @Override
-  public List<Post> getBookmarkedPosts(int memberId, HttpSession session) {
-    User loginUser = (User) session.getAttribute("loginUser");
-    List<Post> posts = postDao.getBookmarkedPosts(memberId);
-    if (loginUser != null) {
-      int loggedInUserId = loginUser.getId();
-      for (Post post : posts) {
-        boolean isBookmarked = postDao.isBookmarked(post.getId(), loggedInUserId);
-        //post.setBookmarked(isBookmarked);
-      }
+
+
+
+    /**
+     * 게시글 상세 정보
+     *
+     * @param postId
+     * @return
+     */
+    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails)  {
+        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
+        return PostResponseDto.of(post);
+
     }
-    return posts;
-  }
 
-  @Override
-  public Post setSessionStatus(int id, HttpSession session) throws Exception {
-    Post post = postDao.findBy(id);
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser != null) {
-      int loggedInUserId = loginUser.getId();
-      boolean isLiked = postDao.isLiked(id, loggedInUserId);
-      boolean isBookmarked = postDao.isBookmarked(id, loggedInUserId);
-      //post.setLiked(isLiked);
-      //post.setBookmarked(isBookmarked);
+
+    /**
+     * 게시글 검색 기능
+     *
+     * @param keyword
+     * @param userDetails
+     * @return
+     */
+
+    public List<PostListResponseDto> searchPosts(String keyword, UserDetailsImpl userDetails) {
+        List<Post> responseDto = postDao.findAll();
+        List<PostListResponseDto> searchResults = new ArrayList<>();
+
+        for (Post post : responseDto) {
+            if (post.getTitle().contains(keyword)) {
+                searchResults.add(PostListResponseDto.of(post));
+            }
+        }
+
+        return searchResults;
     }
-    return post;
-  }
-
-  @Override
-  public boolean isLiked(int postId, int memberId) {
-    return postDao.isLiked(postId, memberId);
-  }
-
-  @Override
-  public boolean isBookmarked(int postId, int memberId) {
-    return postDao.isBookmarked(postId, memberId);
-  }
-
-  @Transactional
-  @Override
-  public List<Post> getMyPosts(int memberId) {
-    return postDao.getMyPosts(memberId);
-  }
 
 }
+
+
