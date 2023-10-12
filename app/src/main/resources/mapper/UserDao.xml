@@ -21,12 +21,12 @@
 
   <insert id="insert" parameterType="user">
     insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
-    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
+    values(#{email}, #{password}, #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
   <insert id="signup" parameterType="user">
     insert into tbl_user (email, password, nickname, phone, address, detail_address, photo)
-    values(#{email}, sha1(#{password}), #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
+    values(#{email}, #{password}, #{nickName}, #{phone}, #{address}, #{detailAddress}, #{photo})
   </insert>
 
   <select id="findAll" resultMap="userMap">
@@ -64,7 +64,7 @@
     tbl_user
     where
     email=#{email}
-    and password=sha1(#{password})
+    and password=#{password}
   </select>
 
   <select id="findByNickName" resultMap="userMap">
@@ -108,7 +108,7 @@
   <update id="update" parameterType="user">
     update tbl_user set
     nickname=#{nickName}
-    ,password=sha1(#{password})
+    ,password=#{password}
     ,intro=#{intro}
     <if test="photo != null">
       ,photo=#{photo}

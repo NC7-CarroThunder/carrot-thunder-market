@@ -46,7 +46,7 @@ public class DefaultUserService implements UserService {
       throw new IllegalArgumentException("비밀 번호가 옳지 않습니다.");
     }
 
-    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(loginUser.getNickName()));
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(loginUser.getNickName(),loginUser.getId()));
 
     if (loginUser.getRole() == Role.ADMIN) {
       System.out.println(loginUser.getRole());
