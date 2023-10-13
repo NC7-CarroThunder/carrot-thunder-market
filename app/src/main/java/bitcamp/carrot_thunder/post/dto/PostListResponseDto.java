@@ -5,6 +5,7 @@ import bitcamp.carrot_thunder.user.model.vo.User;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Builder
@@ -26,6 +27,7 @@ public class PostListResponseDto {
   private String nickname;
   private int likeCount;
   private Boolean isLiked;
+  private List<AttachedFile> attachedFilesPaths;
 
   public static PostListResponseDto of(Post post) {
     return PostListResponseDto.builder()
@@ -41,6 +43,7 @@ public class PostListResponseDto {
             .itemStatus(post.getItemStatus())
             .createdAt(post.getCreatedAt())
             .likeCount(post.getLikeCount())
+            .attachedFilesPaths(post.getAttachedFiles())
             .build();
   }
 
