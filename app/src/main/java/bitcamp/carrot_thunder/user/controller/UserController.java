@@ -111,18 +111,9 @@ public class UserController {
   // 회원가입
   @PostMapping("/users/signup")
   @ResponseBody
-  public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
+  public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto, HttpServletResponse response) throws Exception {
     return userService.signup(signupRequestDto,response);
   }
-//  @PostMapping("add")
-//  public String add(User user) throws Exception {
-//    userService.add(user);
-//
-//    // 회원가입 이메일 전송
-//    emailService.sendWelcomeEmail(user);
-//
-//    return "redirect:form";
-//  }
 
   @GetMapping("delete")
   public String delete(Long userId, Model model) throws Exception {
@@ -207,113 +198,113 @@ public class UserController {
 
   }
 
-  @PostMapping("/{memberId}/follow")
-  @ResponseBody
-  public Map<String, Object> memberFollow(@PathVariable Long userId, HttpSession session)
-      throws Exception {
-    Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) session.getAttribute("loginUser");
-
-    if (loginUser == null) {
-      response.put("status", "notLoggedIn");
-      return response;
-    }
-
-    Long currentMemberId = loginUser.getId();
-    boolean newIsFollowed = userService.memberFollow(currentMemberId, userId);
-    response.put("newIsFollowed", newIsFollowed);
-    if (newIsFollowed) {
-      User user = userService.get(userId);
-      if (user != null) {
-        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
-        defaultNotificationService.send(content, user.getId());
-      }
-    }
-    return response;
-  }
-
-//   팔로우 상태 확인
-  @PostMapping("/getFollowStatus")
-  @ResponseBody
-  public Map<Long, Boolean> getFollowStatus(@RequestBody List<Long> userIds,
-      HttpSession session)
-      throws Exception {
-    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
-    User loginUser = (User) session.getAttribute("loginUser");
-    Map<Long, Boolean> response = new HashMap<>();
-    if (loginUser != null) {
-      Long currentMemberId = loginUser.getId();
-      for (Long userId : userIds) {
-        boolean isFollowing = userService.isFollowed(currentMemberId, userId);
-        response.put(userId, isFollowing);
-      }
-    }
-    return response;
-  }
-
-  @GetMapping("/followers")
-  public String followers(HttpSession session, Model model) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/member/form";
-    }
-    List<User> followersList = userService.getFollowers(loginUser.getId());
-    model.addAttribute("followersList", followersList);
-    model.addAttribute("followerCount", followersList.size());
-    return "member/followers";
-  }
-
-  @GetMapping("/followings")
-  public String followings(HttpSession session, Model model) throws Exception {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/member/form";
-    }
-    List<User> followingsList = userService.getFollowings(loginUser.getId());
-    model.addAttribute("followingsList", followingsList);
-    model.addAttribute("followingsCount", followingsList.size()); // 팔로잉 숫자 추가
-    return "member/followings";
-  }
-
-  @GetMapping("/notifications/stream")
-  public SseEmitter streamNotifications(HttpSession session) {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new RuntimeException("로그인이 필요합니다.");
-    }
-
-    Long userId = loginUser.getId();
-    return defaultNotificationService.connectNotification(userId);
-  }
-
-  @PostMapping("/notifications/deleteAll")
-  public ResponseEntity<?> deleteAllNotifications(HttpSession session) {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
-    }
-
-    try {
-      userService.deleteAllNotifications(loginUser.getId());
-      return new ResponseEntity<>("모든 알림이 삭제되었습니다.", HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @GetMapping("/headerNotifications")
-  public ResponseEntity<List<Notification>> getHeaderNotifications(HttpSession session) {
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
-    try {
-      List<Notification> notifications = userService.getNotifications(loginUser.getId());
-      return new ResponseEntity<>(notifications, HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+//  @PostMapping("/{memberId}/follow")
+//  @ResponseBody
+//  public Map<String, Object> memberFollow(@PathVariable Long userId, HttpSession session)
+//      throws Exception {
+//    Map<String, Object> response = new HashMap<>();
+//    User loginUser = (User) session.getAttribute("loginUser");
+//
+//    if (loginUser == null) {
+//      response.put("status", "notLoggedIn");
+//      return response;
+//    }
+//
+//    Long currentMemberId = loginUser.getId();
+//    boolean newIsFollowed = userService.memberFollow(currentMemberId, userId);
+//    response.put("newIsFollowed", newIsFollowed);
+//    if (newIsFollowed) {
+//      User user = userService.get(userId);
+//      if (user != null) {
+//        String content = loginUser.getNickName() + "님이 당신을 팔로우했습니다.";
+//        defaultNotificationService.send(content, user.getId());
+//      }
+//    }
+//    return response;
+//  }
+//
+////   팔로우 상태 확인
+//  @PostMapping("/getFollowStatus")
+//  @ResponseBody
+//  public Map<Long, Boolean> getFollowStatus(@RequestBody List<Long> userIds,
+//      HttpSession session)
+//      throws Exception {
+//    System.out.println("컨트롤러 팔로우상태확인 호출됨!");
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    Map<Long, Boolean> response = new HashMap<>();
+//    if (loginUser != null) {
+//      Long currentMemberId = loginUser.getId();
+//      for (Long userId : userIds) {
+//        boolean isFollowing = userService.isFollowed(currentMemberId, userId);
+//        response.put(userId, isFollowing);
+//      }
+//    }
+//    return response;
+//  }
+//
+//  @GetMapping("/followers")
+//  public String followers(HttpSession session, Model model) throws Exception {
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    if (loginUser == null) {
+//      return "redirect:/member/form";
+//    }
+//    List<User> followersList = userService.getFollowers(loginUser.getId());
+//    model.addAttribute("followersList", followersList);
+//    model.addAttribute("followerCount", followersList.size());
+//    return "member/followers";
+//  }
+//
+//  @GetMapping("/followings")
+//  public String followings(HttpSession session, Model model) throws Exception {
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    if (loginUser == null) {
+//      return "redirect:/member/form";
+//    }
+//    List<User> followingsList = userService.getFollowings(loginUser.getId());
+//    model.addAttribute("followingsList", followingsList);
+//    model.addAttribute("followingsCount", followingsList.size()); // 팔로잉 숫자 추가
+//    return "member/followings";
+//  }
+//
+//  @GetMapping("/notifications/stream")
+//  public SseEmitter streamNotifications(HttpSession session) {
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    if (loginUser == null) {
+//      throw new RuntimeException("로그인이 필요합니다.");
+//    }
+//
+//    Long userId = loginUser.getId();
+//    return defaultNotificationService.connectNotification(userId);
+//  }
+//
+//  @PostMapping("/notifications/deleteAll")
+//  public ResponseEntity<?> deleteAllNotifications(HttpSession session) {
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    if (loginUser == null) {
+//      return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+//    }
+//
+//    try {
+//      userService.deleteAllNotifications(loginUser.getId());
+//      return new ResponseEntity<>("모든 알림이 삭제되었습니다.", HttpStatus.OK);
+//    } catch (Exception e) {
+//      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//  }
+//
+//  @GetMapping("/headerNotifications")
+//  public ResponseEntity<List<Notification>> getHeaderNotifications(HttpSession session) {
+//    User loginUser = (User) session.getAttribute("loginUser");
+//    if (loginUser == null) {
+//      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//    }
+//    try {
+//      List<Notification> notifications = userService.getNotifications(loginUser.getId());
+//      return new ResponseEntity<>(notifications, HttpStatus.OK);
+//    } catch (Exception e) {
+//      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//  }
 
   // 프로필 유저 정보 조회
   @GetMapping("/profiles/{userId}")
