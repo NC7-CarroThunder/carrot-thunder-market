@@ -27,7 +27,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
         String token = jwtUtil.resolveToken(request);
+        String requestURL =request.getRequestURL().toString();
+        if (requestURL.equals("http://localhost:8888/api/users/kakao/callback")) {
+            filterChain.doFilter(request,response);
+            return;
+        } else if (requestURL.equals("http://localhost:8888/api/users/login")) {
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        System.out.println(request.getRequestURL().toString());
+
 
         if(token != null) {
             if(!jwtUtil.validateToken(token)){
@@ -35,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
             Claims info = jwtUtil.getUserInfoFromToken(token);
-            setAuthentication(info.getSubject());
+            setAuthentication(info.get("nickname").toString());
         } else {
             SecurityContextHolder.clearContext();
         }
@@ -45,6 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     public void setAuthentication(String nickName) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
+
         Authentication authentication = jwtUtil.createAuthentication(nickName);
         context.setAuthentication(authentication);
 

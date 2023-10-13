@@ -22,6 +22,7 @@ public class PostListResponseDto {
   private ItemStatus itemStatus;
   private DealingType dealingType;
   private int price;
+  private String address;
   private String nickname;
   private int likeCount;
   private Boolean isLiked;
@@ -31,6 +32,7 @@ public class PostListResponseDto {
             .postid(post.getId())
             .title(post.getTitle())
             .price(post.getPrice())
+            .address(post.getAddress())
             .nickname(post.getUser().getNickName())
             .isLiked(post.isLiked())
             .viewCount(post.getViewCount())

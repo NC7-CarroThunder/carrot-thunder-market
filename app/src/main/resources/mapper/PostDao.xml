@@ -37,7 +37,7 @@
 
     <insert id="insert" parameterType="post" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO tbl_article(title, content, view_count, item_category, dealing_type, item_status, price, address, user_id)
-        VALUES(#{title}, #{content}, #{viewCount}, #{itemCategory}, #{dealingType}, #{itemStatus}, #{price}, #{address}, #{userId})
+        VALUES(#{title}, #{content}, #{viewCount}, #{itemCategory}, #{dealingType}, #{itemStatus}, #{price}, #{address}, #{user.id})
     </insert>
 
     <insert id="insertFiles" parameterType="post">

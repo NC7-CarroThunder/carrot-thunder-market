@@ -81,7 +81,7 @@
     from
     tbl_user
     where
-    name=#{name}
+    name=#{nickname}
   </select>
 
   <select id="findByEmail" resultMap="userMap">

@@ -11,17 +11,20 @@ import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
+import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
