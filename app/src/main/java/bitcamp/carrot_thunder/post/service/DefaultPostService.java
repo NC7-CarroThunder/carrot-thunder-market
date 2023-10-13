@@ -2,11 +2,16 @@ package bitcamp.carrot_thunder.post.service;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
+import bitcamp.carrot_thunder.post.model.vo.DealingType;
+import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
+import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.post.model.dao.PostDao;
@@ -31,9 +36,40 @@ public class DefaultPostService implements PostService {
     @Autowired
     PostDao postDao;
 
+    @Autowired
+    NcpObjectStorageService ncpObjectStorageService;
+
+
+    @Override
+    public PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception {
+        Post post = new Post();
+        post.setUser(userDetails.getUser());
+        post.setAddress(postRequestDto.getAddress());
+        post.setContent(postRequestDto.getContent());
+        post.setTitle(postRequestDto.getTitle());
+        post.setPrice(postRequestDto.getPrice());
+        post.setItemCategory(ItemCategory.valueOf(postRequestDto.getItemCategory()));
+        post.setDealingType(DealingType.valueOf(postRequestDto.getDealingType()));
+        post.setItemStatus(ItemStatus.valueOf("SELLING"));
+
+
+
+        ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
+//        for (MultipartFile part : files) {
+//            if (part.getSize() > 0) {
+//                String uploadFileUrl = ncpObjectStorageService.uploadFile(
+//                        "bitcamp-nc7-bucket-24", "post/", part);
+//                AttachedFile attachedFile = new AttachedFile();
+//                attachedFile.setFilePath(uploadFileUrl);
+//                attachedFiles.add(attachedFile);
+//            }
+//        }
+        post.setAttachedFiles(attachedFiles);
+        this.add(post);
+        return PostResponseDto.of(post);
+    }
 
     @Transactional
-
     public int add(Post post) throws Exception {
         int count = postDao.insert(post);
         if (!post.getAttachedFiles().isEmpty()) {

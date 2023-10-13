@@ -2,6 +2,7 @@ package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
+import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.dto.ResponseDto;
@@ -14,18 +15,23 @@ import bitcamp.carrot_thunder.post.service.PostService;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
+
+import bitcamp.carrot_thunder.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/postApi")
+@RequestMapping("/api")
 public class PostController {
 
 
   @Autowired
   PostService postService;
+
+  @Autowired
+  UserService userService;
 
   @Autowired
   NcpObjectStorageService ncpObjectStorageService;
@@ -38,31 +44,9 @@ public class PostController {
   public void form() {
   }
 
-  @PostMapping("add")
-  public String add(Post post, MultipartFile[] files, HttpSession session) throws Exception {
-
-    User loginUser = (User) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "/user/form";
-    }
-    post.setUser(loginUser);
-
-    ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
-    for (MultipartFile part : files) {
-      if (part.getSize() > 0) {
-        String uploadFileUrl = ncpObjectStorageService.uploadFile(
-            "bitcamp-nc7-bucket-24", "post/", part);
-        AttachedFile attachedFile = new AttachedFile();
-        attachedFile.setFilePath(uploadFileUrl);
-        attachedFiles.add(attachedFile);
-      }
-    }
-
-
-    post.setAttachedFiles(attachedFiles);
-
-    postService.add(post);
-    return "redirect:/post/list";
+  @PostMapping("/posts")
+  public PostResponseDto add(PostRequestDto postRequestDto, MultipartFile[] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+    return postService.createPost(postRequestDto,files,userDetails);
   }
 
 
