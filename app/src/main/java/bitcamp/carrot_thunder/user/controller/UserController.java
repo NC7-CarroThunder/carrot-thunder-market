@@ -115,6 +115,7 @@ public class UserController {
     return userService.signup(signupRequestDto,response);
   }
 
+
   @GetMapping("delete")
   public String delete(Long userId, Model model) throws Exception {
     if (userService.delete(userId) == 0) {
@@ -166,11 +167,11 @@ public class UserController {
     return "member/profile";
   }
 
-  @GetMapping("detail/{id}")
-  public String detail(@PathVariable Long userId, Model model) throws Exception {
-    model.addAttribute("user", userService.get(userId));
-    return "member/detail";
-  }
+//  @GetMapping("detail/{id}")
+//  public String detail(@PathVariable Long userId, Model model) throws Exception {
+//    model.addAttribute("user", userService.get(userId));
+//    return "member/detail";
+//  }
 
 
   @PostMapping("update")
@@ -306,10 +307,17 @@ public class UserController {
 //    }
 //  }
 
-  // 프로필 유저 정보 조회
-  @GetMapping("/profiles/{userId}")
-  public ResponseDto<ProfileResponseDto> getProfile(@PathVariable long userId) throws Exception{
-    return ResponseDto.success(userService.getProfile(userId));
+  // 프로필 유저 정보 단순 조회
+  @GetMapping("/profiles/{id}")
+  public ResponseDto<ProfileResponseDto> getProfile(@PathVariable long id) throws Exception{
+    return ResponseDto.success(userService.getProfile(id));
+  }
+
+  // 프로필 유저 정보 세부 조회
+  @GetMapping("/profiles")
+  public ResponseDto<ProfileResponseDto> getProfileDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception{
+    System.out.println(userDetails.getUser().getId());
+    return ResponseDto.success(userService.getProfileDetail(userDetails));
   }
 
 }

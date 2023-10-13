@@ -6,7 +6,7 @@
 
 
   <resultMap type="user" id="userMap">
-    <id column="id" property="userId"/>
+    <id column="id" property="id"/>
     <result column="role" property="role"/>
     <result column="activation" property="activation"/>
     <result column="email" property="email"/>

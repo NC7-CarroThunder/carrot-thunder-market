@@ -190,23 +190,12 @@ public class DefaultUserService implements UserService {
     return dto;
   }
 
-//  public PostResponseDto getPost(Long id, UserDetailsImpl userDetails) {
-//    Post post = postRepository.findById(id).orElseThrow(() -> new NullPointerException("게시글 없음"));
-//    PostResponseDto dto = PostResponseDto.of(post);
-//    if (userDetails != null) { //로그인 했을때 관심상품 여부 set
-//      if (wishRepository.findByUserAndPost(userDetails.getUser(), post).isPresent()) {
-//        dto.wish();
-//      }
-//    }
-//
-//    return dto;
-//  }
+  @Override
+  public ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) {
+//    User user = userDao.getProfileDetail(userDetails.getUser().getId());
+//    User user = userDao.getProfileDetail(userDetails);
+    ProfileResponseDto dto = ProfileResponseDto.detail(userDetails.getUser());
+    return dto;
+  }
 
-/*  public UserResponseDto getUser(UserDetailsImpl userDetails) {
-    User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
-            () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
-    );
-
-    return new UserResponseDto(user);
-  }*/
 }

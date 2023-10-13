@@ -6,6 +6,7 @@ import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -51,5 +52,7 @@ public interface UserService {
 
   void deleteAllNotifications(Long userId) throws Exception;
 
-  ProfileResponseDto getProfile(Long userId) throws Exception;
+  ProfileResponseDto getProfile(Long id) throws Exception;
+
+  ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) throws Exception;
 }

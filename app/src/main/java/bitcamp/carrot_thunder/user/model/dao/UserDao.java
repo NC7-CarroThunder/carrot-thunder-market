@@ -1,5 +1,6 @@
 package bitcamp.carrot_thunder.user.model.dao;
 
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
@@ -52,5 +53,7 @@ public interface UserDao {
 
   void deleteAllNotifications(Long userId) throws Exception;
 
-  User getProfile(Long userId);
+  User getProfile(Long id);
+
+  User getProfileDetail(UserDetailsImpl userDetails);
 }
