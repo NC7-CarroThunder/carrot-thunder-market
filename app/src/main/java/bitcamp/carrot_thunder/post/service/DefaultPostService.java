@@ -70,7 +70,6 @@ public class DefaultPostService implements PostService {
     }
 
     @Transactional
-
     public int add(Post post) throws Exception {
         int count = postDao.insert(post);
         if (!post.getAttachedFiles().isEmpty()) {
