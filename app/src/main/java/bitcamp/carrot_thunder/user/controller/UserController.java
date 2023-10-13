@@ -3,27 +3,25 @@ package bitcamp.carrot_thunder.user.controller;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
-import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
-import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.user.service.KakaoService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import bitcamp.carrot_thunder.post.service.PostService;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -110,32 +108,21 @@ public class UserController {
 
   }
 
-
-
-  // 로그아웃
-  @GetMapping("/logout")
-  public String logout(HttpSession session) throws Exception {
-
-    session.invalidate();
-    return "redirect:/";
-  }
-
-
   // 회원가입
   @PostMapping("/users/signup")
   @ResponseBody
   public String signup(@RequestBody @Valid SignupRequestDto signupRequestDto,  HttpServletResponse response) throws Exception {
     return userService.signup(signupRequestDto,response);
   }
-  @PostMapping("add")
-  public String add(User user) throws Exception {
-    userService.add(user);
-
-    // 회원가입 이메일 전송
-    emailService.sendWelcomeEmail(user);
-
-    return "redirect:form";
-  }
+//  @PostMapping("add")
+//  public String add(User user) throws Exception {
+//    userService.add(user);
+//
+//    // 회원가입 이메일 전송
+//    emailService.sendWelcomeEmail(user);
+//
+//    return "redirect:form";
+//  }
 
   @GetMapping("delete")
   public String delete(Long userId, Model model) throws Exception {
@@ -327,5 +314,12 @@ public class UserController {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  // 프로필 유저 정보 조회
+  @GetMapping("/profiles/{userId}")
+  public ResponseDto<ProfileResponseDto> getProfile(@PathVariable long userId) throws Exception{
+    return ResponseDto.success(userService.getProfile(userId));
+  }
+
 }
 

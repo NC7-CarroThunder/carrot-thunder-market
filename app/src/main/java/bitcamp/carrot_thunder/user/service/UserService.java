@@ -2,6 +2,7 @@ package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
@@ -49,4 +50,6 @@ public interface UserService {
   List<Notification> getNotifications(Long userId) throws Exception;
 
   void deleteAllNotifications(Long userId) throws Exception;
+
+  ProfileResponseDto getProfile(Long userId) throws Exception;
 }

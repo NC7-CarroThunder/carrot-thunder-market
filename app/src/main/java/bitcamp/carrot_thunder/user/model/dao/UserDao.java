@@ -51,4 +51,6 @@ public interface UserDao {
   List<Notification> findNotificationsByUserId(Long userId);
 
   void deleteAllNotifications(Long userId) throws Exception;
+
+  User getProfile(Long userId);
 }

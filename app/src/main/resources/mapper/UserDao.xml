@@ -6,7 +6,7 @@
 
 
   <resultMap type="user" id="userMap">
-    <id column="id" property="id"/>
+    <id column="id" property="userId"/>
     <result column="role" property="role"/>
     <result column="activation" property="activation"/>
     <result column="email" property="email"/>
@@ -177,5 +177,15 @@
   <delete id="deleteAllNotifications" parameterType="int">
     DELETE FROM notification WHERE member_id=#{memberId}
   </delete>
+
+  <select id="getProfile" parameterType="long" resultMap="userMap">
+    select
+      nickname,
+      photo
+    from
+      tbl_user
+    where
+      id=#{userId}
+  </select>
 
 </mapper>

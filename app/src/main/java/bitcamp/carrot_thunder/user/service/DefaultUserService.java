@@ -3,6 +3,7 @@ package bitcamp.carrot_thunder.user.service;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
 import bitcamp.carrot_thunder.user.model.vo.Role;
@@ -181,4 +182,31 @@ public class DefaultUserService implements UserService {
   public void deleteAllNotifications(Long userId) throws Exception {
     userDao.deleteAllNotifications(userId);
   }
+
+  @Override
+  public ProfileResponseDto getProfile(Long userId) {
+    User user = userDao.getProfile(userId);
+    ProfileResponseDto dto = ProfileResponseDto.of(user);
+    return dto;
+  }
+
+//  public PostResponseDto getPost(Long id, UserDetailsImpl userDetails) {
+//    Post post = postRepository.findById(id).orElseThrow(() -> new NullPointerException("게시글 없음"));
+//    PostResponseDto dto = PostResponseDto.of(post);
+//    if (userDetails != null) { //로그인 했을때 관심상품 여부 set
+//      if (wishRepository.findByUserAndPost(userDetails.getUser(), post).isPresent()) {
+//        dto.wish();
+//      }
+//    }
+//
+//    return dto;
+//  }
+
+/*  public UserResponseDto getUser(UserDetailsImpl userDetails) {
+    User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+            () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+    );
+
+    return new UserResponseDto(user);
+  }*/
 }
