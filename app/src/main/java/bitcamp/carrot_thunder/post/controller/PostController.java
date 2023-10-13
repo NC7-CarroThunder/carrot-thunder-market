@@ -45,8 +45,8 @@ public class PostController {
   }
 
   @PostMapping("/posts")
-  public PostResponseDto add(PostRequestDto postRequestDto, MultipartFile[] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-    return postService.createPost(postRequestDto,files,userDetails);
+  public PostResponseDto add(@RequestPart PostRequestDto postRequestDto,@RequestPart MultipartFile[] multipartFiles, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+    return postService.createPost(postRequestDto,multipartFiles,userDetails);
   }
 
 
