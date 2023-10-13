@@ -49,6 +49,12 @@ public class PostController {
     return postService.createPost(postRequestDto,multipartFiles,userDetails);
   }
 
+  @GetMapping("/posts/list")
+  public ResponseDto<List<PostListResponseDto>> getAllPosts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    User user = userDetails != null ? userDetails.getUser() : null;
+    return ResponseDto.success(postService.getPostlist(user, userDetails));
+  }
+
 
 
     /** 게시글 상세정보 컨트롤러
