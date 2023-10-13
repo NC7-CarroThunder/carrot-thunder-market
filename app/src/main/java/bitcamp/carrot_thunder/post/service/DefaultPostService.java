@@ -52,18 +52,17 @@ public class DefaultPostService implements PostService {
         post.setDealingType(DealingType.valueOf(postRequestDto.getDealingType()));
         post.setItemStatus(ItemStatus.valueOf("SELLING"));
 
-
-
         ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
-//        for (MultipartFile part : files) {
-//            if (part.getSize() > 0) {
-//                String uploadFileUrl = ncpObjectStorageService.uploadFile(
-//                        "bitcamp-nc7-bucket-24", "post/", part);
-//                AttachedFile attachedFile = new AttachedFile();
-//                attachedFile.setFilePath(uploadFileUrl);
-//                attachedFiles.add(attachedFile);
-//            }
-//        }
+        for (MultipartFile part : files) {
+            if (part.getSize() > 0) {
+                String uploadFileUrl = ncpObjectStorageService.uploadFile(
+                        "carrot-thunder", "article/", part);
+                AttachedFile attachedFile = new AttachedFile();
+                attachedFile.setFilePath(uploadFileUrl);
+
+                attachedFiles.add(attachedFile);
+            }
+        }
         post.setAttachedFiles(attachedFiles);
         this.add(post);
         return PostResponseDto.of(post);

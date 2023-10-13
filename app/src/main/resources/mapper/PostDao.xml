@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertFiles" parameterType="post">
-        INSERT INTO file(filepath, post_id)
+        INSERT INTO tbl_file(filepath, article_id)
         VALUES
         <foreach collection="attachedFiles" item="file" separator=",">
             (#{file.filePath}, #{id})

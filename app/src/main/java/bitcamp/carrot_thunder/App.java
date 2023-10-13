@@ -10,8 +10,6 @@ import org.springframework.web.util.UrlPathHelper;
 
 @EnableTransactionManagement
 @SpringBootApplication
-@ComponentScan(basePackages = "bitcamp.carrot_thunder.post.service")
-@ComponentScan(basePackages = "bitcamp.carrot_thunder.post.model")
 public class App implements WebMvcConfigurer {
 
   public static void main(String[] args) throws Exception {
