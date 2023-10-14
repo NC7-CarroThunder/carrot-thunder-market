@@ -33,6 +33,7 @@ public class PostResponseDto {
   private int likeCount;
   private List<AttachedFile> attachedFilesPaths;
   private Boolean isLiked;
+  private Long userid;
 
   public static PostResponseDto of(Post post) {
     return PostResponseDto.builder()
@@ -41,6 +42,7 @@ public class PostResponseDto {
             .content(post.getContent())
             .price(post.getPrice())
             .nickname(post.getUser().getNickName())
+            .userid(post.getUser().getId())
             .isLiked(post.isLiked())
             .viewCount(post.getViewCount())
             .itemCategory(post.getItemCategory())
@@ -52,5 +54,4 @@ public class PostResponseDto {
             .attachedFilesPaths(post.getAttachedFiles())
             .build();
   }
-
 }

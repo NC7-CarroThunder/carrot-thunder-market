@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
 
     <resultMap type="post" id="articleMap">
@@ -52,7 +52,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.created_at,
@@ -73,7 +73,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.view_count,
@@ -93,24 +93,11 @@
         a.id DESC
     </select>
 
-
-
-    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
-        SELECT
-        file_id,
-        filepath,
-        post_id
-        FROM
-        file
-        WHERE
-        file_id=#{id}
-    </select>
-
     <select id="getMyPosts" resultMap="articleMap">
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.created_at,
@@ -129,8 +116,6 @@
         ORDER BY
         a.id DESC;
     </select>
-
-
 
     <update id="updateCount" parameterType="int">
         update tbl_article set
@@ -165,13 +150,11 @@
         id=#{id}
     </delete>
 
-
     <delete id="deleteLikes" parameterType="int">
         delete from like_list
         where
         article_id=#{postId}
     </delete>
-
 
     <update id="updateLikeCount">
         UPDATE
@@ -181,7 +164,6 @@
         WHERE
         id = #{postId}
     </update>
-
 
     <insert id="insertLike">
         INSERT INTO
@@ -196,7 +178,6 @@
         article_id = #{postId} AND member_id = #{memberId}
     </delete>
 
-
     <select id="isLiked" resultType="boolean">
         SELECT
         COUNT(*)
@@ -204,7 +185,6 @@
         WHERE
         article_id = #{postId} AND member_id = #{memberId}
     </select>
-
 
     <select id="getLikeCount" resultType="int">
         SELECT
@@ -214,7 +194,6 @@
         WHERE
         article_id = #{postId}
     </select>
-
 
     <select id="getLikedPosts" resultMap="articleMap">
         SELECT
@@ -244,7 +223,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.view_count,
@@ -265,6 +244,4 @@
         WHERE
         a.id=#{postId}
     </select>
-
-
 </mapper>
