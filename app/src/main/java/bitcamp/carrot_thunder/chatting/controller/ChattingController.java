@@ -85,15 +85,10 @@ public class ChattingController {
   }
 
   @GetMapping("/chatting/myChatRooms")
-  public ResponseEntity<Map<String, Object>> getMyChatRooms(HttpServletRequest request) {
+  public ResponseEntity<Map<String, Object>> getMyChatRooms(@RequestParam int userId) {
     Map<String, Object> response = new HashMap<>();
-    User loginUser = (User) request.getSession().getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new IllegalArgumentException("로그인이 필요합니다.");
-    }
-    response.put("chatRooms",
-        chattingService.getChatRoomsForMember(Math.toIntExact(loginUser.getId())));
-    response.put("loginUser", loginUser);
+    response.put("chatRooms", chattingService.getChatRoomsForMember(userId));
     return ResponseEntity.ok(response);
   }
+
 }

@@ -59,4 +59,9 @@ public class DefaultChattingService implements ChattingService {
   public String checkChatRoomExists(int sellerId, int currentUserId, int postId) {
     return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
   }
+
+  @Override
+  public String getNicknameByUserId(int userId) {
+    return chattingDAO.getNicknameByUserId(userId);
+  }
 }

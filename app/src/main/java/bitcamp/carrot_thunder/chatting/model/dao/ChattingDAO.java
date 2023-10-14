@@ -27,4 +27,6 @@ public interface ChattingDAO {
       @Param("roomId") String roomId, @Param("postId") int postId);
 
   ChatRoomVO getChatRoomByRoomId(String roomId);
+
+  String getNicknameByUserId(int userId);
 }
