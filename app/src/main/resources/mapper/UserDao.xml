@@ -199,7 +199,7 @@
     from
       tbl_user
     where
-      id=#{userId}
+      id=#{id}
   </select>
 
 </mapper>

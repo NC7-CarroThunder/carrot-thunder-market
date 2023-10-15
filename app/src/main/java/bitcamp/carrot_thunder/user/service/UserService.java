@@ -61,4 +61,6 @@ public interface UserService {
 
   String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
 
+  String getBalance(UserDetailsImpl userDetails, HttpServletResponse response);
+
 }

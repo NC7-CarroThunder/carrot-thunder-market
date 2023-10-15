@@ -243,4 +243,9 @@ public class DefaultUserService implements UserService {
     return "사용자 확인 완료";
   }
 
+  @Override
+  public String getBalance(UserDetailsImpl userDetails, HttpServletResponse response) {
+    ProfileResponseDto dto = ProfileResponseDto.of(userDetails.getUser());
+    return "잔액 조회 완료";
+  }
 }
