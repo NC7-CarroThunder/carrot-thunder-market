@@ -5,9 +5,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface NotificationService {
 
-  void send(String content, Long receiverId);
-
   SseEmitter connectNotification(Long userId);
+
+  void sendNotification(String content, Long receiverId);
 
   void saveNotification(Notification notification);
 }

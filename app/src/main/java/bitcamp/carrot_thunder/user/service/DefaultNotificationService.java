@@ -1,5 +1,6 @@
 package bitcamp.carrot_thunder.user.service;
 
+import bitcamp.carrot_thunder.user.dto.NotificationResponseDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
@@ -16,43 +17,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class DefaultNotificationService implements NotificationService {
 
-  @Autowired
-  private SqlSession sqlSession;
-
   private final static String ALARM_NAME = "alarm";
   private final EmitterRepository emitterRepository;
-  private final UserDao memberDao;
+  private final UserDao userDao;
+  private final SqlSession sqlSession;
 
-  public void send(String content, Long receiverId) {
-    User user = memberDao.findBy(receiverId);
-    if (user == null) {
-      throw new RuntimeException("Member not found with ID: " + receiverId);
-    }
 
-    Notification notification = new Notification();
-    notification.setUserId(receiverId);
-    notification.setContent(content);
-    notification.setType(ALARM_NAME);
-    notification.setRead(false);
-    notification.setCreatedAt(LocalDateTime.now());
-
-    // 알림 저장
-    this.saveNotification(notification);
-
-    SseEmitter emitter = emitterRepository.get(receiverId);
-    if (emitter != null) {
-      try {
-        emitter.send(SseEmitter.event()
-            .id(String.valueOf(notification.getId()))
-            .name(ALARM_NAME)
-            .data(notification));
-      } catch (IOException exception) {
-        emitterRepository.delete(receiverId);
-        throw new RuntimeException("Error sending the notification.");
-      }
-    }
-  }
-
+  // 알림 조회
+  @Override
   public SseEmitter connectNotification(Long userId) {
     SseEmitter emitter = new SseEmitter(60L * 1000 * 60);  // 1 hour
     emitterRepository.save(userId, emitter);
@@ -61,8 +33,49 @@ public class DefaultNotificationService implements NotificationService {
     return emitter;
   }
 
+  // 알림 전송
+  @Override
+  public void sendNotification (String content, Long receiverId) {
+    User user = userDao.findBy(receiverId);
+    if (user == null) {
+      throw new RuntimeException("Member not found with ID: " + receiverId);
+    }
+
+    Notification notification = createNotification(content, receiverId);
+    // 알림 저장
+    this.saveNotification(notification);
+    // 알림을 전송하고 DTO로 변환하여 반환
+    NotificationResponseDto notificationResponseDto = sendNotificationEvent(notification);
+  }
+
+  private Notification createNotification(String content, Long receiverId) {
+    Notification notification = new Notification();
+    notification.setUserId(receiverId);
+    notification.setContent(content);
+    notification.setType(ALARM_NAME);
+    notification.setRead(false);
+    notification.setCreatedAt(LocalDateTime.now());
+    return notification;
+  }
+
   public void saveNotification(Notification notification) {
-    sqlSession.insert("bitcamp.carrot_thunder.member.model.dao.MemberDao.insertNotification",
-        notification);
+    sqlSession.insert("bitcamp.carrot_thunder.user.model.dao.userDao.insertNotification", notification);
+  }
+
+  private NotificationResponseDto sendNotificationEvent(Notification notification) {
+    SseEmitter emitter = emitterRepository.get(notification.getUserId());
+    if (emitter != null) {
+      try {
+        emitter.send(SseEmitter.event()
+                .id(String.valueOf(notification.getId()))
+                .name(ALARM_NAME)
+                .data(notification));
+      } catch (IOException exception) {
+        emitterRepository.delete(notification.getUserId());
+        throw new RuntimeException("Error sending the notification.");
+      }
+    }
+
+    return NotificationResponseDto.of(notification);
   }
 }
