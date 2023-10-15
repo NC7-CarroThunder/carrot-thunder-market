@@ -10,5 +10,6 @@ public class ProfileRequestDto {
     private String phone;
     private String address;
     private String detailAddress;
+    private String password;
 
 }

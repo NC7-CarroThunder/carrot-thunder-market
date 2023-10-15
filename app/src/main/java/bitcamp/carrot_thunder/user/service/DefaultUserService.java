@@ -211,7 +211,7 @@ public class DefaultUserService implements UserService {
     // 프로필 사진
     if (photo.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
-              "https://kr.object.ncloudstorage.com", "/carrot-thunder/article", photo);
+              "https://kr.object.ncloudstorage.com", "/carrot-thunder/user", photo);
       user.setPhoto(uploadFileUrl);
 
     } else {
@@ -223,71 +223,9 @@ public class DefaultUserService implements UserService {
     user.setPhone(profileRequestDto.getPhone());
     user.setAddress(profileRequestDto.getAddress());
     user.setDetailAddress(profileRequestDto.getDetailAddress());
+    user.setPassword(profileRequestDto.getPassword());
 
     return profileRequestDto;
   }
-
-
-
-
-
-
-
-
-
-//  if (user.getUsername().equals(post.getUser().getUsername())) {
-//    post.update(requestDto);
-//
-//    List<String> remainingImages = requestDto.getRemainingImagesUrlList();
-//
-//    if (remainingImages.isEmpty() && (multipartFiles.isEmpty() || multipartFiles.get(0).isEmpty())) {
-//      throw new IllegalArgumentException("최소 한 장의 사진이 필요합니다.");
-//    }
-//
-//    List<Image> images = imageRepository.findImagesByPostId(postId);
-//
-//    try { // 기존에 업로드한 이미지가 갱신된 판매글에 없을경우 이미지를 S3에서 제거하고 DB에서도 삭제
-//      for (Image image : images) {
-//        if (!remainingImages.contains(image.getImageUrl())) {
-//          post.getImages().remove(image);
-//          String source = URLDecoder.decode(image.getImageUrl().replace("https://dangoon.s3.ap-northeast-2.amazonaws.com/", ""), "UTF-8");
-//          s3Uploader.delete(source);
-//          imageRepository.delete(image);
-//        }
-//      }
-//    } catch (UnsupportedEncodingException e) {
-//      throw new RuntimeException(e);
-//    }
-//
-//    try {
-//      if(multipartFiles != null)
-//        if (!multipartFiles.isEmpty() && !multipartFiles.get(0).isEmpty()) {
-//          for (MultipartFile file : multipartFiles) {
-//            String imageUrl = s3Uploader.upload(file);
-//            Image image = new Image(post, imageUrl);
-//            imageRepository.save(image);
-//            post.addImage(image);
-//          }
-//        }
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    }
-//
-//
-//
-//    return PostResponseDto.of(post);
-//  } else {
-//    throw new IllegalArgumentException("유저 불일치");
-//  }
-//
-//  public ResponseDto<PostResponseDto> updatePost(
-//          @PathVariable Long postId,
-//          @RequestBody PostUpdateRequestDto postUpdateRequestDto,
-//          @RequestParam(required = false) List<MultipartFile> multipartFiles,
-//          @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//
-//
-//    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser(), multipartFiles));
-//  }
 
 }
