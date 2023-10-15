@@ -56,4 +56,8 @@ public class PostResponseDto {
             .attachedFilesPaths(post.getAttachedFiles())
             .build();
   }
+
+  public void setAttachedFiles(List<AttachedFile> attachedFilesPaths) {
+    this.attachedFilesPaths = attachedFilesPaths;
+  }
 }

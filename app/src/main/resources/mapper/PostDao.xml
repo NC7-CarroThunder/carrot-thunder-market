@@ -93,6 +93,17 @@
         a.id DESC
     </select>
 
+    <select id="findImagesByPostId" resultMap="attachedFileMap">
+        SELECT
+        id,
+        filepath,
+        article_id
+        FROM
+        tbl_file
+        WHERE
+        article_id = #{postId}
+    </select>
+
     <select id="getMyPosts" resultMap="articleMap">
         SELECT
         a.id,

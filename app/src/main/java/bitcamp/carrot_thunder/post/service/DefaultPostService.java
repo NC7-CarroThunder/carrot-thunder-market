@@ -196,10 +196,17 @@ public class DefaultPostService implements PostService {
      * @param postId
      * @return
      */
-    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails)  {
-        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
-        return PostResponseDto.of(post);
+    @Override
+    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
+        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
+        List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
+
+        // 이미지 정보를 PostResponseDto에 설정하여 반환합니다.
+        PostResponseDto postResponseDto = PostResponseDto.of(post);
+        postResponseDto.setAttachedFiles(attachedFiles);
+
+        return postResponseDto;
     }
 
 
