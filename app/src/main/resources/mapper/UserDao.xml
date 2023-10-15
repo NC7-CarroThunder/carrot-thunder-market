@@ -188,4 +188,18 @@
       id=#{userId}
   </select>
 
+  <select id="getProfileDetail" parameterType="long" resultMap="userMap">
+    select
+      nickname,
+      photo,
+      email,
+      phone,
+      address,
+      detail_address
+    from
+      tbl_user
+    where
+      id=#{userId}
+  </select>
+
 </mapper>
