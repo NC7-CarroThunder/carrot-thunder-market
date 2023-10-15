@@ -18,9 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class PostResponseDto {
+public class PostResponseDtoD {
 
-  private User user;
   private Long postid;
   private String title;
   private String content;
@@ -37,8 +36,8 @@ public class PostResponseDto {
   private Boolean isLiked;
   private Long userid;
 
-  public static PostResponseDto of(Post post) {
-    return PostResponseDto.builder()
+  public static PostResponseDtoD of(Post post) {
+    return PostResponseDtoD.builder()
             .postid(post.getId())
             .title(post.getTitle())
             .content(post.getContent())

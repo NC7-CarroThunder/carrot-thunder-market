@@ -1,9 +1,11 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
+import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,7 +23,8 @@ public interface PostDao {
     List<Post> findAll();
     int delete(Long id);
     int deleteFile(Long fileId);
-    int deleteFiles(Long postId);
+
+    int deleteChat(Long roodId);
 
     int deleteLikes(Long postId);
     int updateLikeCount(@Param("postId") Long postId, @Param("amount") int amount);
@@ -30,6 +33,7 @@ public interface PostDao {
     boolean isLiked(@Param("postId") Long postId, @Param("userId") Long userId);
     int getLikeCount(Long postId);
     Optional<Post> findPostDetailById(Long id);
-    Optional<Object> findById(Long postId);
+    Optional<Post> findById(Long postId);
     List<AttachedFile> findImagesByPostId(Long postId);
+    List<Post> findPostsByKeyword(String keyword, int offset, int size);
 }

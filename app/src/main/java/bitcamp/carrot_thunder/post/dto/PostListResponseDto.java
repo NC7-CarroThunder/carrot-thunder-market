@@ -1,17 +1,11 @@
 package bitcamp.carrot_thunder.post.dto;
 
-import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.DealingType;
-import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
-import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
-import bitcamp.carrot_thunder.post.model.vo.Post;
+import bitcamp.carrot_thunder.post.model.vo.*;
 import bitcamp.carrot_thunder.user.model.vo.User;
+import lombok.*;
+
 import java.sql.Timestamp;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -20,8 +14,7 @@ import lombok.NoArgsConstructor;
 
 public class PostListResponseDto {
 
-  private User user;
-  private Long postid;
+  private Long postId;
   private String title;
   private int viewCount;
   private Timestamp createdAt;
@@ -29,7 +22,6 @@ public class PostListResponseDto {
   private ItemStatus itemStatus;
   private DealingType dealingType;
   private int price;
-  private String address;
   private String nickname;
   private int likeCount;
   private Boolean isLiked;
@@ -37,10 +29,9 @@ public class PostListResponseDto {
 
   public static PostListResponseDto of(Post post) {
     return PostListResponseDto.builder()
-            .postid(post.getId())
+            .postId(post.getId())
             .title(post.getTitle())
             .price(post.getPrice())
-            .address(post.getAddress())
             .nickname(post.getUser().getNickName())
             .isLiked(post.isLiked())
             .viewCount(post.getViewCount())
@@ -54,6 +45,6 @@ public class PostListResponseDto {
   }
 
 
-    public void setIsLiked(boolean isLiked) {
-    }
+  public void setIsLiked(boolean isLiked) {
+  }
 }
