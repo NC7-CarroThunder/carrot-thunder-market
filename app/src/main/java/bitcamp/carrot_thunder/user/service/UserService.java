@@ -2,6 +2,7 @@ package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -16,8 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 public interface UserService {
-
-  public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception;
 
   String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception;
 
@@ -59,4 +58,7 @@ public interface UserService {
   ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) throws Exception;
 
   ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto) throws Exception;
+
+  String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
+
 }

@@ -7,6 +7,7 @@ import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -330,10 +331,17 @@ public class UserController {
   public ResponseDto<ProfileRequestDto> updateProfile(
           @AuthenticationPrincipal UserDetailsImpl userDetails,
           @RequestBody ProfileRequestDto profileRequestDto,
-          @RequestParam(required = false) MultipartFile multipartFile) throws Exception{
+          @RequestParam(required = false) MultipartFile multipartFile) throws Exception {
     return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto));
   }
 
+  // 프로필 유저 정보 수정 전 암호 체크
+  @GetMapping("/profiles/passwdcheck")
+  public String passwdCheck(
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          @RequestBody PasswdCheckRequestDto passwdCheckRequestDto) throws Exception {
+    return userService.passwdCheck(userDetails, passwdCheckRequestDto);
+  }
 
 }
 

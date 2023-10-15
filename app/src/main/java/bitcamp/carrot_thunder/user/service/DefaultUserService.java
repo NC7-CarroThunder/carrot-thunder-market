@@ -5,6 +5,7 @@ import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -190,6 +191,7 @@ public class DefaultUserService implements UserService {
     userDao.deleteAllNotifications(userId);
   }
 
+  // 프로필 유저 정보 단순 조회
   @Override
   public ProfileResponseDto getProfile(Long userId) {
     User user = userDao.getProfile(userId);
@@ -197,14 +199,16 @@ public class DefaultUserService implements UserService {
     return dto;
   }
 
+  // 프로필 유저 정보 세부 조회
   @Override
   public ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) {
 //    User user = userDao.getProfileDetail(userDetails.getUser().getId());
-//    User user = userDao.getProfileDetail(userDetails);
-    ProfileResponseDto dto = ProfileResponseDto.detail(userDetails.getUser());
+    User user = userDao.getProfileDetail(userDetails);
+    ProfileResponseDto dto = ProfileResponseDto.detail(user);
     return dto;
   }
 
+  // 프로필 유저 정보 업데이트
   @Override
   public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto) throws Exception {
     User user = userDetails.getUser();
@@ -223,9 +227,20 @@ public class DefaultUserService implements UserService {
     user.setPhone(profileRequestDto.getPhone());
     user.setAddress(profileRequestDto.getAddress());
     user.setDetailAddress(profileRequestDto.getDetailAddress());
-    user.setPassword(profileRequestDto.getPassword());
+    user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
 
     return profileRequestDto;
+  }
+
+  // 프로필 유저 정보 수정 전 암호 체크
+  @Override
+  public String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto passwdCheckRequestDto) throws Exception {
+    String password = passwdCheckRequestDto.getPassword();
+    if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!");
+    }
+
+    return "사용자 확인 완료";
   }
 
 }
