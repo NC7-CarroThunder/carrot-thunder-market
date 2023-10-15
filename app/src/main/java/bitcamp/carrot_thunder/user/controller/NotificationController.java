@@ -4,6 +4,7 @@ import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.service.NotificationService;
 import bitcamp.carrot_thunder.user.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,15 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class NotificationController {
 
     private final NotificationService notificationService;
     private final UserService userService;
-
-    public NotificationController(NotificationService notificationService, UserService userService) {
-        this.notificationService = notificationService;
-        this.userService = userService;
-    }
 
     // 알림 조회
     @GetMapping("/notifications/check")
