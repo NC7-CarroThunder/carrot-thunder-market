@@ -29,4 +29,6 @@ public interface ChattingDAO {
   ChatRoomVO getChatRoomByRoomId(String roomId);
 
   String getNicknameByUserId(int userId);
+
+  List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
 }

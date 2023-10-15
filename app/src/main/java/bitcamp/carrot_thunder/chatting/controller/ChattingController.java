@@ -91,4 +91,9 @@ public class ChattingController {
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping("/chatting/allRoomsOrdered")
+  public ResponseEntity<List<ChatRoomVO>> getAllChatRoomsOrdered() {
+    List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
+    return ResponseEntity.ok(rooms);
+  }
 }

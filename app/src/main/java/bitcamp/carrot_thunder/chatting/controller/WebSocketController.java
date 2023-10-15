@@ -36,6 +36,9 @@ public class WebSocketController {
   @MessageMapping("/send")
   public ChatMessageVO handleSendMessage(ChatMessageVO message,
       SimpMessageHeaderAccessor headerAccessor) {
+    if (message.getRoomId() == null || message.getRoomId().trim().isEmpty()) {
+      throw new IllegalArgumentException("채팅방 ID가 제공되지 않았습니다.");
+    }
 
     Integer userId = message.getSenderId();
 

@@ -64,4 +64,9 @@ public class DefaultChattingService implements ChattingService {
   public String getNicknameByUserId(int userId) {
     return chattingDAO.getNicknameByUserId(userId);
   }
+
+  @Override
+  public List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated() {
+    return chattingDAO.getAllChatRoomsOrderedByLastUpdated();
+  }
 }
