@@ -1,14 +1,17 @@
 package bitcamp.carrot_thunder.user.service;
 
+
+import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
+import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.model.vo.User;
-import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +21,7 @@ import javax.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class DefaultUserService implements UserService {
@@ -25,11 +29,14 @@ public class DefaultUserService implements UserService {
   private final UserDao userDao;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
+  private final NcpObjectStorageService ncpObjectStorageService;
 
-  public DefaultUserService(UserDao userDao, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+
+  public DefaultUserService(UserDao userDao, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, NcpObjectStorageService ncpObjectStorageService) {
     this.userDao = userDao;
     this.jwtUtil = jwtUtil;
     this.passwordEncoder = passwordEncoder;
+    this.ncpObjectStorageService = ncpObjectStorageService;
   }
 
 
@@ -197,5 +204,90 @@ public class DefaultUserService implements UserService {
     ProfileResponseDto dto = ProfileResponseDto.detail(userDetails.getUser());
     return dto;
   }
+
+  @Override
+  public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto) throws Exception {
+    User user = userDetails.getUser();
+    // 프로필 사진
+    if (photo.getSize() > 0) {
+      String uploadFileUrl = ncpObjectStorageService.uploadFile(
+              "https://kr.object.ncloudstorage.com", "/carrot-thunder/article", photo);
+      user.setPhoto(uploadFileUrl);
+
+    } else {
+      // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.
+      user.setPhoto(user.getPhoto());
+    }
+
+    user.setNickName(profileRequestDto.getNickName());
+    user.setPhone(profileRequestDto.getPhone());
+    user.setAddress(profileRequestDto.getAddress());
+    user.setDetailAddress(profileRequestDto.getDetailAddress());
+
+    return profileRequestDto;
+  }
+
+
+
+
+
+
+
+
+
+//  if (user.getUsername().equals(post.getUser().getUsername())) {
+//    post.update(requestDto);
+//
+//    List<String> remainingImages = requestDto.getRemainingImagesUrlList();
+//
+//    if (remainingImages.isEmpty() && (multipartFiles.isEmpty() || multipartFiles.get(0).isEmpty())) {
+//      throw new IllegalArgumentException("최소 한 장의 사진이 필요합니다.");
+//    }
+//
+//    List<Image> images = imageRepository.findImagesByPostId(postId);
+//
+//    try { // 기존에 업로드한 이미지가 갱신된 판매글에 없을경우 이미지를 S3에서 제거하고 DB에서도 삭제
+//      for (Image image : images) {
+//        if (!remainingImages.contains(image.getImageUrl())) {
+//          post.getImages().remove(image);
+//          String source = URLDecoder.decode(image.getImageUrl().replace("https://dangoon.s3.ap-northeast-2.amazonaws.com/", ""), "UTF-8");
+//          s3Uploader.delete(source);
+//          imageRepository.delete(image);
+//        }
+//      }
+//    } catch (UnsupportedEncodingException e) {
+//      throw new RuntimeException(e);
+//    }
+//
+//    try {
+//      if(multipartFiles != null)
+//        if (!multipartFiles.isEmpty() && !multipartFiles.get(0).isEmpty()) {
+//          for (MultipartFile file : multipartFiles) {
+//            String imageUrl = s3Uploader.upload(file);
+//            Image image = new Image(post, imageUrl);
+//            imageRepository.save(image);
+//            post.addImage(image);
+//          }
+//        }
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//
+//
+//
+//    return PostResponseDto.of(post);
+//  } else {
+//    throw new IllegalArgumentException("유저 불일치");
+//  }
+//
+//  public ResponseDto<PostResponseDto> updatePost(
+//          @PathVariable Long postId,
+//          @RequestBody PostUpdateRequestDto postUpdateRequestDto,
+//          @RequestParam(required = false) List<MultipartFile> multipartFiles,
+//          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//
+//
+//    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser(), multipartFiles));
+//  }
 
 }

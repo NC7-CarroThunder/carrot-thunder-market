@@ -7,6 +7,7 @@ import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.mail.EmailService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -88,11 +90,11 @@ public class UserController {
     return userService.login(loginInfo,response);
   }
 
-  @PatchMapping("/users/patch")
-  @ResponseBody
-  public String patch(@AuthenticationPrincipal UserDetailsImpl userDetails,String password) throws Exception {
-    return userService.patchPassword(userDetails, password);
-  }
+//  @PatchMapping("/users/patch")
+//  @ResponseBody
+//  public String patch(@AuthenticationPrincipal UserDetailsImpl userDetails,String password) throws Exception {
+//    return userService.patchPassword(userDetails, password);
+//  }
 
 
   // 카카오 로그인 관련 컨트롤러
@@ -319,9 +321,19 @@ public class UserController {
   // 프로필 유저 정보 세부 조회
   @GetMapping("/profiles")
   public ResponseDto<ProfileResponseDto> getProfileDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception{
-    System.out.println(userDetails.getUser().getId());
+//    System.out.println(userDetails.getUser().getId()); // 넘어오는 값 확인
     return ResponseDto.success(userService.getProfileDetail(userDetails));
   }
+
+  // 프로필 유저 정보 업데이트
+  @PutMapping("/profiles")
+  public ResponseDto<ProfileRequestDto> updateProfile(
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          @RequestBody ProfileRequestDto profileRequestDto,
+          @RequestParam(required = false) MultipartFile multipartFile) throws Exception{
+    return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto));
+  }
+
 
 }
 

@@ -18,12 +18,12 @@ public class User implements Serializable {
   private Long id;
   private Role role;
   private Activation activation;
-  private String email;
-  private String password;
-  private String nickName;
-  private String phone;
-  private String address;
-  private String detailAddress;
+  private @Setter String email;
+  private @Setter String password;
+  private @Setter String nickName;
+  private @Setter String phone;
+  private @Setter String address;
+  private @Setter String detailAddress;
   private Timestamp createdAt;
   private @Setter String photo;
   private int point;
@@ -46,4 +46,5 @@ public class User implements Serializable {
     this.detailAddress = detailAddress;
     this.photo = photo;
   }
+
 }

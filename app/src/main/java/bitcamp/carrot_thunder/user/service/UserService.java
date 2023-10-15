@@ -2,12 +2,14 @@ package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
+import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -55,4 +57,6 @@ public interface UserService {
   ProfileResponseDto getProfile(Long id) throws Exception;
 
   ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) throws Exception;
+
+  ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto) throws Exception;
 }

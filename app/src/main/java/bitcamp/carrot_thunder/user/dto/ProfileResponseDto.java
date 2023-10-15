@@ -18,7 +18,7 @@ public class ProfileResponseDto {
     private String email;
     private String phone;
     private String address;
-    private String detail_address;
+    private String detailAddress;
 
     public static ProfileResponseDto of(User user) {
         return ProfileResponseDto.builder()
@@ -34,7 +34,7 @@ public class ProfileResponseDto {
                 .email(user.getEmail())
                 .phone(user.getEmail())
                 .address(user.getAddress())
-                .detail_address(user.getDetailAddress())
+                .detailAddress(user.getDetailAddress())
                 .build();
     }
 }
