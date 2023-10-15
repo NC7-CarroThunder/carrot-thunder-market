@@ -1,11 +1,9 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
-import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import java.util.Optional;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

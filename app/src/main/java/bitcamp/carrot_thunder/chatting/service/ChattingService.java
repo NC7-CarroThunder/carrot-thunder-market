@@ -23,4 +23,6 @@ public interface ChattingService {
   String checkChatRoomExists(int sellerId, int currentUserId, int postId);
 
   String getNicknameByUserId(int userId);
+
+  List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
 }

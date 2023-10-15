@@ -133,6 +133,7 @@
     ) f ON cr.article_id = f.article_id
     WHERE
     cr.seller_id = #{userId} OR cr.buyer_id = #{userId}
+    ORDER BY cr.last_updated DESC
   </select>
 
   <select id="checkChatRoomExists" resultType="String">
@@ -151,5 +152,9 @@
 
   <select id="getNicknameByUserId" resultType="String">
     SELECT nickname FROM tbl_user WHERE id = #{userId}
+  </select>
+
+  <select id="getAllChatRoomsOrderedByLastUpdated" resultMap="ChatRoomMap">
+    SELECT * FROM tbl_chat_room ORDER BY last_updated DESC;
   </select>
 </mapper>

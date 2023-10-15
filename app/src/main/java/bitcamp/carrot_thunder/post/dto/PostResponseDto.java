@@ -1,15 +1,17 @@
 package bitcamp.carrot_thunder.post.dto;
 
-import bitcamp.carrot_thunder.post.model.vo.*;
+import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
+import bitcamp.carrot_thunder.post.model.vo.DealingType;
+import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
+import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
+import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.user.model.vo.User;
+import java.sql.Timestamp;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
-import java.sql.Timestamp;
-import java.util.List;
 
 @Getter
 @Builder
