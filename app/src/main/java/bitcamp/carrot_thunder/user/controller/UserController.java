@@ -22,7 +22,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,31 +37,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class UserController {
 
+  // @AllArgsConstructor 를 통한 의존성 주입
+  private final NcpConfig ncpConfig;
+  private final NcpObjectStorageService ncpObjectStorageService;
+  private final KakaoService kakaoService;
+  private final UserService userService;
+  private final PostService postService;
   private final EmailService emailService;
-
-  public UserController(UserService userService, EmailService emailService) {
-    this.userService = userService;
-    this.emailService = emailService;
-  }
-
-  @Autowired
-  NcpConfig ncpConfig;
-
-  @Autowired
-  UserService userService;
-
-  @Autowired
-  KakaoService kakaoService;
-
-  @Autowired
-  NcpObjectStorageService ncpObjectStorageService;
-
-  @Autowired
-  PostService postService;
 
 
   // 로그인
