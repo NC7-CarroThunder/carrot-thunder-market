@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
 
     <resultMap type="post" id="articleMap">
@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertFiles" parameterType="post">
-        INSERT INTO tbl_file(filepath, article_id)
+        INSERT INTO file(filepath, article_id)
         VALUES
         <foreach collection="attachedFiles" item="file" separator=",">
             (#{file.filePath}, #{id})
@@ -52,7 +52,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id as user_id,
+        u.id,
         a.title,
         a.content,
         a.created_at,
@@ -73,7 +73,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id as user_id,
+        u.id,
         a.title,
         a.content,
         a.view_count,
@@ -127,22 +127,22 @@
 
     </select>
 
-    <select id="findImagesByPostId" resultMap="attachedFileMap">
+    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
         SELECT
-        id,
+        file_id,
         filepath,
-        article_id
+        post_id
         FROM
-        tbl_file
+        file
         WHERE
-        article_id = #{postId}
+        file_id=#{id}
     </select>
 
     <select id="getMyPosts" resultMap="articleMap">
         SELECT
         a.id,
         u.nickname,
-        u.id as user_id,
+        u.id,
         a.title,
         a.content,
         a.created_at,
@@ -162,6 +162,8 @@
         a.id DESC;
     </select>
 
+
+
     <update id="updateCount" parameterType="int">
         update tbl_article set
         view_count=view_count + 1
@@ -169,37 +171,47 @@
         id=#{no}
     </update>
 
-    <delete id="deleteFile" parameterType="int">
-        delete from file
+    <delete id="deleteFile" parameterType="Long">
+        delete from tbl_file
         where
-        file_id=#{id}
+        id=#{id}
     </delete>
 
-    <delete id="deleteFiles" parameterType="int">
-        delete from file
+    <delete id="deleteFiles" parameterType="Long">
+        delete from tbl_file
         where
         article_id=#{postId}
+    </delete>
+
+    <delete id="deleteChat" parameterType="Long">
+        delete from tbl_chat
+        where
+        id=#{id}
     </delete>
 
     <update id="update" parameterType="post">
         update tbl_article set
         title=#{title},
-        content=#{content}
+        content=#{content},
+        price=#{price},
+        address=#{address}
         where
         id=#{id}
     </update>
 
-    <delete id="delete" parameterType="int">
+    <delete id="delete" parameterType="Long">
         delete from tbl_article
         where
         id=#{id}
     </delete>
+
 
     <delete id="deleteLikes" parameterType="int">
         delete from like_list
         where
         article_id=#{postId}
     </delete>
+
 
     <update id="updateLikeCount">
         UPDATE
@@ -209,6 +221,7 @@
         WHERE
         id = #{postId}
     </update>
+
 
     <insert id="insertLike">
         INSERT INTO
@@ -223,6 +236,7 @@
         article_id = #{postId} AND member_id = #{memberId}
     </delete>
 
+
     <select id="isLiked" resultType="boolean">
         SELECT
         COUNT(*)
@@ -230,6 +244,7 @@
         WHERE
         article_id = #{postId} AND member_id = #{memberId}
     </select>
+
 
     <select id="getLikeCount" resultType="int">
         SELECT
@@ -239,6 +254,7 @@
         WHERE
         article_id = #{postId}
     </select>
+
 
     <select id="getLikedPosts" resultMap="articleMap">
         SELECT
@@ -268,7 +284,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id as user_id,
+        u.id,
         a.title,
         a.content,
         a.view_count,
@@ -289,4 +305,12 @@
         WHERE
         a.id=#{postId}
     </select>
+
+    <select id="findImagesByPostId" parameterType="java.lang.Long">
+        SELECT * FROM tbl_file WHERE article_id = #{postId}
+    </select>
+
+
+
+
 </mapper>

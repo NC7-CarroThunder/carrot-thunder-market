@@ -5,7 +5,7 @@ import bitcamp.carrot_thunder.post.model.vo.DealingType;
 import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
 import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
 import bitcamp.carrot_thunder.post.model.vo.Post;
-import bitcamp.carrot_thunder.user.model.vo.User;
+
 import java.sql.Timestamp;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 
 public class PostResponseDto {
 
-  private User user;
   private Long postid;
   private String title;
   private String content;
