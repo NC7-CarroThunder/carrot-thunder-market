@@ -66,11 +66,6 @@ public class DefaultUserService implements UserService {
 
   }
 
-  public String patchPassword(UserDetailsImpl userDetails, String password) throws Exception {
-    this.updatePasswordByName(userDetails.getUsername(),passwordEncoder.encode(password));
-    return "비밀번호 변경 완료";
-  }
-
 
   @Transactional
   @Override
@@ -243,6 +238,7 @@ public class DefaultUserService implements UserService {
     return "사용자 확인 완료";
   }
 
+  // 잔액 조회
   @Override
   public String getBalance(UserDetailsImpl userDetails, HttpServletResponse response) {
     ProfileResponseDto dto = ProfileResponseDto.of(userDetails.getUser());
