@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
 
     <resultMap type="post" id="articleMap">
@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertFiles" parameterType="post">
-        INSERT INTO tbl_file(filepath, article_id)
+        INSERT INTO file(filepath, article_id)
         VALUES
         <foreach collection="attachedFiles" item="file" separator=",">
             (#{file.filePath}, #{id})
@@ -93,15 +93,6 @@
         a.id DESC
     </select>
 
-    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
-        SELECT
-        file_id,
-        filepath,
-        post_id
-        FROM
-        file
-        WHERE
-        file_id=#{id}
     <select id="findByPage" resultMap="articleMap">
         SELECT
         a.id,
@@ -136,7 +127,15 @@
 
     </select>
 
-    <select id="findImagesByPostId" resultMap="attachedFileMap">
+    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
+        SELECT
+        file_id,
+        filepath,
+        post_id
+        FROM
+        file
+        WHERE
+        file_id=#{id}
     </select>
 
     <select id="getMyPosts" resultMap="articleMap">
