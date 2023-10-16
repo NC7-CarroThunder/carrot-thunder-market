@@ -69,4 +69,9 @@ public class DefaultChattingService implements ChattingService {
   public List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated() {
     return chattingDAO.getAllChatRoomsOrderedByLastUpdated();
   }
+
+  @Override
+  public String getFirstAttachmentByPostId(Long postId) {
+    return chattingDAO.getFirstAttachmentByPostId(postId);
+  }
 }

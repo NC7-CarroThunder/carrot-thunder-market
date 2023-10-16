@@ -7,7 +7,7 @@ public class ChatRoomVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private String roomId;
-  private int postId;
+  private Long postId;
   private int sellerId;
   private int buyerId;
   private String lastMessage;
@@ -16,6 +16,7 @@ public class ChatRoomVO implements Serializable {
   private String buyerNickname;
   private String postTitle;
   private String postAttachment;
+  private Long messageId;
 
   public String getRoomId() {
     return roomId;
@@ -25,11 +26,11 @@ public class ChatRoomVO implements Serializable {
     this.roomId = roomId;
   }
 
-  public int getPostId() {
+  public Long getPostId() {
     return postId;
   }
 
-  public void setPostId(int postId) {
+  public void setPostId(Long postId) {
     this.postId = postId;
   }
 
@@ -95,5 +96,13 @@ public class ChatRoomVO implements Serializable {
 
   public void setPostAttachment(String postAttachment) {
     this.postAttachment = postAttachment;
+  }
+
+  public Long getMessageId() {
+    return messageId;
+  }
+
+  public void setMessageId(Long messageId) {
+    this.messageId = messageId;
   }
 }
