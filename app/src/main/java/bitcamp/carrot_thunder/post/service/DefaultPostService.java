@@ -153,18 +153,17 @@ public class DefaultPostService implements PostService {
 
 
     @Override
-    public List<PostListResponseDto> getPostlist(User user, UserDetailsImpl userDetails) {
-
-        List<Post> posts = postDao.findAll();
+    public List<PostListResponseDto> getPostlist(User user,  int page) {
+        List<Post> posts = postDao.findByPage((page-1) * 8, page * 8);
         List<PostListResponseDto> dtoList = new ArrayList<>();
 
         for (Post post : posts) {
             PostListResponseDto responseDto = PostListResponseDto.of(post);
-
-            if (userDetails != null) {
-                boolean isLiked = postDao.isLiked(post.getId(), user.getId());
-                responseDto.setIsLiked(isLiked);
+            boolean isLiked = false;
+            if (user != null) {
+                isLiked = postDao.isLiked(post.getId(), user.getId());
             }
+            responseDto.setIsLiked(isLiked);
             dtoList.add(responseDto);
         }
 
