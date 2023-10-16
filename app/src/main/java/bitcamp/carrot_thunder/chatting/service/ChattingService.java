@@ -25,4 +25,6 @@ public interface ChattingService {
   String getNicknameByUserId(int userId);
 
   List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
+
+  String getFirstAttachmentByPostId(Long postId);
 }

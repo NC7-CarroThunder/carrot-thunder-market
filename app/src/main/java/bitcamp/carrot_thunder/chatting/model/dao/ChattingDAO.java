@@ -31,4 +31,6 @@ public interface ChattingDAO {
   String getNicknameByUserId(int userId);
 
   List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
+
+  String getFirstAttachmentByPostId(Long postId);
 }

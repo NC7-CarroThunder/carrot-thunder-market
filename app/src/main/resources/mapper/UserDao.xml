@@ -178,4 +178,28 @@
     DELETE FROM notification WHERE member_id=#{memberId}
   </delete>
 
+  <select id="getProfile" parameterType="long" resultMap="userMap">
+    select
+      nickname,
+      photo
+    from
+      tbl_user
+    where
+      id=#{userId}
+  </select>
+
+  <select id="getProfileDetail" parameterType="long" resultMap="userMap">
+    select
+      nickname,
+      photo,
+      email,
+      phone,
+      address,
+      detail_address
+    from
+      tbl_user
+    where
+      id=#{id}
+  </select>
+
 </mapper>
