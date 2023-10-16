@@ -96,4 +96,10 @@ public class ChattingController {
     List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
     return ResponseEntity.ok(rooms);
   }
+
+  @GetMapping("/chatting/getFirstAttachment")
+  public ResponseEntity<String> getFirstAttachmentByPostId(@RequestParam Long postId) {
+    String attachment = chattingService.getFirstAttachmentByPostId(postId);
+    return ResponseEntity.ok(attachment);
+  }
 }
