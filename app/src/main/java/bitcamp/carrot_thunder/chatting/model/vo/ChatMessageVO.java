@@ -12,6 +12,7 @@ public class ChatMessageVO implements Serializable {
   private LocalDateTime sentAt;
   private char isRead;
   private String senderNickname;
+  private String targetLang;
 
   public int getMessageId() {
     return messageId;
@@ -67,5 +68,13 @@ public class ChatMessageVO implements Serializable {
 
   public void setSenderNickname(String senderNickname) {
     this.senderNickname = senderNickname;
+  }
+
+  public String getTargetLang() {
+    return targetLang;
+  }
+
+  public void setTargetLang(String targetLang) {
+    this.targetLang = targetLang;
   }
 }

@@ -154,7 +154,7 @@ public class PapagoTranslationService {
     try {
       JSONObject jsonObject = new JSONObject(jsonResponse);
       return jsonObject.getJSONObject("message").getJSONObject("result")
-          .getString("translatedText");
+              .getString("translatedText");
     } catch (Exception e) {
       e.printStackTrace();
     }
