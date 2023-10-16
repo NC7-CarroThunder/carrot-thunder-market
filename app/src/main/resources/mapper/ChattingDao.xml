@@ -157,4 +157,19 @@
   <select id="getAllChatRoomsOrderedByLastUpdated" resultMap="ChatRoomMap">
     SELECT * FROM tbl_chat_room ORDER BY last_updated DESC;
   </select>
+
+    <delete id="deleteChatRoomByPostId" parameterType="java.lang.Long">
+        DELETE FROM tbl_chat_room
+        WHERE article_id = #{postId}
+    </delete>
+
+    <delete id="deleteChatMsgByRoomId" parameterType="java.lang.String">
+        DELETE FROM tbl_chat_message
+        WHERE room_id = #{roomId}
+    </delete>
+
+    <select id="getRoomIdByPostId" parameterType="java.lang.Long" >
+        SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
+    </select>
+
 </mapper>

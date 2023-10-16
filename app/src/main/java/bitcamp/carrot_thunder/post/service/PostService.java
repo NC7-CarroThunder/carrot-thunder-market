@@ -2,7 +2,7 @@ package bitcamp.carrot_thunder.post.service;
 
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
-import bitcamp.carrot_thunder.post.dto.PostResponseDtoD;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
@@ -16,7 +16,7 @@ import java.util.List;
 public interface PostService {
     int add(Post post) throws Exception;
 
-    PostResponseDtoD createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception;
+    PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception;
 
     int increaseViewCount(Long postId) throws Exception;
 
@@ -28,11 +28,12 @@ public interface PostService {
 
     int deletePost(Long postId, User user);
 
-    PostResponseDtoD getPost(Long postId, UserDetailsImpl userDetails);
+    PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
 
 
     Object updatePost(Long postId, PostUpdateRequestDto requestDto,User user);
 //    Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
+
 
 
 }

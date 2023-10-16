@@ -3,9 +3,10 @@ package bitcamp.carrot_thunder.post.service;
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
+import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
-import bitcamp.carrot_thunder.post.dto.PostResponseDtoD;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
 import bitcamp.carrot_thunder.post.model.vo.*;
@@ -15,6 +16,7 @@ import bitcamp.carrot_thunder.post.model.dao.PostDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,9 @@ public class DefaultPostService implements PostService {
 
 
     @Autowired
+    ChattingDAO chattingDao;
+
+    @Autowired
     PostDao postDao;
 
     @Autowired
@@ -35,7 +40,7 @@ public class DefaultPostService implements PostService {
 
 
     @Override
-    public PostResponseDtoD createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception {
+    public PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception {
         Post post = new Post();
         post.setUser(userDetails.getUser());
         post.setAddress(postRequestDto.getAddress());
@@ -59,7 +64,7 @@ public class DefaultPostService implements PostService {
         }
         post.setAttachedFiles(attachedFiles);
         this.add(post);
-        return PostResponseDtoD.of(post);
+        return PostResponseDto.of(post);
     }
 
     @Transactional
@@ -81,16 +86,15 @@ public class DefaultPostService implements PostService {
     //TODO : 로그인 유저 , 게시글 유저 비교 필요
 
     @Transactional
-    public PostResponseDtoD updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
+    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
+
+        Post post =  postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
 
+        if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
+            throw NotHaveAuthorityException.EXCEPTION;
+        }
 
-        Post post =  postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
-
-//        // 게시물의 작성자와 로그인한 사용자의 ID 비교
-//        if (!Objects.equals(userDetails.getUser().getId(), post.getUser().getId())) {
-//            throw NotHaveAuthorityException.EXCEPTION;
-//        }
 
 
 //        List<String> uploadedImageUrls = new ArrayList<>();
@@ -114,7 +118,7 @@ public class DefaultPostService implements PostService {
 //        List<String> remainingImages = getRemainingImages(requestDto);
 //
 //        handleImageUpdates(post, remainingImages);
-        return PostResponseDtoD.of(post);
+        return PostResponseDto.of(post);
     }
 
 //    private List<String> getRemainingImages(PostUpdateRequestDto postUpdateRequestDto) {
@@ -150,6 +154,7 @@ public class DefaultPostService implements PostService {
 
     @Override
     public List<PostListResponseDto> getPostlist(User user, UserDetailsImpl userDetails) {
+
         List<Post> posts = postDao.findAll();
         List<PostListResponseDto> dtoList = new ArrayList<>();
 
@@ -189,28 +194,30 @@ public class DefaultPostService implements PostService {
     public int deletePost(Long postId, User user) {
 
         Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        String roomId = chattingDao.getRoomIdByPostId(postId);
+
+        if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
+            throw NotHaveAuthorityException.EXCEPTION;
+        }
+
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
         for (AttachedFile attachedFile : attachedFiles) {
             if (!post.getAttachedFiles().isEmpty()) {
                 // S3에서 이미지 삭제
-                ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + attachedFile.getFilename());
+                ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + attachedFile.getFilePath());
                 // DB에서 이미지 삭제
                 postDao.deleteFile(attachedFile.getId());
             }
 //            postDao.deleteLikes()
-//            postDao.deleteChat()
         }
+
+            chattingDao.deleteChatMsgByRoomId(roomId);
+
+            chattingDao.deleteChatRoomByPostId(postId);
         return postDao.delete(postId);
 
     }
-
-
-
-
-
-
-
 
 
 
@@ -221,12 +228,12 @@ public class DefaultPostService implements PostService {
      * @return
      */
     @Override
-    public PostResponseDtoD getPost(Long postId, UserDetailsImpl userDetails) {
+    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
         Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
 
-        PostResponseDtoD postResponseDto = PostResponseDtoD.of(post);
+        PostResponseDto postResponseDto = PostResponseDto.of(post);
         postResponseDto.setAttachedFiles(attachedFiles);
 
         return postResponseDto;

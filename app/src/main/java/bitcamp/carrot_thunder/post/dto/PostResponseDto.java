@@ -5,7 +5,7 @@ import bitcamp.carrot_thunder.post.model.vo.DealingType;
 import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
 import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
 import bitcamp.carrot_thunder.post.model.vo.Post;
-import bitcamp.carrot_thunder.user.model.vo.User;
+
 import java.sql.Timestamp;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class PostResponseDtoD {
+public class PostResponseDto {
 
   private Long postid;
   private String title;
@@ -36,8 +36,8 @@ public class PostResponseDtoD {
   private Boolean isLiked;
   private Long userid;
 
-  public static PostResponseDtoD of(Post post) {
-    return PostResponseDtoD.builder()
+  public static PostResponseDto of(Post post) {
+    return PostResponseDto.builder()
             .postid(post.getId())
             .title(post.getTitle())
             .content(post.getContent())

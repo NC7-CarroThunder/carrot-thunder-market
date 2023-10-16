@@ -1,7 +1,7 @@
 package bitcamp.carrot_thunder.post.controller;
 
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
-import bitcamp.carrot_thunder.post.dto.PostResponseDtoD;
+import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.dto.ResponseDto;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
@@ -27,7 +27,7 @@ public class PostController {
   }
 
   @PostMapping("/posts")
-  public PostResponseDtoD add(PostRequestDto postRequestDto, MultipartFile[] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+  public PostResponseDto add(PostRequestDto postRequestDto, MultipartFile[] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
     return postService.createPost(postRequestDto,files,userDetails);
   }
 
@@ -43,7 +43,7 @@ public class PostController {
 
 
   @GetMapping("/posts/{postId}")
-  public ResponseDto<PostResponseDtoD> getPost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+  public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseDto.success(postService.getPost(postId, userDetails));
   }
 
@@ -58,14 +58,13 @@ public class PostController {
    */
 
   @PutMapping("/posts/{postId}")
-  public ResponseDto<PostResponseDtoD> updatePost(
+  public ResponseDto<PostResponseDto> updatePost(
           @PathVariable Long postId,
           @RequestBody PostUpdateRequestDto postUpdateRequestDto,
 //            @RequestPart MultipartFile[] files,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-
-    return ResponseDto.success((PostResponseDtoD) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser() ));
+    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser() ));
   }
 
   @DeleteMapping("/posts/{postId}")
