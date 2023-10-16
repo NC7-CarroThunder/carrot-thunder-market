@@ -93,6 +93,40 @@
         a.id DESC
     </select>
 
+    <select id="findByPage" resultMap="articleMap">
+        SELECT
+        a.id,
+        u.nickname,
+        u.id as user_id,
+        a.title,
+        a.content,
+        a.view_count,
+        a.created_at,
+        a.dealing_type,
+        a.item_category,
+        a.item_status,
+        a.address,
+        a.price,
+        f.id,
+        f.filepath
+        FROM
+        tbl_article a
+        INNER JOIN tbl_user u ON a.user_id = u.id
+        LEFT OUTER JOIN (
+        SELECT article_id, MIN(id) as id, filepath
+        FROM tbl_file
+        GROUP BY article_id
+        ) f ON a.id = f.article_id
+        ORDER BY
+        a.id DESC
+        LIMIT #{start}, #{end};
+
+
+
+
+
+    </select>
+
     <select id="findImagesByPostId" resultMap="attachedFileMap">
         SELECT
         id,

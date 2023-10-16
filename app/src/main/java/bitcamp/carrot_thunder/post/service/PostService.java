@@ -20,7 +20,7 @@ public interface PostService {
 
     Post get(Long id) throws Exception;
 
-    List<PostListResponseDto> getPostlist(User user, UserDetailsImpl userDetails);
+    List<PostListResponseDto> getPostlist(User user, int page);
 
     AttachedFile getAttachedFile(Long fileId) throws Exception;
 
