@@ -57,5 +57,5 @@ public interface UserDao {
 
   User getProfile(Long userId);
 
-  User getProfileDetail(UserDetailsImpl userDetails);
+  User getProfileDetail(Long userId);
 }

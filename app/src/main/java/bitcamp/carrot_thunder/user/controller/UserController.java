@@ -152,7 +152,7 @@ public class UserController {
   // 프로필 유저 정보 세부 조회
   @GetMapping("/profiles")
   public ResponseDto<ProfileResponseDto> getProfileDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception{
-//    System.out.println(userDetails.getUser().getId()); // 넘어오는 값 확인
+    System.out.println(userDetails.getUser().getId()); // 넘어오는 값 확인
     return ResponseDto.success(userService.getProfileDetail(userDetails));
   }
 

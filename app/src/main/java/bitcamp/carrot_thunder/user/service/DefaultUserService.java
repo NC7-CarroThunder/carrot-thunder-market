@@ -197,8 +197,7 @@ public class DefaultUserService implements UserService {
   // 프로필 유저 정보 세부 조회
   @Override
   public ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) {
-//    User user = userDao.getProfileDetail(userDetails.getUser().getId());
-    User user = userDao.getProfileDetail(userDetails);
+    User user = userDao.getProfileDetail(userDetails.getUser().getId());
     ProfileResponseDto dto = ProfileResponseDto.detail(user);
     return dto;
   }
