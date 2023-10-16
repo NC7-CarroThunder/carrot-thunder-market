@@ -36,7 +36,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } else if (requestURL.equals("http://localhost:8888/api/users/login")) {
             filterChain.doFilter(request,response);
             return;
+        } else if (requestURL.equals("http://localhost:8888/api/users/signup")) {
+            filterChain.doFilter(request,response);
+            return;
         }
+
 
         System.out.println(request.getRequestURL().toString());
 
