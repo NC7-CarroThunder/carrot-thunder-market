@@ -284,7 +284,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.view_count,
@@ -306,8 +306,15 @@
         a.id=#{postId}
     </select>
 
-    <select id="findImagesByPostId" parameterType="java.lang.Long">
-        SELECT * FROM tbl_file WHERE article_id = #{postId}
+    <select id="findImagesByPostId" resultMap="attachedFileMap" >
+        SELECT
+        id,
+        filepath,
+        article_id
+        FROM
+        tbl_file
+        WHERE
+        article_id = #{postId}
     </select>
 
 

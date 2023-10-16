@@ -34,7 +34,7 @@ public interface PostDao {
     boolean isLiked(@Param("postId") Long postId, @Param("userId") Long userId);
     int getLikeCount(Long postId);
     Optional<Post> findPostDetailById(Long id);
-    Optional<Post> findById(Long postId);
+    Optional<Object> findById(Long postId);
     List<AttachedFile> findImagesByPostId(Long postId);
     List<Post> findPostsByKeyword(String keyword, int offset, int size);
 }

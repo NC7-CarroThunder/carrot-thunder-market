@@ -88,7 +88,7 @@ public class DefaultPostService implements PostService {
     @Transactional
     public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
 
-        Post post =  postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post =  (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
@@ -192,7 +192,7 @@ public class DefaultPostService implements PostService {
     @Transactional
     public int deletePost(Long postId, User user) {
 
-        Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
         String roomId = chattingDao.getRoomIdByPostId(postId);
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
@@ -228,7 +228,7 @@ public class DefaultPostService implements PostService {
      */
     @Override
     public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
-        Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
 
