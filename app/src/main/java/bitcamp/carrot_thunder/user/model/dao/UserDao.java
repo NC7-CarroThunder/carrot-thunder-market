@@ -1,8 +1,11 @@
 package bitcamp.carrot_thunder.user.model.dao;
 
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -51,4 +54,8 @@ public interface UserDao {
   List<Notification> findNotificationsByUserId(Long userId);
 
   void deleteAllNotifications(Long userId) throws Exception;
+
+  User getProfile(Long userId);
+
+  User getProfileDetail(Long userId);
 }

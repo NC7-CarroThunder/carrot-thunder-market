@@ -41,7 +41,7 @@
   <resultMap id="ChatRoomWithAttachmentMap"
     type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
     <result column="roomId" property="roomId"/>
-    <result column="article_id" property="postId"/>
+    <result column="postId" property="postId"/>
     <result column="sellerId" property="sellerId"/>
     <result column="buyerId" property="buyerId"/>
     <result column="lastMessage" property="lastMessage"/>
@@ -50,6 +50,7 @@
     <result column="buyerNickname" property="buyerNickname"/>
     <result column="postTitle" property="postTitle"/>
     <result column="postAttachment" property="postAttachment"/>
+    <result column="messageId" property="messageId"/>
   </resultMap>
 
   <select id="getChatRoomByPostIdAndUserId" resultMap="ChatRoomMap">
@@ -112,29 +113,36 @@
     cr.article_id AS postId,
     cr.seller_id AS sellerId,
     cr.buyer_id AS buyerId,
-    cr.last_message AS lastMessage,
+    cm.message_id AS messageId, -- 메시지 ID 추가
+    cm.content AS lastMessage, -- 마지막 메시지 내용 추가
     cr.last_updated AS lastUpdated,
     m1.nickname AS sellerNickname,
     m2.nickname AS buyerNickname,
     a.title AS postTitle,
-    f.filepath AS postAttachment <!-- 수정된 부분 -->
+    f.filepath AS postAttachment
     FROM
     tbl_chat_room cr
-    JOIN
-    tbl_article a ON cr.article_id = a.id
     JOIN
     tbl_user m1 ON cr.seller_id = m1.id
     JOIN
     tbl_user m2 ON cr.buyer_id = m2.id
     LEFT JOIN (
+    SELECT room_id, MAX(message_id) AS max_message_id
+    FROM tbl_chat_message
+    GROUP BY room_id
+    ) max_message ON cr.room_id = max_message.room_id
+    LEFT JOIN tbl_chat_message cm ON max_message.room_id = cm.room_id AND max_message.max_message_id = cm.message_id
+    LEFT JOIN (
     SELECT article_id, MIN(filepath) as filepath
     FROM tbl_file
     GROUP BY article_id
     ) f ON cr.article_id = f.article_id
+    LEFT JOIN tbl_article a ON cr.article_id = a.id
     WHERE
     cr.seller_id = #{userId} OR cr.buyer_id = #{userId}
     ORDER BY cr.last_updated DESC
   </select>
+
 
   <select id="checkChatRoomExists" resultType="String">
     SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND buyer_id = #{currentUserId}
@@ -158,6 +166,7 @@
     SELECT * FROM tbl_chat_room ORDER BY last_updated DESC;
   </select>
 
+
     <delete id="deleteChatRoomByPostId" parameterType="java.lang.Long">
         DELETE FROM tbl_chat_room
         WHERE article_id = #{postId}
@@ -171,5 +180,12 @@
     <select id="getRoomIdByPostId" parameterType="java.lang.Long" >
         SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
     </select>
+
+
+  <select id="getFirstAttachmentByPostId" resultType="String">
+    SELECT MIN(filepath) AS filepath
+    FROM tbl_file
+    WHERE article_id = #{postId}
+  </select>
 
 </mapper>

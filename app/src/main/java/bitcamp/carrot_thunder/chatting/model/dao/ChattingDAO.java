@@ -32,9 +32,12 @@ public interface ChattingDAO {
 
   List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
 
+
     int deleteChatRoomByPostId(@Param("postId") Long postId);
 
     int deleteChatMsgByRoomId(@Param("roomId") String roomId);
 
     String getRoomIdByPostId(@Param("postId") Long postId);
+
+
 }
