@@ -8,6 +8,8 @@ public interface ChattingService {
 
   ChatRoomVO getChatRoomByPostIdAndUserId(int postId, int currentUserId);
 
+  List<ChatMessageVO> getMessagesByRoomId(String roomId);
+
   void saveMessage(ChatMessageVO message);
 
   List<ChatRoomVO> getChatRoomsForSeller(int sellerId);
@@ -18,7 +20,9 @@ public interface ChattingService {
 
   ChatRoomVO getChatRoomByRoomId(String roomId);
 
-  List<ChatMessageVO> getMessagesByRoomId(String roomId);
-
   String checkChatRoomExists(int sellerId, int currentUserId, int postId);
+
+  String getNicknameByUserId(int userId);
+
+  List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated();
 }

@@ -82,6 +82,14 @@ dependencies {
     implementation 'org.apache.clerezza.ext:org.json.simple:0.4'
 }
 
+tasks.register('checkBuildStatus') {
+    doLast {
+        if (project.hasProperty('buildFailed') && project.buildFailed) {
+            throw new GradleException("Build failed. Blocking merge.")
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

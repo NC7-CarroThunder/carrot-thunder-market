@@ -1,15 +1,17 @@
 package bitcamp.carrot_thunder.post.dto;
 
-import bitcamp.carrot_thunder.post.model.vo.*;
+import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
+import bitcamp.carrot_thunder.post.model.vo.DealingType;
+import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
+import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
+import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.user.model.vo.User;
+import java.sql.Timestamp;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
-import java.sql.Timestamp;
-import java.util.List;
 
 @Getter
 @Builder
@@ -33,6 +35,7 @@ public class PostResponseDto {
   private int likeCount;
   private List<AttachedFile> attachedFilesPaths;
   private Boolean isLiked;
+  private Long userid;
 
   public static PostResponseDto of(Post post) {
     return PostResponseDto.builder()
@@ -41,6 +44,7 @@ public class PostResponseDto {
             .content(post.getContent())
             .price(post.getPrice())
             .nickname(post.getUser().getNickName())
+            .userid(post.getUser().getId())
             .isLiked(post.isLiked())
             .viewCount(post.getViewCount())
             .itemCategory(post.getItemCategory())
@@ -53,4 +57,7 @@ public class PostResponseDto {
             .build();
   }
 
+  public void setAttachedFiles(List<AttachedFile> attachedFilesPaths) {
+    this.attachedFilesPaths = attachedFilesPaths;
+  }
 }

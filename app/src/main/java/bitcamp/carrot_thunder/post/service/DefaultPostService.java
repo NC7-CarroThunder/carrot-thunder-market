@@ -2,27 +2,24 @@ package bitcamp.carrot_thunder.post.service;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.config.NcpConfig;
-import bitcamp.carrot_thunder.dto.ResponseDto;
+import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
-import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
+import bitcamp.carrot_thunder.post.model.dao.PostDao;
+import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.DealingType;
 import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
 import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
+import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
-import bitcamp.carrot_thunder.post.model.dao.PostDao;
-import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.Post;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,18 +49,17 @@ public class DefaultPostService implements PostService {
         post.setDealingType(DealingType.valueOf(postRequestDto.getDealingType()));
         post.setItemStatus(ItemStatus.valueOf("SELLING"));
 
-
-
         ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
-//        for (MultipartFile part : files) {
-//            if (part.getSize() > 0) {
-//                String uploadFileUrl = ncpObjectStorageService.uploadFile(
-//                        "bitcamp-nc7-bucket-24", "post/", part);
-//                AttachedFile attachedFile = new AttachedFile();
-//                attachedFile.setFilePath(uploadFileUrl);
-//                attachedFiles.add(attachedFile);
-//            }
-//        }
+        for (MultipartFile part : files) {
+            if (part.getSize() > 0) {
+                String uploadFileUrl = ncpObjectStorageService.uploadFile(
+                        "carrot-thunder", "article/", part);
+                AttachedFile attachedFile = new AttachedFile();
+                attachedFile.setFilePath(uploadFileUrl);
+
+                attachedFiles.add(attachedFile);
+            }
+        }
         post.setAttachedFiles(attachedFiles);
         this.add(post);
         return PostResponseDto.of(post);
@@ -200,10 +196,17 @@ public class DefaultPostService implements PostService {
      * @param postId
      * @return
      */
-    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails)  {
-        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
-        return PostResponseDto.of(post);
+    @Override
+    public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
+        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
+        List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
+
+        // 이미지 정보를 PostResponseDto에 설정하여 반환합니다.
+        PostResponseDto postResponseDto = PostResponseDto.of(post);
+        postResponseDto.setAttachedFiles(attachedFiles);
+
+        return postResponseDto;
     }
 
 

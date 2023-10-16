@@ -36,6 +36,9 @@ public class WebSocketController {
   @MessageMapping("/send")
   public ChatMessageVO handleSendMessage(ChatMessageVO message,
       SimpMessageHeaderAccessor headerAccessor) {
+    if (message.getRoomId() == null || message.getRoomId().trim().isEmpty()) {
+      throw new IllegalArgumentException("채팅방 ID가 제공되지 않았습니다.");
+    }
 
     Integer userId = message.getSenderId();
 
@@ -50,6 +53,8 @@ public class WebSocketController {
       throw new IllegalArgumentException("존재하지 않는 채팅방입니다. RoomId: " + message.getRoomId());
     }
 
+    String senderNickname = chattingService.getNicknameByUserId(message.getSenderId());
+    message.setSenderNickname(senderNickname);
     String translatedMessage = papagoTranslationService.detectAndTranslate(message.getContent(),
         "ko");
     message.setContent(translatedMessage);

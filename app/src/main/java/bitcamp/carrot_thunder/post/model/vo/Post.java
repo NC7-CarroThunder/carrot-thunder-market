@@ -1,16 +1,14 @@
 package bitcamp.carrot_thunder.post.model.vo;
 
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
-//import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.User;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.List;
 
 @Getter
 @Setter
