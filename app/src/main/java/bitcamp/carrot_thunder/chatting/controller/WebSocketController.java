@@ -34,8 +34,8 @@ public class WebSocketController {
   }
 
   @MessageMapping("/send")
-  public ChatMessageVO handleSendMessage(ChatMessageVO message,
-      SimpMessageHeaderAccessor headerAccessor) {
+  public ChatMessageVO handleSendMessage(@Payload ChatMessageVO message,
+                                         SimpMessageHeaderAccessor headerAccessor) {
     if (message.getRoomId() == null || message.getRoomId().trim().isEmpty()) {
       throw new IllegalArgumentException("채팅방 ID가 제공되지 않았습니다.");
     }
@@ -55,8 +55,8 @@ public class WebSocketController {
 
     String senderNickname = chattingService.getNicknameByUserId(message.getSenderId());
     message.setSenderNickname(senderNickname);
-    String translatedMessage = papagoTranslationService.detectAndTranslate(message.getContent(),
-        "ko");
+    String translatedMessage = papagoTranslationService.detectAndTranslate(message.getContent(), message.getTargetLang());
+    message.setContent(translatedMessage);
     message.setContent(translatedMessage);
 
     chattingService.saveMessage(message);
