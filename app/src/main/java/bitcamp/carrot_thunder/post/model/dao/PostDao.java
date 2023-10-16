@@ -19,6 +19,7 @@ public interface PostDao {
     int update(Post post);
     AttachedFile findFileByfileId(Long fileId);
     List<Post> findAll();
+    List<Post> findByPage(int start, int end);
     int delete(Long id);
     int deleteFile(Long fileId);
     int deleteFiles(Long postId);
