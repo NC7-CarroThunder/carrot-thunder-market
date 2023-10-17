@@ -32,7 +32,7 @@ public class ProfileResponseDto {
                 .nickname(user.getNickName())
                 .photo(user.getPhoto())
                 .email(user.getEmail())
-                .phone(user.getEmail())
+                .phone(user.getPhone())
                 .address(user.getAddress())
                 .detailAddress(user.getDetailAddress())
                 .build();

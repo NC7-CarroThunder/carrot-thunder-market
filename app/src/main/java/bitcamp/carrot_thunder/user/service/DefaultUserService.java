@@ -192,7 +192,7 @@ public class DefaultUserService implements UserService {
   public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto) throws Exception {
     User user = userDetails.getUser();
     // 프로필 사진
-    if (photo.getSize() > 0) {
+    if (photo != null && photo.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
               "carrot-thunder", "user/", photo);
       user.setPhoto(uploadFileUrl);
@@ -201,14 +201,35 @@ public class DefaultUserService implements UserService {
       user.setPhoto(user.getPhoto());
     }
 
-    user.setNickName(profileRequestDto.getNickName());
-    user.setPhone(profileRequestDto.getPhone());
-    user.setAddress(profileRequestDto.getAddress());
-    user.setDetailAddress(profileRequestDto.getDetailAddress());
-    user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
+    if (profileRequestDto.getNickname() != null) {
+      user.setNickName(profileRequestDto.getNickname());
+    }
 
+    if (profileRequestDto.getPhone() != null) {
+      user.setPhone(profileRequestDto.getPhone());
+    }
+
+    if (profileRequestDto.getAddress() != null) {
+      user.setAddress(profileRequestDto.getAddress());
+    }
+
+    if (profileRequestDto.getDetailAddress() != null) {
+      user.setDetailAddress(profileRequestDto.getDetailAddress());
+    }
+
+    if (profileRequestDto.getPassword() != null) {
+      user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
+    }
+    userDao.updateProfile(user);
+//    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId())); //닉네임 변경으로 인한 토큰 재발급
     return profileRequestDto;
   }
+
+//  @Transactional
+//  @Override
+//  public int update(User user) throws Exception {
+//    return userDao.update(user);
+//  }
 
   // 프로필 유저 정보 수정 전 암호 체크
   @Override
