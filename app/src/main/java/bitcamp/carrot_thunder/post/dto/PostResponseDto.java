@@ -31,7 +31,7 @@ public class PostResponseDto {
     private DealingType dealingType;
     private String address;
     private int price;
-    private String nickname;
+    private String nickName;
     private int likeCount;
     private List<AttachedFile> attachedFilesPaths;
     private Boolean isLiked;
@@ -43,7 +43,7 @@ public class PostResponseDto {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .price(post.getPrice())
-                .nickname(post.getUser().getNickName())
+                .nickName(post.getUser().getNickName())
                 .userid(post.getUser().getId())
                 .isLiked(post.isLiked())
                 .viewCount(post.getViewCount())
