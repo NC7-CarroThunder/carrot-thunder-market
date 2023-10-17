@@ -30,8 +30,6 @@ public interface PostDao {
     int deleteChat(Long roodId);
 
     int deleteLikes(Long postId);
-    int updateLikeCount(@Param("postId") Long postId, @Param("amount") int amount);
-    int insertLike(@Param("postId") Long postId, @Param("userId") Long userId);
     int deleteLike(@Param("postId") Long postId, @Param("userId") Long userId);
     boolean isLiked(@Param("postId") Long postId, @Param("userId") Long userId);
     int getLikeCount(Long postId);
@@ -39,4 +37,9 @@ public interface PostDao {
     Optional<Object> findById(Long postId);
     List<AttachedFile> findImagesByPostId(Long postId);
     List<Post> findPostsByKeyword(String keyword, int offset, int size);
+
+    int addWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
+    int removeWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
+    int isInWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
+    List<Post> getUserWishlist(Long user_id);
 }

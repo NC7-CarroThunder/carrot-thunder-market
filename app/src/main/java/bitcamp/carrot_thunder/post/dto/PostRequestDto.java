@@ -16,5 +16,4 @@ public class PostRequestDto {
   private String address;
   private int price;
 
-//이걸로게시글작성
 }
