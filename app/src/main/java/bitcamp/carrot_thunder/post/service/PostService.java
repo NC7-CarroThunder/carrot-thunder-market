@@ -8,32 +8,35 @@ import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 
 public interface PostService {
-    int add(Post post) throws Exception;
 
-    PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files, UserDetailsImpl userDetails) throws Exception;
+  int add(Post post) throws Exception;
 
-    int increaseViewCount(Long postId) throws Exception;
+  PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files,
+      UserDetailsImpl userDetails) throws Exception;
 
-    Post get(Long id) throws Exception;
+  int increaseViewCount(Long postId) throws Exception;
 
-    List<PostListResponseDto> getPostlist(User user, int page, String category);
+  Post get(Long id) throws Exception;
 
-    AttachedFile getAttachedFile(Long fileId) throws Exception;
+  List<PostListResponseDto> getPostlist(User user, int page, String category);
 
-    int deletePost(Long postId, User user);
+  AttachedFile getAttachedFile(Long fileId) throws Exception;
 
-    PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
+  int deletePost(Long postId, User user);
 
+  PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
 
-    Object updatePost(Long postId, PostUpdateRequestDto requestDto,User user);
-//    Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
+  Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user);
+  // Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
 
+  void toggleWishlist(Long article_id, User user);
 
+  List<Post> getUserWishlist(User user);
 
+  boolean isInWishlist(Long userId, Long postId);
 }
