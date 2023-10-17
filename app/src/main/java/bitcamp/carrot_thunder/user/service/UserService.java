@@ -3,6 +3,7 @@ package bitcamp.carrot_thunder.user.service;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
+import bitcamp.carrot_thunder.user.dto.PaymentsResponseDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -36,22 +37,18 @@ public interface UserService {
 
   void updatePasswordByName(String nickName, String password) throws Exception;
 
-  boolean memberFollow(Long followerId, Long followingId) throws Exception;
-
-  boolean isFollowed(Long followerId, Long followingId) throws Exception;
-
-  List<User> getFollowers(Long userId) throws Exception;
-
-  List<User> getFollowings(Long userId) throws Exception;
+//  boolean memberFollow(Long followerId, Long followingId) throws Exception;
+//
+//  boolean isFollowed(Long followerId, Long followingId) throws Exception;
+//
+//  List<User> getFollowers(Long userId) throws Exception;
+//
+//  List<User> getFollowings(Long userId) throws Exception;
 
   @Transactional
   int delete(Long userId) throws Exception;
 
   User get(Long userId, HttpSession session) throws Exception;
-
-  List<Notification> getNotifications(Long userId) throws Exception;
-
-  void deleteAllNotifications(Long userId) throws Exception;
 
   ProfileResponseDto getProfile(Long id) throws Exception;
 
@@ -61,6 +58,6 @@ public interface UserService {
 
   String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
 
-  String getBalance(UserDetailsImpl userDetails, HttpServletResponse response);
+  PaymentsResponseDto getBalance(UserDetailsImpl userDetails, HttpServletResponse response);
 
 }
