@@ -3,9 +3,11 @@ package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
+import bitcamp.carrot_thunder.user.dto.PaymentsResponseDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -19,27 +21,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@RequiredArgsConstructor
 public class DefaultUserService implements UserService {
 
   private final UserDao userDao;
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
   private final NcpObjectStorageService ncpObjectStorageService;
-
-
-  public DefaultUserService(UserDao userDao, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, NcpObjectStorageService ncpObjectStorageService) {
-    this.userDao = userDao;
-    this.jwtUtil = jwtUtil;
-    this.passwordEncoder = passwordEncoder;
-    this.ncpObjectStorageService = ncpObjectStorageService;
-  }
-
 
   @Override
   public String login(LoginRequestDto loginInfo, HttpServletResponse response) throws Exception {
@@ -137,21 +132,21 @@ public class DefaultUserService implements UserService {
 
 
 
-  @Override
-  public boolean memberFollow(Long currentMemberId, Long userId) throws Exception {
-    boolean isFollowed = userDao.isFollowed(currentMemberId, userId);
-    if (isFollowed) {
-      userDao.deleteFollow(currentMemberId, userId);
-    } else {
-      userDao.insertFollow(currentMemberId, userId);
-    }
-    return !isFollowed;
-  }
-
-  @Override
-  public boolean isFollowed(Long currentMemberId, Long userId) throws Exception {
-    return userDao.isFollowed(currentMemberId, userId);
-  }
+//  @Override
+//  public boolean memberFollow(Long currentMemberId, Long userId) throws Exception {
+//    boolean isFollowed = userDao.isFollowed(currentMemberId, userId);
+//    if (isFollowed) {
+//      userDao.deleteFollow(currentMemberId, userId);
+//    } else {
+//      userDao.insertFollow(currentMemberId, userId);
+//    }
+//    return !isFollowed;
+//  }
+//
+//  @Override
+//  public boolean isFollowed(Long currentMemberId, Long userId) throws Exception {
+//    return userDao.isFollowed(currentMemberId, userId);
+//  }
 
   @Override
   public User get(Long userId, HttpSession session) throws Exception {
@@ -166,25 +161,15 @@ public class DefaultUserService implements UserService {
     return user;
   }
 
-  @Override
-  public List<User> getFollowers(Long userId) throws Exception {
-    return userDao.getFollowers(userId);
-  }
-
-  @Override
-  public List<User> getFollowings(Long userId) throws Exception {
-    return userDao.getFollowings(userId);
-  }
-
-  @Override
-  public List<Notification> getNotifications(Long userId) throws Exception {
-    return userDao.findNotificationsByUserId(userId);
-  }
-
-  @Override
-  public void deleteAllNotifications(Long userId) throws Exception {
-    userDao.deleteAllNotifications(userId);
-  }
+//  @Override
+//  public List<User> getFollowers(Long userId) throws Exception {
+//    return userDao.getFollowers(userId);
+//  }
+//
+//  @Override
+//  public List<User> getFollowings(Long userId) throws Exception {
+//    return userDao.getFollowings(userId);
+//  }
 
   // 프로필 유저 정보 단순 조회
   @Override
@@ -209,9 +194,8 @@ public class DefaultUserService implements UserService {
     // 프로필 사진
     if (photo.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
-              "https://kr.object.ncloudstorage.com", "/carrot-thunder/user", photo);
+              "carrot-thunder", "user/", photo);
       user.setPhoto(uploadFileUrl);
-
     } else {
       // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.
       user.setPhoto(user.getPhoto());
@@ -239,8 +223,8 @@ public class DefaultUserService implements UserService {
 
   // 잔액 조회
   @Override
-  public String getBalance(UserDetailsImpl userDetails, HttpServletResponse response) {
-    ProfileResponseDto dto = ProfileResponseDto.of(userDetails.getUser());
-    return "잔액 조회 완료";
+  public PaymentsResponseDto getBalance(UserDetailsImpl userDetails, HttpServletResponse response) {
+    PaymentsResponseDto dto = PaymentsResponseDto.of(userDetails.getUser());
+    return dto;
   }
 }
