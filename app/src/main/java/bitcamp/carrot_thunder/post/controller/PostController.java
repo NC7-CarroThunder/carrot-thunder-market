@@ -30,39 +30,38 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 public class PostController {
 
+  @Autowired
+  PostService postService;
 
-    @Autowired
-    PostService postService;
+  @Autowired
+  UserService userService;
 
-    @Autowired
-    UserService userService;
+  @Autowired
+  NcpObjectStorageService ncpObjectStorageService;
 
-    @Autowired
-    NcpObjectStorageService ncpObjectStorageService;
+  @Autowired
+  DefaultNotificationService defaultNotificationService;
 
-    @Autowired
-    DefaultNotificationService defaultNotificationService;
+  @GetMapping("form")
+  public void form() {
+  }
 
+  @PostMapping("/posts")
+  public PostResponseDto add(@RequestPart PostRequestDto postRequestDto, @RequestPart MultipartFile[] multipartFiles,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+    return postService.createPost(postRequestDto, multipartFiles, userDetails);
+  }
 
-    @GetMapping("form")
-    public void form() {
-    }
+  @GetMapping("/posts/list")
+  public ResponseDto<List<PostListResponseDto>> getAllPosts(@AuthenticationPrincipal UserDetailsImpl userDetails,
+      String pageNo, String category) {
+    System.out.println("category : " + category);
+    User user = userDetails != null ? userDetails.getUser() : null;
+    return ResponseDto.success(postService.getPostlist(user, Integer.parseInt(pageNo), category));
+  }
 
-    @PostMapping("/posts")
-    public PostResponseDto add(@RequestPart PostRequestDto postRequestDto,@RequestPart MultipartFile[] multipartFiles, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-        return postService.createPost(postRequestDto,multipartFiles,userDetails);
-    }
-
-    @GetMapping("/posts/list")
-    public ResponseDto<List<PostListResponseDto>> getAllPosts(@AuthenticationPrincipal UserDetailsImpl userDetails,String pageNo) {
-        User user = userDetails != null ? userDetails.getUser() : null;
-        return ResponseDto.success(postService.getPostlist(user, Integer.parseInt(pageNo)));
-    }
-
-
-
-
-    /** 게시글 상세정보 컨트롤러
+  /**
+   * 게시글 상세정보 컨트롤러
    *
    *
    * @param postId
@@ -70,37 +69,36 @@ public class PostController {
    * @return
    */
 
-
   @GetMapping("/posts/{postId}")
-  public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+  public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseDto.success(postService.getPost(postId, userDetails));
   }
 
-
-
-  /** 게시글 수정 컨트롤러
+  /**
+   * 게시글 수정 컨트롤러
    *
    *
-
+   * 
    * @param
    * @return
    */
 
   @PutMapping("/posts/{postId}")
   public ResponseDto<PostResponseDto> updatePost(
-          @PathVariable Long postId,
-          @RequestBody PostUpdateRequestDto postUpdateRequestDto,
-//            @RequestPart MultipartFile[] files,
-          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @PathVariable Long postId,
+      @RequestBody PostUpdateRequestDto postUpdateRequestDto,
+      // @RequestPart MultipartFile[] files,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    return ResponseDto.success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser() ));
+    return ResponseDto
+        .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto, userDetails.getUser()));
   }
 
   @DeleteMapping("/posts/{postId}")
-  public ResponseDto<Integer> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+  public ResponseDto<Integer> deletePost(@PathVariable Long postId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
   }
-
-
 
 }

@@ -88,7 +88,7 @@ public class DefaultPostService implements PostService {
     @Transactional
     public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
 
-        Post post =  postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post =  (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
@@ -153,8 +153,13 @@ public class DefaultPostService implements PostService {
 
 
     @Override
-    public List<PostListResponseDto> getPostlist(User user,  int page) {
-        List<Post> posts = postDao.findByPage((page-1) * 8, page * 8);
+    public List<PostListResponseDto> getPostlist(User user,  int page, String category) {
+        List<Post> posts;
+        if (category.equals("TOTAL")) {
+            posts = postDao.findByPage((page-1) * 8,  8);
+        } else {
+            posts = postDao.findByPageAndCategory((page-1) * 8, 8, ItemCategory.valueOf(category));
+        }
         List<PostListResponseDto> dtoList = new ArrayList<>();
 
         for (Post post : posts) {
@@ -192,7 +197,7 @@ public class DefaultPostService implements PostService {
     @Transactional
     public int deletePost(Long postId, User user) {
 
-        Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
         String roomId = chattingDao.getRoomIdByPostId(postId);
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
@@ -228,7 +233,7 @@ public class DefaultPostService implements PostService {
      */
     @Override
     public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
-        Post post = postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
 

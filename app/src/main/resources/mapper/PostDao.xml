@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertFiles" parameterType="post">
-        INSERT INTO file(filepath, article_id)
+        INSERT INTO tbl_file(filepath, article_id)
         VALUES
         <foreach collection="attachedFiles" item="file" separator=",">
             (#{file.filePath}, #{id})
@@ -120,11 +120,37 @@
         ORDER BY
         a.id DESC
         LIMIT #{start}, #{end};
+    </select>
 
-
-
-
-
+    <select id="findByPageAndCategory" resultMap="articleMap">
+        SELECT
+        a.id,
+        u.nickname,
+        u.id as user_id,
+        a.title,
+        a.content,
+        a.view_count,
+        a.created_at,
+        a.dealing_type,
+        a.item_category,
+        a.item_status,
+        a.address,
+        a.price,
+        f.id,
+        f.filepath
+        FROM
+        tbl_article a
+        INNER JOIN tbl_user u ON a.user_id = u.id
+        LEFT OUTER JOIN (
+        SELECT article_id, MIN(id) as id, filepath
+        FROM tbl_file
+        GROUP BY article_id
+        ) f ON a.id = f.article_id
+        WHERE
+        a.item_category = #{category}
+        ORDER BY
+        a.id DESC
+        LIMIT #{start}, #{end};
     </select>
 
     <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
@@ -284,7 +310,7 @@
         SELECT
         a.id,
         u.nickname,
-        u.id,
+        u.id as user_id,
         a.title,
         a.content,
         a.view_count,
@@ -306,8 +332,15 @@
         a.id=#{postId}
     </select>
 
-    <select id="findImagesByPostId" parameterType="java.lang.Long">
-        SELECT * FROM tbl_file WHERE article_id = #{postId}
+    <select id="findImagesByPostId" resultMap="attachedFileMap" >
+        SELECT
+        id,
+        filepath,
+        article_id
+        FROM
+        tbl_file
+        WHERE
+        article_id = #{postId}
     </select>
 
 
