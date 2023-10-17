@@ -58,4 +58,6 @@ public interface UserDao {
   User getProfile(Long userId);
 
   User getProfileDetail(Long userId);
+
+  int updateProfile(User user);
 }

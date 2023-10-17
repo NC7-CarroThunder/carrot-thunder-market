@@ -2,7 +2,10 @@ package bitcamp.carrot_thunder.user.service;
 
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
+import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
+import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
+import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
@@ -14,6 +17,7 @@ import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -206,10 +210,11 @@ public class DefaultUserService implements UserService {
   @Override
   public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto) throws Exception {
     User user = userDetails.getUser();
+    System.out.println(userDetails.getUser().getId());
     // 프로필 사진
-    if (photo.getSize() > 0) {
+    if (photo != null && photo.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
-              "https://kr.object.ncloudstorage.com", "/carrot-thunder/user", photo);
+              "carrot-thunder", "user/", photo);
       user.setPhoto(uploadFileUrl);
 
     } else {
@@ -217,12 +222,26 @@ public class DefaultUserService implements UserService {
       user.setPhoto(user.getPhoto());
     }
 
-    user.setNickName(profileRequestDto.getNickName());
-    user.setPhone(profileRequestDto.getPhone());
-    user.setAddress(profileRequestDto.getAddress());
-    user.setDetailAddress(profileRequestDto.getDetailAddress());
-    user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
+    if (profileRequestDto.getNickName() != null) {
+      user.setNickName(profileRequestDto.getNickName());
+    }
 
+    if (profileRequestDto.getPhone() != null) {
+      user.setPhone(profileRequestDto.getPhone());
+    }
+
+    if (profileRequestDto.getAddress() != null) {
+      user.setAddress(profileRequestDto.getAddress());
+    }
+
+    if (profileRequestDto.getDetailAddress() != null) {
+      user.setDetailAddress(profileRequestDto.getDetailAddress());
+    }
+
+    if (profileRequestDto.getPassword() != null) {
+      user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
+    }
+    userDao.updateProfile(user);
     return profileRequestDto;
   }
 
