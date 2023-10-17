@@ -30,7 +30,7 @@
   </insert>
 
   <select id="findAll" resultMap="userMap">
-    select12
+    select
     id,
     role,
     activation,
