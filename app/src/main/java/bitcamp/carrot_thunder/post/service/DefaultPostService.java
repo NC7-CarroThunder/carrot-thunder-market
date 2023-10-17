@@ -28,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DefaultPostService implements PostService {
 
-
   @Autowired
   ChattingDAO chattingDao;
 

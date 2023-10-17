@@ -6,14 +6,19 @@ import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
 import bitcamp.carrot_thunder.chatting.service.ChattingService;
 import bitcamp.carrot_thunder.chatting.service.PapagoTranslationService;
 import bitcamp.carrot_thunder.user.model.vo.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -34,7 +39,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/room/{roomId}")
   public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,
-                                                         HttpServletRequest request) {
+      HttpServletRequest request) {
     Map<String, Object> response = new HashMap<>();
 
     if (roomId == null || roomId.trim().isEmpty() || !roomId.matches("^[a-fA-F0-9\\-]{36}$")) {
@@ -67,7 +72,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/createOrGetChatRoom")
   public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
-                                                                 @RequestParam int currentUserId, @RequestParam int postId) {
+      @RequestParam int currentUserId, @RequestParam int postId) {
     Map<String, Object> result = new HashMap<>();
     String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId);
     if (existingRoomId != null) {
