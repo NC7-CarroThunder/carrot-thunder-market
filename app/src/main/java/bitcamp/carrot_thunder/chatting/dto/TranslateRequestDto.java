@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TranslateRequestDto {
-    private String message;
-    private String targetLang;
+
+  private String message;
+  private String targetLang;
 }

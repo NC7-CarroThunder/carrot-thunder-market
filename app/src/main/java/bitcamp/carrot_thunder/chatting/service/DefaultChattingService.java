@@ -46,7 +46,7 @@ public class DefaultChattingService implements ChattingService {
       return existingRoomId;
     }
     String newRoomId = UUID.randomUUID().toString();
-    chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
+    createChatRoom(sellerId, currentUserId, newRoomId, postId); // 반환 값은 무시
     return newRoomId;
   }
 
@@ -73,5 +73,14 @@ public class DefaultChattingService implements ChattingService {
   @Override
   public String getFirstAttachmentByPostId(Long postId) {
     return chattingDAO.getFirstAttachmentByPostId(postId);
+  }
+
+  @Override
+  public void updateChatRoomLastUpdated(String roomId) {
+    chattingDAO.updateChatRoomLastUpdated(roomId);
+  }
+
+  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
+    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
   }
 }
