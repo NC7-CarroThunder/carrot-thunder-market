@@ -1,25 +1,23 @@
 package bitcamp.carrot_thunder.post.service;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
-import bitcamp.carrot_thunder.config.NcpConfig;
+import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
+import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
 import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.exception.NotFoundPostException;
-import bitcamp.carrot_thunder.post.model.dao.PostDao;
-import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
-import bitcamp.carrot_thunder.post.model.vo.DealingType;
-import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
-import bitcamp.carrot_thunder.post.model.vo.ItemStatus;
-import bitcamp.carrot_thunder.post.model.vo.Post;
+import bitcamp.carrot_thunder.post.model.vo.*;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
+import bitcamp.carrot_thunder.post.model.dao.PostDao;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DefaultPostService implements PostService {
 
+
+
+    @Autowired
+    ChattingDAO chattingDao;
 
     @Autowired
     PostDao postDao;
@@ -80,49 +82,72 @@ public class DefaultPostService implements PostService {
     }
 
 
+    //TODO : 시간 여유가 있다면 , 파일첨부 + db와 S3에 삭제 기능
+    //TODO : 로그인 유저 , 게시글 유저 비교 필요
 
     @Transactional
-        public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user, List<MultipartFile> multipartFiles) {
-            Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION );
+    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
 
-            if (!Objects.equals(user.getId(), post.getUser().getId())) {
-                throw NotHaveAuthorityException.EXCEPTION;
-            }
+        Post post =  (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
-            List<String> remainingImages = getRemainingImages(requestDto);
 
-            if (!post.getAttachedFiles().isEmpty()) {
-                postDao.insertFiles(post);
-            }
-
-            post.update(requestDto);
-
-            handleImageUpdates(post, remainingImages);
-
-            return PostResponseDto.of(post);
+        if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
+            throw NotHaveAuthorityException.EXCEPTION;
         }
 
-        private List<String> getRemainingImages(PostUpdateRequestDto postUpdateRequestDto) {
-            return postUpdateRequestDto.getAttachedFilesPaths().stream()
-                    .map(AttachedFile::getFilename)
-                    .collect(Collectors.toList());
-        }
 
-        private void handleImageUpdates(Post post, List<String> remainingImages) {
-            List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
 
-            NcpConfig ncpConfig = new NcpConfig();
-            NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
+//        List<String> uploadedImageUrls = new ArrayList<>();
 
-            for (AttachedFile attachedFile : attachedFiles) {
-                if (!remainingImages.contains(attachedFile.getFilename())) {
-                    // S3에서 이미지 삭제
-                    ncpObjectStorageService.deleteFile("https://kr.object.ncloudstorage.com", "/carrot-thunder/article" + attachedFile.getFilename());
-                    // DB에서 이미지 삭제
-                    postDao.deleteFile(attachedFile.getId());
-                }
-            }
-        }
+//        for (MultipartFile file : files) {
+//            String imageUrl = ncpObjectStorageService.uploadFile("carrot-thunder", "article/", file);
+//            uploadedImageUrls.add(imageUrl);
+//        }
+
+
+
+//        if (!post.getAttachedFiles().isEmpty()) {
+//            postDao.insertFiles(post);
+//        } else {
+//            throw No
+//        }
+
+
+        post.update(requestDto);
+        postDao.update(post);
+//        List<String> remainingImages = getRemainingImages(requestDto);
+//
+//        handleImageUpdates(post, remainingImages);
+        return PostResponseDto.of(post);
+    }
+
+//    private List<String> getRemainingImages(PostUpdateRequestDto postUpdateRequestDto) {
+//        return postUpdateRequestDto.getAttachedFiles().stream()
+//                .map(multipartFile -> {
+//                    AttachedFile attachedFile = new AttachedFile();
+//                    attachedFile.setFilePath(multipartFile.getOriginalFilename());
+//                    return attachedFile.getFilename();
+//                })
+//                .collect(Collectors.toList());
+//    }
+//
+//
+//    private void handleImageUpdates(Post post, List<String> remainingImages) {
+//        List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
+//
+//        NcpConfig ncpConfig = new NcpConfig();
+//        NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
+//
+//        for (AttachedFile attachedFile : attachedFiles) {
+//            if (!remainingImages.contains(attachedFile.getFilename())) {
+//                // S3에서 이미지 삭제
+//                ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + attachedFile.getFilename());
+//                // DB에서 이미지 삭제
+//                postDao.deleteFile(attachedFile.getId());
+//            }
+//        }
+//    }
+
 
 
 
@@ -161,6 +186,7 @@ public class DefaultPostService implements PostService {
     }
 
 
+    //TODO : 로그인 유저 , 게시글 유저 비교 필요
     /**
      * 게시글 삭제
      *
@@ -169,29 +195,33 @@ public class DefaultPostService implements PostService {
      * @throws Exception ( 난중에 처리 )
      */
     @Transactional
-    public String deletePost(Long postId, User user) {
-        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
-        if (user.getId() != post.getUser().getId()) {
+    public int deletePost(Long postId, User user) {
+
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        String roomId = chattingDao.getRoomIdByPostId(postId);
+
+        if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
+            throw NotHaveAuthorityException.EXCEPTION;
+        }
 
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
         for (AttachedFile attachedFile : attachedFiles) {
             if (!post.getAttachedFiles().isEmpty()) {
-
-                NcpConfig ncpConfig = new NcpConfig();
-                NcpObjectStorageService ncpObjectStorageService = new NcpObjectStorageService(ncpConfig);
-                ncpObjectStorageService.deleteFile("https://kr.object.ncloudstorage.com", "/carrot-thunder/article" + attachedFile.getFilename());
+                // S3에서 이미지 삭제
+                ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + attachedFile.getFilePath());
                 // DB에서 이미지 삭제
-                postDao.deleteFile(postId);
+                postDao.deleteFile(attachedFile.getId());
             }
-            }
+//            postDao.deleteLikes()
         }
 
+            chattingDao.deleteChatMsgByRoomId(roomId);
 
-        postDao.deleteLikes(postId);
-        return String.valueOf(postDao.delete(postId));
+            chattingDao.deleteChatRoomByPostId(postId);
+        return postDao.delete(postId);
+
     }
-
 
 
 
@@ -203,11 +233,10 @@ public class DefaultPostService implements PostService {
      */
     @Override
     public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
-        Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        Post post = (Post)postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(postId);
 
-        // 이미지 정보를 PostResponseDto에 설정하여 반환합니다.
         PostResponseDto postResponseDto = PostResponseDto.of(post);
         postResponseDto.setAttachedFiles(attachedFiles);
 
@@ -215,27 +244,4 @@ public class DefaultPostService implements PostService {
     }
 
 
-    /**
-     * 게시글 검색 기능
-     *
-     * @param keyword
-     * @param userDetails
-     * @return
-     */
-
-    public List<PostListResponseDto> searchPosts(String keyword, UserDetailsImpl userDetails) {
-        List<Post> responseDto = postDao.findAll();
-        List<PostListResponseDto> searchResults = new ArrayList<>();
-
-        for (Post post : responseDto) {
-            if (post.getTitle().contains(keyword)) {
-                searchResults.add(PostListResponseDto.of(post));
-            }
-        }
-
-        return searchResults;
-    }
-
 }
-
-
