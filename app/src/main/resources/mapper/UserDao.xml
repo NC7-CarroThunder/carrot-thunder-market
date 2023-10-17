@@ -30,7 +30,7 @@
   </insert>
 
   <select id="findAll" resultMap="userMap">
-    select
+    select12
     id,
     role,
     activation,
@@ -155,28 +155,28 @@
     WHERE f.follower_member_id=#{memberId}
   </select>
 
-  <insert id="insertNotification">
-    INSERT INTO notification (member_id, content, created_at, type, isRead)
-    VALUES (#{memberId}, #{content}, NOW(), #{type}, #{isRead})
-  </insert>
+<!--  <insert id="insertNotification">-->
+<!--    INSERT INTO tbl_notification (user_id, content, created_at, type, isRead)-->
+<!--    VALUES (#{userId}, #{content}, NOW(), #{type}, #{isRead})-->
+<!--  </insert>-->
 
-  <select id="findNotificationsByMemberId"
-    resultType="bitcamp.carrot_thunder.user.model.vo.Notification">
-    SELECT * FROM notification WHERE member_id = #{memberId}
-  </select>
+<!--  <select id="findNotificationsByMemberId"-->
+<!--    resultType="bitcamp.carrot_thunder.user.model.vo.Notification">-->
+<!--    SELECT * FROM tbl_notification WHERE user_id = #{userId}-->
+<!--  </select>-->
 
-  <update id="updateReadStatus">
-    UPDATE notification SET isRead = #{isRead} WHERE id = #{id}
-  </update>
+<!--  <update id="updateReadStatus">-->
+<!--    UPDATE tbl_notification SET isRead = #{isRead} WHERE id = #{id}-->
+<!--  </update>-->
 
-  <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">
-    INSERT INTO notification (member_id, content, created_at, type, isRead)
-    VALUES (#{memberId}, #{content}, #{createdAt}, #{type}, #{isRead})
-  </insert>
+<!--  <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">-->
+<!--    INSERT INTO tbl_notification (user_id, content, created_at, type, isRead)-->
+<!--    VALUES (#{userId}, #{content}, #{createdAt}, #{type}, #{isRead})-->
+<!--  </insert>-->
 
-  <delete id="deleteAllNotifications" parameterType="int">
-    DELETE FROM notification WHERE member_id=#{memberId}
-  </delete>
+<!--  <delete id="deleteAllNotifications" parameterType="int">-->
+<!--    DELETE FROM tbl_notification WHERE user_id=#{userId}-->
+<!--  </delete>-->
 
   <select id="getProfile" parameterType="long" resultMap="userMap">
     select
