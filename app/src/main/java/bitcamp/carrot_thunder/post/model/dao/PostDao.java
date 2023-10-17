@@ -1,6 +1,7 @@
 package bitcamp.carrot_thunder.post.model.dao;
 
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
+import bitcamp.carrot_thunder.post.model.vo.ItemCategory;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ public interface PostDao {
     AttachedFile findFileByfileId(Long fileId);
     List<Post> findAll();
     List<Post> findByPage(int start, int end);
+    List<Post> findByPageAndCategory(int start, int end, ItemCategory category);
     int delete(Long id);
     int deleteFile(Long fileId);
     int deleteFiles(Long postId);
