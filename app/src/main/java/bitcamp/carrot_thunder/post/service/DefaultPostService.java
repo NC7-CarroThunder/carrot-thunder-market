@@ -153,8 +153,13 @@ public class DefaultPostService implements PostService {
 
 
     @Override
-    public List<PostListResponseDto> getPostlist(User user,  int page) {
-        List<Post> posts = postDao.findByPage((page-1) * 8, page * 8);
+    public List<PostListResponseDto> getPostlist(User user,  int page, String category) {
+        List<Post> posts;
+        if (category.equals("TOTAL")) {
+            posts = postDao.findByPage((page-1) * 8,  8);
+        } else {
+            posts = postDao.findByPageAndCategory((page-1) * 8, 8, ItemCategory.valueOf(category));
+        }
         List<PostListResponseDto> dtoList = new ArrayList<>();
 
         for (Post post : posts) {
