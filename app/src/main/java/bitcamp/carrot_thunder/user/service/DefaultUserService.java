@@ -201,8 +201,8 @@ public class DefaultUserService implements UserService {
       user.setPhoto(user.getPhoto());
     }
 
-    if (profileRequestDto.getNickName() != null) {
-      user.setNickName(profileRequestDto.getNickName());
+    if (profileRequestDto.getNickname() != null) {
+      user.setNickName(profileRequestDto.getNickname());
     }
 
     if (profileRequestDto.getPhone() != null) {
@@ -221,8 +221,15 @@ public class DefaultUserService implements UserService {
       user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
     }
     userDao.updateProfile(user);
+//    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId())); //닉네임 변경으로 인한 토큰 재발급
     return profileRequestDto;
   }
+
+//  @Transactional
+//  @Override
+//  public int update(User user) throws Exception {
+//    return userDao.update(user);
+//  }
 
   // 프로필 유저 정보 수정 전 암호 체크
   @Override

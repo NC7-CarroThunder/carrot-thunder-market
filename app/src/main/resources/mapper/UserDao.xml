@@ -207,7 +207,7 @@
       nickname=#{nickName},
       password=#{password},
       address=#{address},
-      detail_address=#{detailAddress}
+      detail_address=#{detailAddress},
       phone=#{phone}
     <if test="photo != null">
       ,photo=#{photo}
