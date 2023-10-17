@@ -8,6 +8,7 @@ import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.PaymentsResponseDto;
+import bitcamp.carrot_thunder.user.dto.PointRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -50,7 +51,7 @@ public class DefaultUserService implements UserService {
       throw new IllegalArgumentException("비밀 번호가 옳지 않습니다.");
     }
 
-    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(loginUser.getNickName(),loginUser.getId()));
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(loginUser.getNickName(),loginUser.getId(),loginUser.getPoint(), loginUser.getPhoto()));
 
     if (loginUser.getRole() == Role.ADMIN) {
       System.out.println(loginUser.getRole());
@@ -91,6 +92,27 @@ public class DefaultUserService implements UserService {
     userDao.signup(user);
     return "회원가입 완료";
   }
+
+
+  @Override
+  public String UpdatePoint(PointRequestDto dto) throws Exception {
+    System.out.println(dto.getChargePoint());
+    System.out.println(dto.getUserId());
+    try {
+
+      User user = this.get(Long.parseLong(dto.getUserId()));
+
+      System.out.println(dto.getChargePoint());
+      System.out.println(dto.getUserId());
+      int updatePoint = user.getPoint() + Integer.parseInt(dto.getChargePoint());
+      user.setPoint(updatePoint);
+      this.update(user);
+      return String.valueOf(updatePoint);
+    } catch (Exception e) {
+      throw new Exception("포인트 추가 실패");
+    }
+  }
+
   @Transactional
   @Override
   public int add(User user) throws Exception {
@@ -106,6 +128,7 @@ public class DefaultUserService implements UserService {
   public User get(Long userId) throws Exception {
     return userDao.findBy(userId);
   }
+
 
   @Override
   public User get(String email, String password) throws Exception {

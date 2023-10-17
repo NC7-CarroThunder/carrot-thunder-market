@@ -26,7 +26,7 @@ public class User implements Serializable {
   private @Setter String detailAddress;
   private Timestamp createdAt;
   private @Setter String photo;
-  private int point;
+  private  @Setter int point;
 
   public User(String email, String encodedPassword, String nickName, String phone,String address, String detailAddress) {
     this.email = email;

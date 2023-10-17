@@ -53,7 +53,7 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String nickName, long userId) {
+    public String createToken(String nickName, long userId, int point, String photo) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -61,6 +61,8 @@ public class JwtUtil {
                         //.setSubject(nickName)
                         .claim("nickname", nickName)
                         .claim("userId", userId)
+                        .claim("point", point)
+                        .claim("photo", photo)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
