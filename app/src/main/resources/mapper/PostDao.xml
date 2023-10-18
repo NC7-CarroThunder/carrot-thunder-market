@@ -1,334 +1,354 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="bitcamp.carrot_thunder.post.model.dao.PostDao">
 
-    <resultMap type="post" id="articleMap">
-        <id column="id" property="id"/>
-        <result column="title" property="title"/>
-        <result column="content" property="content"/>
-        <result column="view_count" property="viewCount"/>
-        <result column="created_at" property="createdAt"/>
-        <result column="item_category" property="itemCategory"/>
-        <result column="item_status" property="itemStatus"/>
-        <result column="dealing_type" property="dealingType"/>
-        <result column="address" property="address"/>
-        <result column="price" property="price"/>
-        <result column="like_count" property="likeCount"/>
+  <resultMap type="post" id="articleMap">
+    <id column="id"                property="id"/>
+    <result column="title"         property="title"/>
+    <result column="content"       property="content"/>
+    <result column="view_count"    property="viewCount"/>
+    <result column="created_at"    property="createdAt"/>
+    <result column="item_category" property="itemCategory"/>
+    <result column="item_status"   property="itemStatus"/>
+    <result column="dealing_type"  property="dealingType"/>
+    <result column="address"       property="address"/>
+    <result column="price"         property="price"/>
+    <result column="like_count"    property="likeCount"/>
 
-        <association property="user" javaType="User">
-            <id column="user_id" property="id"/>
-            <result column="nickname" property="nickName"/>
-        </association>
+    <association property="user" javaType="User">
+      <id column="user_id"      property="id"/>
+      <result column="nickname" property="nickName"/>
+    </association>
 
-        <collection property="attachedFiles" ofType="attachedFile">
-            <id column="id" property="id"/>
-            <result column="filepath" property="filePath"/>
-            <result column="post_id" property="postId"/>
-        </collection>
-    </resultMap>
+    <collection property="attachedFiles" ofType="attachedFile">
+      <id column="id" property="id"/>
+      <result column="filepath" property="filePath"/>
+      <result column="post_id"  property="postId"/>
+    </collection>
+  </resultMap>
 
-    <resultMap type="attachedFile" id="attachedFileMap">
-        <id column="id" property="id"/>
-        <result column="filepath" property="filePath"/>
-        <result column="post_id" property="postId"/>
-    </resultMap>
+  <resultMap type="attachedFile" id="attachedFileMap">
+    <id column="id"           property="id"/>
+    <result column="filepath" property="filePath"/>
+    <result column="post_id"  property="postId"/>
+  </resultMap>
 
-    <insert id="insert" parameterType="post" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-        INSERT INTO tbl_article(title, content, view_count, item_category, dealing_type, item_status, price, address, user_id)
-        VALUES(#{title}, #{content}, #{viewCount}, #{itemCategory}, #{dealingType}, #{itemStatus}, #{price}, #{address}, #{user.id})
-    </insert>
+  <insert id="insert" parameterType="post" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+    INSERT INTO tbl_article(title, content, view_count, item_category, dealing_type, item_status,
+    price, address, user_id)
+    VALUES(#{title}, #{content}, #{viewCount}, #{itemCategory}, #{dealingType}, #{itemStatus},
+    #{price}, #{address}, #{user.id})
+  </insert>
 
-    <insert id="insertFiles" parameterType="post">
-        INSERT INTO tbl_file(filepath, article_id)
-        VALUES
-        <foreach collection="attachedFiles" item="file" separator=",">
-            (#{file.filePath}, #{id})
-        </foreach>
-    </insert>
+  <insert id="insertFiles" parameterType="post">
+    INSERT INTO tbl_file(filepath, article_id)
+    VALUES
+    <foreach collection="attachedFiles" item="file" separator=",">
+      (#{file.filePath}, #{id})
+    </foreach>
+  </insert>
 
-    <select id="findBy" resultMap="articleMap" parameterType="int">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id,
-        a.title,
-        a.content,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT JOIN tbl_file f ON a.id = f.article_id
-        WHERE
-        a.id=#{postId}
-    </select>
+  <select id="findBy" resultMap="articleMap" parameterType="int">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id,
+    a.title,
+    a.content,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT JOIN tbl_file f ON a.id = f.article_id
+    WHERE
+    a.id=#{postId}
+  </select>
 
-    <select id="findAll" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id,
-        a.title,
-        a.content,
-        a.view_count,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        a.address,
-        a.price,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN tbl_file f ON a.id = f.article_id
-        ORDER BY
-        a.id DESC
-    </select>
-
-
-    <select id="getPostsByUserId" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id,
-        a.title,
-        a.content,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        a.price,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN tbl_file f ON a.id = f.article_id
-        WHERE
-        a.user_id = #{userId}
-        ORDER BY
-        a.id DESC;
-    </select>
+  <select id="findAll" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id,
+    a.title,
+    a.content,
+    a.view_count,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    a.address,
+    a.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN tbl_file f ON a.id = f.article_id
+    ORDER BY
+    a.id DESC
+  </select>
 
 
-    <select id="findByPage" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id as user_id,
-        a.title,
-        a.content,
-        a.view_count,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        a.address,
-        a.price,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN (
-        SELECT article_id, MIN(id) as id, filepath
-        FROM tbl_file
-        GROUP BY article_id
-        ) f ON a.id = f.article_id
-        ORDER BY
-        a.id DESC
-        LIMIT #{start}, #{end};
-    </select>
-
-    <select id="findByPageAndCategory" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id as user_id,
-        a.title,
-        a.content,
-        a.view_count,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        a.address,
-        a.price,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN (
-        SELECT article_id, MIN(id) as id, filepath
-        FROM tbl_file
-        GROUP BY article_id
-        ) f ON a.id = f.article_id
-        WHERE
-        a.item_category = #{category}
-        ORDER BY
-        a.id DESC
-        LIMIT #{start}, #{end};
-    </select>
-
-    <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
-        SELECT
-        file_id,
-        filepath,
-        post_id
-        FROM
-        file
-        WHERE
-        file_id=#{id}
-    </select>
-
-    <select id="getMyPosts" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id,
-        a.title,
-        a.content,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        f.id,
-        f.filepath,
-        a.like_count
-        FROM
-        tbl_article a
-        INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN tbl_file f ON a.id = f.post_id
-        WHERE
-        a.user_id = #{userId}
-        ORDER BY
-        a.id DESC;
-    </select>
+  <select id="getPostsByUserId" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id,
+    a.title,
+    a.content,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    a.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN tbl_file f ON a.id = f.article_id
+    WHERE
+    a.user_id = #{userId}
+    ORDER BY
+    a.id DESC;
+  </select>
 
 
+  <select id="findByPage" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id as user_id,
+    a.title,
+    a.content,
+    a.view_count,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    a.address,
+    a.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN (
+    SELECT article_id, MIN(id) as id, filepath
+    FROM tbl_file
+    GROUP BY article_id
+    ) f ON a.id = f.article_id
+    ORDER BY
+    a.id DESC
+    LIMIT #{start}, #{end};
+  </select>
 
-    <update id="updateCount" parameterType="Long">
-        update tbl_article set
-        view_count=view_count + 1
-        where
-        id=#{postId}
-    </update>
+  <select id="findByPageAndCategory" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id as user_id,
+    a.title,
+    a.content,
+    a.view_count,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    a.address,
+    a.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN (
+    SELECT article_id, MIN(id) as id, filepath
+    FROM tbl_file
+    GROUP BY article_id
+    ) f ON a.id = f.article_id
+    WHERE
+    a.item_category = #{category}
+    ORDER BY
+    a.id DESC
+    LIMIT #{start}, #{end};
+  </select>
 
-    <delete id="deleteFile" parameterType="Long">
-        delete from tbl_file
-        where
-        id=#{id}
-    </delete>
+  <select id="findFileBy" parameterType="int" resultMap="attachedFileMap">
+    SELECT
+    file_id,
+    filepath,
+    post_id
+    FROM
+    file
+    WHERE
+    file_id=#{id}
+  </select>
 
-    <delete id="deleteFiles" parameterType="Long">
-        delete from tbl_file
-        where
-        article_id=#{postId}
-    </delete>
+  <select id="getMyPosts" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id,
+    a.title,
+    a.content,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    f.id,
+    f.filepath,
+    a.like_count
+    FROM
+    tbl_article a
+    INNER JOIN tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN tbl_file f ON a.id = f.post_id
+    WHERE
+    a.user_id = #{userId}
+    ORDER BY
+    a.id DESC;
+  </select>
 
-    <delete id="deleteChat" parameterType="Long">
-        delete from tbl_chat
-        where
-        id=#{id}
-    </delete>
 
-    <delete id="deleteWishListByPostId" parameterType="Long">
-        delete from tbl_like_list
-        where
-        article_id=#{postId}
+  <update id="updateCount" parameterType="Long">
+    update tbl_article set
+    view_count=view_count + 1
+    where
+    id=#{postId}
+  </update>
 
-    </delete>
+  <delete id="deleteFile" parameterType="Long">
+    delete from tbl_file
+    where
+    id=#{id}
+  </delete>
 
-    <update id="update" parameterType="post">
-        update tbl_article set
-        title=#{title},
-        content=#{content},
-        price=#{price},
-        address=#{address}
-        where
-        id=#{id}
-    </update>
+  <delete id="deleteFiles" parameterType="Long">
+    delete from tbl_file
+    where
+    article_id=#{postId}
+  </delete>
 
-    <delete id="delete" parameterType="Long">
-        delete from tbl_article
-        where
-        id=#{id}
-    </delete>
+  <delete id="deleteChat" parameterType="Long">
+    delete from tbl_chat
+    where
+    id=#{id}
+  </delete>
 
-    <delete id="deleteLikes" parameterType="int">
-        delete from like_list
-        where
-        article_id=#{postId}
-    </delete>
+  <delete id="deleteWishListByPostId" parameterType="Long">
+    delete from tbl_like_list
+    where
+    article_id=#{postId}
 
-    <delete id="deleteLike">
-        DELETE FROM
-        like_list
-        WHERE
-        article_id = #{postId} AND member_id = #{memberId}
-    </delete>
+  </delete>
 
-    <select id="findById" parameterType="Long" resultMap="articleMap">
-        SELECT
-        a.id,
-        u.nickname,
-        u.id as user_id,
-        a.title,
-        a.content,
-        a.view_count,
-        a.created_at,
-        a.dealing_type,
-        a.item_category,
-        a.item_status,
-        a.address,
-        a.price,
-        f.id,
-        f.filepath
-        FROM
-        tbl_article a
-        INNER JOIN
-        tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN
-        tbl_file f ON a.id = f.article_id
-        WHERE
-        a.id=#{postId}
-    </select>
+  <update id="update" parameterType="post">
+    update tbl_article set
+    title=#{title},
+    content=#{content},
+    price=#{price},
+    address=#{address}
+    where
+    id=#{id}
+  </update>
 
-    <select id="findImagesByPostId" resultMap="attachedFileMap" >
-        SELECT
-        id,
-        filepath,
-        article_id
-        FROM
-        tbl_file
-        WHERE
-        article_id = #{postId}
-    </select>
+  <delete id="delete" parameterType="Long">
+    delete from tbl_article
+    where
+    id=#{id}
+  </delete>
 
-    <insert id="addWishlist">
-        INSERT INTO tbl_like_list (user_id, article_id) VALUES (#{user_id}, #{article_id})
-    </insert>
+  <delete id="deleteLikes" parameterType="int">
+    delete from like_list
+    where
+    article_id=#{postId}
+  </delete>
 
-    <delete id="removeWishlist">
-        DELETE FROM tbl_like_list WHERE user_id = #{user_id} AND article_id = #{article_id}
-    </delete>
+  <delete id="deleteLike">
+    DELETE FROM
+    like_list
+    WHERE
+    article_id = #{postId} AND member_id = #{memberId}
+  </delete>
 
-    <select id="isInWishlist" resultType="int">
-        SELECT COUNT(*) FROM tbl_like_list WHERE user_id = #{user_id} AND article_id = #{article_id}
-    </select>
+  <select id="findById" parameterType="Long" resultMap="articleMap">
+    SELECT
+    a.id,
+    u.nickname,
+    u.id as user_id,
+    a.title,
+    a.content,
+    a.view_count,
+    a.created_at,
+    a.dealing_type,
+    a.item_category,
+    a.item_status,
+    a.address,
+    a.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article a
+    INNER JOIN
+    tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN
+    tbl_file f ON a.id = f.article_id
+    WHERE
+    a.id=#{postId}
+  </select>
 
-    <select id="getUserWishlist" resultType="bitcamp.carrot_thunder.post.model.vo.Post">
-        SELECT p.* FROM tbl_article p
-        JOIN tbl_like_list w ON p.id = w.article_id
-        WHERE w.user_id = #{user_id}
-    </select>
+  <select id="findImagesByPostId" resultMap="attachedFileMap">
+    SELECT
+    id,
+    filepath,
+    article_id
+    FROM
+    tbl_file
+    WHERE
+    article_id = #{postId}
+  </select>
+
+  <insert id="addWishlist">
+    INSERT INTO tbl_like_list (user_id, article_id) VALUES (#{user_id}, #{article_id})
+  </insert>
+
+  <delete id="removeWishlist">
+    DELETE FROM tbl_like_list WHERE user_id = #{user_id} AND article_id = #{article_id}
+  </delete>
+
+  <select id="isInWishlist" resultType="int">
+    SELECT COUNT(*) FROM tbl_like_list WHERE user_id = #{user_id} AND article_id = #{article_id}
+  </select>
+
+  <select id="getUserWishlist" resultMap="articleMap">
+    SELECT
+    p.id,
+    u.nickname,
+    u.id as user_id,
+    p.title,
+    p.content,
+    p.view_count,
+    p.created_at,
+    p.dealing_type,
+    p.item_category,
+    p.item_status,
+    p.address,
+    p.price,
+    f.id,
+    f.filepath
+    FROM
+    tbl_article p
+    INNER JOIN tbl_user u ON p.user_id = u.id
+    INNER JOIN tbl_like_list w ON p.id = w.article_id
+    LEFT OUTER JOIN tbl_file f ON p.id = f.article_id
+    WHERE w.user_id = #{user_id}
+  </select>
+
 </mapper>
