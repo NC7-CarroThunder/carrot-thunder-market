@@ -23,8 +23,10 @@ public interface ChattingDAO {
   String checkChatRoomExists(@Param("sellerId") int sellerId,
       @Param("currentUserId") int currentUserId, @Param("postId") int postId);
 
-  String createChatRoom(@Param("sellerId") int sellerId, @Param("currentUserId") int currentUserId,
-      @Param("roomId") String roomId, @Param("postId") int postId);
+  int createChatRoom(@Param("sellerId") int sellerId,
+      @Param("currentUserId") int currentUserId,
+      @Param("roomId") String roomId,
+      @Param("postId") int postId);
 
   ChatRoomVO getChatRoomByRoomId(String roomId);
 
@@ -34,9 +36,11 @@ public interface ChattingDAO {
 
   String getFirstAttachmentByPostId(Long postId);
 
-    int deleteChatRoomByPostId(@Param("postId") Long postId);
+  int deleteChatRoomByPostId(@Param("postId") Long postId);
 
-    int deleteChatMsgByRoomId(@Param("roomId") String roomId);
+  int deleteChatMsgByRoomId(@Param("roomIds") String roomId);
 
-    String getRoomIdByPostId(@Param("postId") Long postId);
+  List<String> getRoomIdByPostId(@Param("postId") Long postId);
+
+  void updateChatRoomLastUpdated(@Param("roomId") String roomId);
 }

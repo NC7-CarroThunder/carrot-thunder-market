@@ -172,19 +172,23 @@
         WHERE article_id = #{postId}
     </select>
 
+    <delete id="deleteChatMsgByRoomId" parameterType="String">
+        DELETE FROM tbl_chat_message
+        WHERE room_id = #{roomIds}
+    </delete>
+
     <delete id="deleteChatRoomByPostId" parameterType="java.lang.Long">
         DELETE FROM tbl_chat_room
         WHERE article_id = #{postId}
-    </delete>
-
-    <delete id="deleteChatMsgByRoomId" parameterType="java.lang.String">
-        DELETE FROM tbl_chat_message
-        WHERE room_id = #{roomId}
     </delete>
 
     <select id="getRoomIdByPostId" parameterType="java.lang.Long" >
         SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
     </select>
 
-
+    <update id="updateChatRoomLastUpdated">
+        UPDATE tbl_chat_room
+        SET last_updated = now()
+        WHERE room_id = #{roomId}
+    </update>
 </mapper>

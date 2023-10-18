@@ -41,5 +41,6 @@ public interface PostDao {
     int addWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
     int removeWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
     int isInWishlist(@Param("user_id") Long user_id, @Param("article_id") Long article_id);
+    int deleteWishListByPostId(Long postId);
     List<Post> getUserWishlist(Long user_id);
 }
