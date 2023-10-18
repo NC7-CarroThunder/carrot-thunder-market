@@ -95,7 +95,27 @@
 
 
     <select id="getPostsByUserId" resultMap="articleMap">
-        SELECT * FROM tbl_article WHERE user_id = #{userId}
+        SELECT
+        a.id,
+        u.nickname,
+        u.id,
+        a.title,
+        a.content,
+        a.created_at,
+        a.dealing_type,
+        a.item_category,
+        a.item_status,
+        a.price,
+        f.id,
+        f.filepath
+        FROM
+        tbl_article a
+        INNER JOIN tbl_user u ON a.user_id = u.id
+        LEFT OUTER JOIN tbl_file f ON a.id = f.article_id
+        WHERE
+        a.user_id = #{userId}
+        ORDER BY
+        a.id DESC;
     </select>
 
 
@@ -187,7 +207,7 @@
         FROM
         tbl_article a
         INNER JOIN tbl_user u ON a.user_id = u.id
-        LEFT OUTER JOIN file f ON a.id = f.post_id
+        LEFT OUTER JOIN tbl_file f ON a.id = f.post_id
         WHERE
         a.user_id = #{userId}
         ORDER BY
