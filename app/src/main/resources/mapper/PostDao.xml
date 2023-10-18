@@ -93,6 +93,12 @@
         a.id DESC
     </select>
 
+
+    <select id="getPostsByUserId" resultMap="articleMap">
+        SELECT * FROM tbl_article WHERE user_id = #{userId}
+    </select>
+
+
     <select id="findByPage" resultMap="articleMap">
         SELECT
         a.id,

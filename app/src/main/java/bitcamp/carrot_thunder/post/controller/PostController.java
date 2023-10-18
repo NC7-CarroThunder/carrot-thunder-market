@@ -85,7 +85,9 @@ public class PostController {
     /**
      * 게시글 수정 컨트롤러
      *
-     * @param
+     * @param postId
+     * @param postUpdateRequestDto
+     * @param userDetails
      * @return
      */
 
@@ -100,6 +102,15 @@ public class PostController {
                 .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
                         userDetails.getUser()));
     }
+
+    /**
+     * 게시글 삭제 컨트롤러
+     *
+     * @param postId
+     * @param userDetails
+     * @return
+     */
+
 
     @DeleteMapping("/posts/{postId}")
     public ResponseDto<Integer> deletePost(@PathVariable Long postId,
@@ -147,4 +158,21 @@ public class PostController {
         response.put("isLiked", isInWishlist);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 나의 게시글 조회 컨트롤러
+     *
+     * @param postId
+     * @param userDetails
+     * @return
+     */
+
+
+    @GetMapping("/mypost")
+    public ResponseDto<List<PostListResponseDto>> getMyPosts(Long postId,
+                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseDto.success(postService.getMyPosts(postId, userDetails));
+    }
+
+
 }

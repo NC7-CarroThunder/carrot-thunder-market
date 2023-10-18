@@ -41,4 +41,6 @@ public interface PostService {
     List<Post> getUserWishlist(User user);
 
     boolean isInWishlist(Long userId, Long postId);
+
+    List<PostListResponseDto> getMyPosts(Long postId , UserDetailsImpl userDetails);
 }
