@@ -184,7 +184,6 @@ public class DefaultPostService implements PostService {
     @Transactional
     public int deletePost(Long postId, User user) {
         Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
-        List<String> roomId = chattingDao.getRoomIdByPostId(postId);
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
             throw NotHaveAuthorityException.EXCEPTION;
         }

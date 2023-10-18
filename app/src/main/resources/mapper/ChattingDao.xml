@@ -182,10 +182,13 @@
         WHERE article_id = #{postId}
     </delete>
 
-
     <select id="getRoomIdByPostId" parameterType="java.lang.Long" >
         SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
     </select>
 
-
+    <update id="updateChatRoomLastUpdated">
+        UPDATE tbl_chat_room
+        SET last_updated = now()
+        WHERE room_id = #{roomId}
+    </update>
 </mapper>
