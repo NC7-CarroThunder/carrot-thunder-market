@@ -184,13 +184,10 @@ public class DefaultPostService implements PostService {
     @Transactional
     public int deletePost(Long postId, User user) {
         Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
-        System.out.println("에러에요");
         List<String> roomId = chattingDao.getRoomIdByPostId(postId);
-        System.out.println("에러에요!");
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
             throw NotHaveAuthorityException.EXCEPTION;
         }
-        System.out.println("에러에요!!");
         List<AttachedFile> attachedFiles = postDao.findImagesByPostId(post.getId());
         for (AttachedFile attachedFile : attachedFiles) {
             if (!post.getAttachedFiles().isEmpty()) {
@@ -202,12 +199,10 @@ public class DefaultPostService implements PostService {
             }
         }
         List<String> roomIdList = chattingDao.getRoomIdByPostId(postId);
-        System.out.println(roomIdList);
         for (String roomIds : roomIdList) {
             chattingDao.deleteChatMsgByRoomId(roomIds);
         }
         chattingDao.deleteChatRoomByPostId(postId);
-        System.out.println(postId);
         postDao.deleteWishListByPostId(postId);
 
         return postDao.delete(postId);
