@@ -232,7 +232,9 @@ public class DefaultPostService implements PostService {
      * @param userDetails
      * @return
      */
+
     @Override
+    @Transactional(readOnly = true)
     public PostResponseDto getPost(Long postId, UserDetailsImpl userDetails) {
         Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
 
@@ -287,6 +289,7 @@ public class DefaultPostService implements PostService {
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> getMyPosts(Long postId ,UserDetailsImpl userDetails) {
+
         List<Post> userPosts = postDao.getPostsByUserId(userDetails.getUser().getId());
         List<PostListResponseDto> dtoList = new ArrayList<>();
 
