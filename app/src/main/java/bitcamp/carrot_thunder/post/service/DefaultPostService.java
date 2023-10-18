@@ -86,6 +86,16 @@ public class DefaultPostService implements PostService {
     //TODO : 시간 여유가 있다면 , 파일첨부 + db와 S3에 삭제 기능
     //TODO : 로그인 유저 , 게시글 유저 비교 필요
 
+    /**
+     * 게시글 수정 기능
+     *
+     * @param postId
+     * @param user
+     * @param requestDto
+     * @return
+     */
+
+
     @Transactional
     public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
 
@@ -182,6 +192,7 @@ public class DefaultPostService implements PostService {
     /**
      * 게시글 삭제
      *
+     * @param user
      * @param postId
      * @return
      * @throws Exception ( 난중에 처리 )
@@ -215,9 +226,10 @@ public class DefaultPostService implements PostService {
 
 
     /**
-     * 게시글 상세 정보
+     * 게시글 상세 정보 기능
      *
      * @param postId
+     * @param userDetails
      * @return
      */
     @Override
@@ -251,8 +263,37 @@ public class DefaultPostService implements PostService {
         return count > 0;
     }
 
+    /**
+     * 조회수 증가 기능
+     *
+     * @param postId
+     * @return
+     */
+
     @Transactional
     public int increaseViewCount(Long postId) {
         return postDao.updateCount(postId);
+    }
+
+
+
+    /**
+     * 나의 게시글 기능구현
+     *
+     * @param postId
+     * @param userDetails
+     * @return
+     */
+
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> getMyPosts(Long postId ,UserDetailsImpl userDetails) {
+        List<Post> userPosts = postDao.getPostsByUserId(userDetails.getUser().getId());
+        List<PostListResponseDto> dtoList = new ArrayList<>();
+
+        for (Post post : userPosts) {
+            dtoList.add(PostListResponseDto.of(post));
+        }
+
+        return dtoList;
     }
 }
