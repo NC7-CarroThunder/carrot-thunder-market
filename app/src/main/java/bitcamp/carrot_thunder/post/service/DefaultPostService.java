@@ -116,6 +116,11 @@ public class DefaultPostService implements PostService {
         return PostResponseDto.of(post);
     }
 
+    @Override
+    public int update(Post post) {
+        return postDao.update(post);
+    }
+
 //    private List<String> getRemainingImages(PostUpdateRequestDto postUpdateRequestDto) {
 //        return postUpdateRequestDto.getAttachedFiles().stream()
 //                .map(multipartFile -> {
