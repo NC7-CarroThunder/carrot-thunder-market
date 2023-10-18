@@ -4,6 +4,7 @@ import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.PaymentsResponseDto;
+import bitcamp.carrot_thunder.user.dto.PointRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
@@ -28,6 +29,8 @@ public interface UserService {
   List<User> list() throws Exception;
 
   User get(Long userId) throws Exception;
+
+  String UpdatePoint(PointRequestDto dto) throws Exception;
 
   User get(String email, String password) throws Exception;
 
@@ -54,7 +57,7 @@ public interface UserService {
 
   ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) throws Exception;
 
-  ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto) throws Exception;
+  ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto, HttpServletResponse response) throws Exception;
 
   String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
 

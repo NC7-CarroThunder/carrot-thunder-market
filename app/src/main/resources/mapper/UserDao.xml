@@ -47,7 +47,7 @@
     role asc
   </select>
 
-  <select id="findBy" parameterType="int" resultMap="userMap">
+  <select id="findBy" parameterType="long" resultMap="userMap">
     select
     *
     from
@@ -108,12 +108,12 @@
   <update id="update" parameterType="user">
     update tbl_user set
     nickname=#{nickName}
-    ,password=#{password}
-    ,intro=#{intro}
+    ,point=#{point}
     <if test="photo != null">
       ,photo=#{photo}
     </if>
-    ,tel=#{tel}
+    ,phone=#{phone}
+    ,address=#{address}
     where
     id=#{id}
   </update>
