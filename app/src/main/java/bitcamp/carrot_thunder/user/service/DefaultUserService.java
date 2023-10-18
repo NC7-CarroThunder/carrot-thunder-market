@@ -216,6 +216,13 @@ public class DefaultUserService implements UserService {
     if (photo != null && photo.getSize() > 0) {
       String uploadFileUrl = ncpObjectStorageService.uploadFile(
               "carrot-thunder", "user/", photo);
+      if (user.getPhoto() != null) {
+        if (!user.getPhoto().isEmpty()) {
+          ncpObjectStorageService.deleteFile("carrot-thunder", "user/" + user.getPhoto());
+        }
+      }
+
+
       user.setPhoto(uploadFileUrl);
     } else {
       // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.

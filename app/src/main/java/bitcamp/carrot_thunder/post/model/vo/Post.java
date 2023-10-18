@@ -31,6 +31,7 @@ public class Post implements Serializable {
     private DealingType dealingType;
     private String address;
     private int price;
+    private Long buyerId;
 
     private int likeCount;
     private boolean liked;
