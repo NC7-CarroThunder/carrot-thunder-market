@@ -96,14 +96,8 @@ public class DefaultUserService implements UserService {
 
   @Override
   public String UpdatePoint(PointRequestDto dto) throws Exception {
-    System.out.println(dto.getChargePoint());
-    System.out.println(dto.getUserId());
     try {
-
       User user = this.get(Long.parseLong(dto.getUserId()));
-
-      System.out.println(dto.getChargePoint());
-      System.out.println(dto.getUserId());
       int updatePoint = user.getPoint() + Integer.parseInt(dto.getChargePoint());
       user.setPoint(updatePoint);
       this.update(user);
@@ -176,7 +170,7 @@ public class DefaultUserService implements UserService {
     User user = userDao.findBy(userId);
     User loginUser = (User) session.getAttribute("loginUser");
     if (loginUser != null) {
-//      int loggedInUserId = loginUser.getId();
+      //int loggedInUserId = loginUser.getId();
       //member.setFollowed(userDao.isFollowed(loggedInUserId, userId));
     } else {
       //member.setFollowed(false);
@@ -210,9 +204,11 @@ public class DefaultUserService implements UserService {
     return dto;
   }
 
+
   // 프로필 유저 정보 업데이트
   @Override
-  public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto) throws Exception {
+
+  public ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile photo, ProfileRequestDto profileRequestDto, HttpServletResponse response) throws Exception {
     User user = userDetails.getUser();
     // 프로필 사진
     if (photo != null && photo.getSize() > 0) {
@@ -223,6 +219,8 @@ public class DefaultUserService implements UserService {
       // 사용자가 사진을 업로드하지 않은 경우, 기존의 프로필 사진을 그대로 유지하도록 합니다.
       user.setPhoto(user.getPhoto());
     }
+
+
 
     if (profileRequestDto.getNickname() != null) {
       user.setNickName(profileRequestDto.getNickname());
@@ -244,7 +242,8 @@ public class DefaultUserService implements UserService {
       user.setPassword(passwordEncoder.encode(profileRequestDto.getPassword()));
     }
     userDao.updateProfile(user);
-//    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId())); //닉네임 변경으로 인한 토큰 재발급
+    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
+    //닉네임 변경으로 인한 토큰 재발급
     return profileRequestDto;
   }
 

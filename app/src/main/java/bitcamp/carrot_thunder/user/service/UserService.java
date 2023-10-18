@@ -57,7 +57,7 @@ public interface UserService {
 
   ProfileResponseDto getProfileDetail(UserDetailsImpl userDetails) throws Exception;
 
-  ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto) throws Exception;
+  ProfileRequestDto updateProfile(UserDetailsImpl userDetails, MultipartFile multipartFile, ProfileRequestDto profileRequestDto, HttpServletResponse response) throws Exception;
 
   String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
 

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -160,9 +161,10 @@ public class UserController {
   @PutMapping("/profiles")
   public ResponseDto<ProfileRequestDto> updateProfile(
           @AuthenticationPrincipal UserDetailsImpl userDetails,
-          @RequestBody ProfileRequestDto profileRequestDto,
-          @RequestParam(required = false) MultipartFile multipartFile) throws Exception {
-    return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto));
+          @RequestPart ProfileRequestDto profileRequestDto,
+          @RequestPart MultipartFile multipartFile,
+          HttpServletResponse response) throws Exception {
+    return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto, response));
   }
 
   // 프로필 유저 정보 수정 전 암호 체크
