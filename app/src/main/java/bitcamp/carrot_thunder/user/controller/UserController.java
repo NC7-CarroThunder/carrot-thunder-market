@@ -11,6 +11,8 @@ import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
+import bitcamp.carrot_thunder.user.dto.UserEmailCheckDto;
+import bitcamp.carrot_thunder.user.dto.UserNameCheckDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.service.KakaoService;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.amazonaws.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
@@ -174,6 +177,25 @@ public class UserController {
           @RequestBody PasswdCheckRequestDto passwdCheckRequestDto) throws Exception {
     return userService.passwdCheck(userDetails, passwdCheckRequestDto);
   }
+
+  // 프로필 유저 정보 수정 전 닉네임 체크
+  @PostMapping("/users/nicknamecheck")
+  public ResponseDto<Boolean> userNameCheck (
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          @RequestBody UserNameCheckDto userNameCheckDto,
+          HttpServletResponse response) throws Exception {
+    return ResponseDto.success(userService.userNameCheck(userDetails, userNameCheckDto, response));
+  }
+
+
+  @PostMapping("/users/useremailcheck")
+  public ResponseDto<Boolean> userEmailCheck(
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          @RequestBody UserEmailCheckDto userEmailCheckDto,
+          HttpServletResponse response) throws Exception {
+    return ResponseDto.success(userService.userEmailCheck(userDetails, userEmailCheckDto, response));
+  }
+
 
 }
 

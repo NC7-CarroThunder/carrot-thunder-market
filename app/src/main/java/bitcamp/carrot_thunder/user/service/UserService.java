@@ -8,6 +8,8 @@ import bitcamp.carrot_thunder.user.dto.PointRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
+import bitcamp.carrot_thunder.user.dto.UserEmailCheckDto;
+import bitcamp.carrot_thunder.user.dto.UserNameCheckDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,5 +64,9 @@ public interface UserService {
   String passwdCheck(UserDetailsImpl userDetails, PasswdCheckRequestDto profileRequestDto) throws Exception;
 
   PaymentsResponseDto getBalance(UserDetailsImpl userDetails, HttpServletResponse response);
+
+  Boolean userNameCheck(UserDetailsImpl userDetails, UserNameCheckDto userNameCheckDto, HttpServletResponse response) throws Exception;
+
+  Boolean userEmailCheck(UserDetailsImpl userDetails, UserEmailCheckDto userEmailCheckDto, HttpServletResponse response) throws Exception;
 
 }

@@ -12,6 +12,8 @@ import bitcamp.carrot_thunder.user.dto.PointRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileRequestDto;
 import bitcamp.carrot_thunder.user.dto.ProfileResponseDto;
 import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
+import bitcamp.carrot_thunder.user.dto.UserEmailCheckDto;
+import bitcamp.carrot_thunder.user.dto.UserNameCheckDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
 import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
@@ -269,5 +271,28 @@ public class DefaultUserService implements UserService {
   public PaymentsResponseDto getBalance(UserDetailsImpl userDetails, HttpServletResponse response) {
     PaymentsResponseDto dto = PaymentsResponseDto.of(userDetails.getUser());
     return dto;
+  }
+
+  // 닉네임 중복 체크
+
+  @Override
+  public Boolean userNameCheck(UserDetailsImpl userDetails, UserNameCheckDto userNameCheckDto, HttpServletResponse response) {
+    boolean isDuplicate = false;
+    String nickname = userNameCheckDto.getNickname();
+    long count = userDao.checkNicknameDuplicate(nickname);
+    isDuplicate = count <= 0;
+
+    return isDuplicate;
+  }
+
+  // 이메일 중복체크
+  @Override
+  public Boolean userEmailCheck(UserDetailsImpl userDetails, UserEmailCheckDto userEmailCheckDto, HttpServletResponse response) {
+    boolean isDuplicate = false;
+    String email = userEmailCheckDto.getEmail();
+    long count = userDao.checkEmailDuplicate(email);
+    isDuplicate = count <= 0;
+
+    return isDuplicate;
   }
 }
