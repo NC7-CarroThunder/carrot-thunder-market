@@ -34,6 +34,8 @@ public class PostResponseDto {
     private String nickName;
     private int likeCount;
     private List<AttachedFile> attachedFilesPaths;
+    private Long buyerId;
+
     private Boolean isLiked;
     private Long userid;
 
@@ -54,6 +56,7 @@ public class PostResponseDto {
                 .address(post.getAddress())
                 .likeCount(post.getLikeCount())
                 .attachedFilesPaths(post.getAttachedFiles())
+                .buyerId(post.getBuyerId())
                 .build();
     }
 

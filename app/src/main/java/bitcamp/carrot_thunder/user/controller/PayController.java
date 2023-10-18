@@ -6,6 +6,7 @@ import bitcamp.carrot_thunder.user.dto.PointRequestDto;
 import bitcamp.carrot_thunder.user.service.PurchaseService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import lombok.AllArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
@@ -42,8 +43,9 @@ public class PayController {
     @PutMapping("/payments/purchase")
     @ResponseBody
     public String purchase(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                           @RequestBody Long postId, HttpServletResponse response) throws Exception {
-        return purchaseService.Purchase(postId, userDetails.getUser(),response);
+                           @RequestBody String postId, HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = new JSONObject(postId);
+        return purchaseService.Purchase((jsonObject.getLong("postId")), userDetails.getUser(),response);
     }
 
     // 구매취소 api
@@ -51,8 +53,9 @@ public class PayController {
     @PutMapping("/payments/cancel")
     @ResponseBody
     public String cancelPurchase(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                 @RequestBody Long postId, HttpServletResponse response) throws Exception {
-        return purchaseService.CancelPurchase(postId,userDetails.getUser(),response);
+                                 @RequestBody String postId, HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = new JSONObject(postId);
+        return purchaseService.CancelPurchase((jsonObject.getLong("postId")),userDetails.getUser(),response);
     }
 
     // 구매 확정 api
@@ -60,7 +63,8 @@ public class PayController {
     @PutMapping("/payments/ConfirmedPurchase")
     @ResponseBody
     public String confirmedPurchase(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                    @RequestBody Long postId, HttpServletResponse response) throws Exception {
-        return purchaseService.ConfirmedPurchase(postId,response);
+                                    @RequestBody String postId, HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = new JSONObject(postId);
+        return purchaseService.ConfirmedPurchase((jsonObject.getLong("postId")),response);
     }
 }

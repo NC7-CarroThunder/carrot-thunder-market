@@ -41,9 +41,11 @@ public class PurchaseService {
                 return "현재 갖고있는 포인트보다 물건의 가격이 더 비쌉니다.";
             }
             user.setPoint(updatePoint) ;
-            post.setItemStatus(ItemStatus.SELLING);
+            post.setItemStatus(ItemStatus.ONGOING);
+            post.setBuyerId(user.getId());
             postService.update(post);
-            return "성공";
+            userService.update(user);
+            return String.valueOf(updatePoint);
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             throw new Exception("구매 실패");
@@ -56,9 +58,10 @@ public class PurchaseService {
             Post post = postService.get(postId);
             int updatePoint = user.getPoint() + post.getPrice();
             user.setPoint(updatePoint) ;
-            post.setItemStatus(ItemStatus.ONGOING);
+            post.setItemStatus(ItemStatus.SELLING);
+            userService.update(user);
             postService.update(post);
-            return "성공";
+            return String.valueOf(updatePoint);
         } catch( Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             throw new Exception("구매취소 실패");

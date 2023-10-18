@@ -14,6 +14,7 @@
     <result column="item_status"   property="itemStatus"/>
     <result column="dealing_type"  property="dealingType"/>
     <result column="address"       property="address"/>
+    <result column="buyer_id" property="buyerId"/>
     <result column="price"         property="price"/>
     <result column="like_count"    property="likeCount"/>
 
@@ -50,23 +51,29 @@
     </foreach>
   </insert>
 
-  <select id="findBy" resultMap="articleMap" parameterType="int">
+  <select id="findBy" resultMap="articleMap" parameterType="Long">
     SELECT
     a.id,
     u.nickname,
-    u.id,
+    u.id as user_id,
     a.title,
     a.content,
+    a.view_count,
     a.created_at,
     a.dealing_type,
     a.item_category,
     a.item_status,
+    a.address,
+    a.price,
+    a.buyer_id,
     f.id,
     f.filepath
     FROM
     tbl_article a
-    INNER JOIN tbl_user u ON a.user_id = u.id
-    LEFT JOIN tbl_file f ON a.id = f.article_id
+    INNER JOIN
+    tbl_user u ON a.user_id = u.id
+    LEFT OUTER JOIN
+    tbl_file f ON a.id = f.article_id
     WHERE
     a.id=#{postId}
   </select>
@@ -254,7 +261,9 @@
     title=#{title},
     content=#{content},
     price=#{price},
-    address=#{address}
+    address=#{address},
+    buyer_id=#{buyerId},
+    item_status=#{itemStatus}
     where
     id=#{id}
   </update>
@@ -292,6 +301,7 @@
     a.item_status,
     a.address,
     a.price,
+    a.buyer_id,
     f.id,
     f.filepath
     FROM
