@@ -34,6 +34,8 @@ public interface PostService {
     Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user);
     // Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
 
+    int update(Post post);
+
     void toggleWishlist(Long article_id, User user);
 
     List<Post> getUserWishlist(User user);
