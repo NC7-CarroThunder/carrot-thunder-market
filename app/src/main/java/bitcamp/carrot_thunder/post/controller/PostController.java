@@ -35,115 +35,116 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 public class PostController {
 
-  @Autowired
-  PostService postService;
+    @Autowired
+    PostService postService;
 
-  @Autowired
-  UserService userService;
+    @Autowired
+    UserService userService;
 
-  @Autowired
-  NcpObjectStorageService ncpObjectStorageService;
+    @Autowired
+    NcpObjectStorageService ncpObjectStorageService;
 
-  @Autowired
-  DefaultNotificationService defaultNotificationService;
+    @Autowired
+    DefaultNotificationService defaultNotificationService;
 
-  @GetMapping("form")
-  public void form() {
-  }
-
-  @PostMapping("/posts")
-  public PostResponseDto add(@RequestPart PostRequestDto postRequestDto,
-      @RequestPart MultipartFile[] multipartFiles,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
-    return postService.createPost(postRequestDto, multipartFiles, userDetails);
-  }
-
-  @GetMapping("/posts/list")
-  public ResponseDto<List<PostListResponseDto>> getAllPosts(
-      @AuthenticationPrincipal UserDetailsImpl userDetails,
-      String pageNo, String category) {
-    System.out.println("category : " + category);
-    User user = userDetails != null ? userDetails.getUser() : null;
-    return ResponseDto.success(postService.getPostlist(user, Integer.parseInt(pageNo), category));
-  }
-
-  /**
-   * 게시글 상세정보 컨트롤러
-   *
-   * @param postId
-   * @param userDetails
-   * @return
-   */
-
-  @GetMapping("/posts/{postId}")
-  public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseDto.success(postService.getPost(postId, userDetails));
-  }
-
-  /**
-   * 게시글 수정 컨트롤러
-   *
-   * @param
-   * @return
-   */
-
-  @PutMapping("/posts/{postId}")
-  public ResponseDto<PostResponseDto> updatePost(
-      @PathVariable Long postId,
-      @RequestBody PostUpdateRequestDto postUpdateRequestDto,
-      // @RequestPart MultipartFile[] files,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
-    return ResponseDto
-        .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
-            userDetails.getUser()));
-  }
-
-  @DeleteMapping("/posts/{postId}")
-  public ResponseDto<Integer> deletePost(@PathVariable Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
-  }
-
-  @PostMapping("/wishlist/toggle")
-  public ResponseEntity<Map<String, Boolean>> toggleWishlist(
-      @RequestBody WishlistRequest request,
-      @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-
-    if (userDetailsImpl == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @GetMapping("form")
+    public void form() {
     }
 
-    User user = userDetailsImpl.getUser();
-    postService.toggleWishlist(request.getArticleId(), user);
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("success", true);
-    return ResponseEntity.ok(response);
-  }
-
-  @GetMapping("/wishlist")
-  public ResponseEntity<List<Post>> getUserWishlist(
-      @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-    User user = userDetailsImpl.getUser();
-    List<Post> wishlist = postService.getUserWishlist(user);
-    return ResponseEntity.ok(wishlist);
-  }
-
-  @GetMapping("/wishlist/status/{postId}")
-  public ResponseEntity<Map<String, Boolean>> checkWishlistStatus(
-      @PathVariable Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-
-    if (userDetailsImpl == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @PostMapping("/posts")
+    public PostResponseDto add(@RequestPart PostRequestDto postRequestDto,
+                               @RequestPart MultipartFile[] multipartFiles,
+                               @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+        return postService.createPost(postRequestDto, multipartFiles, userDetails);
     }
 
-    User user = userDetailsImpl.getUser();
-    boolean isInWishlist = postService.isInWishlist(user.getId(), postId);
+    @GetMapping("/posts/list")
+    public ResponseDto<List<PostListResponseDto>> getAllPosts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            String pageNo, String category) {
+        System.out.println("category : " + category);
+        User user = userDetails != null ? userDetails.getUser() : null;
+        return ResponseDto.success(postService.getPostlist(user, Integer.parseInt(pageNo), category));
+    }
 
-    Map<String, Boolean> response = new HashMap<>();
-    response.put("isLiked", isInWishlist);
-    return ResponseEntity.ok(response);
-  }
+    /**
+     * 게시글 상세정보 컨트롤러
+     *
+     * @param postId
+     * @param userDetails
+     * @return
+     */
+
+    @GetMapping("/posts/{postId}")
+    public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        postService.increaseViewCount(postId);
+        return ResponseDto.success(postService.getPost(postId, userDetails));
+    }
+
+    /**
+     * 게시글 수정 컨트롤러
+     *
+     * @param
+     * @return
+     */
+
+    @PutMapping("/posts/{postId}")
+    public ResponseDto<PostResponseDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateRequestDto postUpdateRequestDto,
+            // @RequestPart MultipartFile[] files,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return ResponseDto
+                .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
+                        userDetails.getUser()));
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseDto<Integer> deletePost(@PathVariable Long postId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
+    }
+
+    @PostMapping("/wishlist/toggle")
+    public ResponseEntity<Map<String, Boolean>> toggleWishlist(
+            @RequestBody WishlistRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+
+        if (userDetailsImpl == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userDetailsImpl.getUser();
+        postService.toggleWishlist(request.getArticleId(), user);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("success", true);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/wishlist")
+    public ResponseEntity<List<Post>> getUserWishlist(
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        User user = userDetailsImpl.getUser();
+        List<Post> wishlist = postService.getUserWishlist(user);
+        return ResponseEntity.ok(wishlist);
+    }
+
+    @GetMapping("/wishlist/status/{postId}")
+    public ResponseEntity<Map<String, Boolean>> checkWishlistStatus(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+
+        if (userDetailsImpl == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userDetailsImpl.getUser();
+        boolean isInWishlist = postService.isInWishlist(user.getId(), postId);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isLiked", isInWishlist);
+        return ResponseEntity.ok(response);
+    }
 }

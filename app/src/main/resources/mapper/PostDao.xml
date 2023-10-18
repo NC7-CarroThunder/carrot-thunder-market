@@ -190,11 +190,11 @@
 
 
 
-    <update id="updateCount" parameterType="int">
+    <update id="updateCount" parameterType="Long">
         update tbl_article set
         view_count=view_count + 1
         where
-        id=#{no}
+        id=#{postId}
     </update>
 
     <delete id="deleteFile" parameterType="Long">
@@ -213,6 +213,13 @@
         delete from tbl_chat
         where
         id=#{id}
+    </delete>
+
+    <delete id="deleteWishListByPostId" parameterType="Long">
+        delete from tbl_like_list
+        where
+        article_id=#{postId}
+
     </delete>
 
     <update id="update" parameterType="post">
