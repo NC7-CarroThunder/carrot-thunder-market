@@ -24,96 +24,96 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ChattingController {
 
-  @Autowired
-  private ChattingService chattingService;
+    @Autowired
+    private ChattingService chattingService;
 
-  @Autowired
-  private PapagoTranslationService translationService;
+    @Autowired
+    private PapagoTranslationService translationService;
 
-  @PostMapping("/translate")
-  public String translate(@RequestBody TranslateRequestDto request) {
-    String inputText = request.getMessage();
-    String targetLang = request.getTargetLang();
-    return translationService.detectAndTranslate(inputText, targetLang);
-  }
-
-  @GetMapping("/chatting/room/{roomId}")
-  public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,
-      HttpServletRequest request) {
-    Map<String, Object> response = new HashMap<>();
-
-    if (roomId == null || roomId.trim().isEmpty() || !roomId.matches("^[a-fA-F0-9\\-]{36}$")) {
-      throw new IllegalArgumentException("잘못된 채팅방 ID입니다.");
+    @PostMapping("/translate")
+    public String translate(@RequestBody TranslateRequestDto request) {
+        String inputText = request.getMessage();
+        String targetLang = request.getTargetLang();
+        return translationService.detectAndTranslate(inputText, targetLang);
     }
 
-    ChatRoomVO chatRoom = chattingService.getChatRoomByRoomId(roomId);
-    if (chatRoom == null) {
-      throw new IllegalArgumentException("채팅방을 찾을 수 없습니다.");
+    @GetMapping("/chatting/room/{roomId}")
+    public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,
+                                                           HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (roomId == null || roomId.trim().isEmpty() || !roomId.matches("^[a-fA-F0-9\\-]{36}$")) {
+            throw new IllegalArgumentException("잘못된 채팅방 ID입니다.");
+        }
+
+        ChatRoomVO chatRoom = chattingService.getChatRoomByRoomId(roomId);
+        if (chatRoom == null) {
+            throw new IllegalArgumentException("채팅방을 찾을 수 없습니다.");
+        }
+
+        response.put("room", chatRoom);
+        response.put("loginUser", request.getSession().getAttribute("loginUser"));
+        return ResponseEntity.ok(response);
     }
 
-    response.put("room", chatRoom);
-    response.put("loginUser", request.getSession().getAttribute("loginUser"));
-    return ResponseEntity.ok(response);
-  }
-
-  @GetMapping("/chatting/message/{roomId}")
-  public List<ChatMessageVO> getChatMessages(@PathVariable String roomId) {
-    return chattingService.getMessagesByRoomId(roomId);
-  }
-
-  @GetMapping("/chatting/roomsForSeller")
-  public List<ChatRoomVO> getRoomsForSeller(HttpServletRequest request) {
-    User loginUser = (User) request.getSession().getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new IllegalArgumentException("로그인이 필요합니다.");
+    @GetMapping("/chatting/message/{roomId}")
+    public List<ChatMessageVO> getChatMessages(@PathVariable String roomId) {
+        return chattingService.getMessagesByRoomId(roomId);
     }
-    return chattingService.getChatRoomsForSeller(Math.toIntExact(loginUser.getId()));
-  }
 
-  @GetMapping("/chatting/createOrGetChatRoom")
-  public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
-      @RequestParam int currentUserId, @RequestParam int postId) {
-    Map<String, Object> result = new HashMap<>();
-    String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId);
-    if (existingRoomId != null) {
-      ChatRoomVO existingRoom = chattingService.getChatRoomByPostIdAndUserId(postId, currentUserId);
-      if (existingRoom != null && existingRoom.getRoomId().equals(existingRoomId)) {
-        result.put("success", true);
-        result.put("roomId", existingRoomId);
+    @GetMapping("/chatting/roomsForSeller")
+    public List<ChatRoomVO> getRoomsForSeller(HttpServletRequest request) {
+        User loginUser = (User) request.getSession().getAttribute("loginUser");
+        if (loginUser == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+        return chattingService.getChatRoomsForSeller(Math.toIntExact(loginUser.getId()));
+    }
+
+    @GetMapping("/chatting/createOrGetChatRoom")
+    public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
+                                                                   @RequestParam int currentUserId, @RequestParam int postId) {
+        Map<String, Object> result = new HashMap<>();
+        String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId);
+        if (existingRoomId != null) {
+            ChatRoomVO existingRoom = chattingService.getChatRoomByPostIdAndUserId(postId, currentUserId);
+            if (existingRoom != null && existingRoom.getRoomId().equals(existingRoomId)) {
+                result.put("success", true);
+                result.put("roomId", existingRoomId);
+                return ResponseEntity.ok(result);
+            }
+        }
+        try {
+
+            String roomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId);
+            if (roomId == null) {
+                throw new RuntimeException("채팅방 ID를 가져오는데 실패했습니다.");
+            }
+            result.put("success", true);
+            result.put("roomId", roomId);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
         return ResponseEntity.ok(result);
-      }
     }
-    try {
 
-      String roomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId);
-      if (roomId == null) {
-        throw new RuntimeException("채팅방 ID를 가져오는데 실패했습니다.");
-      }
-      result.put("success", true);
-      result.put("roomId", roomId);
-    } catch (Exception e) {
-      result.put("success", false);
-      result.put("message", e.getMessage());
+    @GetMapping("/chatting/myChatRooms")
+    public ResponseEntity<Map<String, Object>> getMyChatRooms(@RequestParam int userId) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("chatRooms", chattingService.getChatRoomsForMember(userId));
+        return ResponseEntity.ok(response);
     }
-    return ResponseEntity.ok(result);
-  }
 
-  @GetMapping("/chatting/myChatRooms")
-  public ResponseEntity<Map<String, Object>> getMyChatRooms(@RequestParam int userId) {
-    Map<String, Object> response = new HashMap<>();
-    response.put("chatRooms", chattingService.getChatRoomsForMember(userId));
-    return ResponseEntity.ok(response);
-  }
+    @GetMapping("/chatting/allRoomsOrdered")
+    public ResponseEntity<List<ChatRoomVO>> getAllChatRoomsOrdered() {
+        List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
+        return ResponseEntity.ok(rooms);
+    }
 
-  @GetMapping("/chatting/allRoomsOrdered")
-  public ResponseEntity<List<ChatRoomVO>> getAllChatRoomsOrdered() {
-    List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
-    return ResponseEntity.ok(rooms);
-  }
-
-  @GetMapping("/chatting/getFirstAttachment")
-  public ResponseEntity<String> getFirstAttachmentByPostId(@RequestParam Long postId) {
-    String attachment = chattingService.getFirstAttachmentByPostId(postId);
-    return ResponseEntity.ok(attachment);
-  }
+    @GetMapping("/chatting/getFirstAttachment")
+    public ResponseEntity<String> getFirstAttachmentByPostId(@RequestParam Long postId) {
+        String attachment = chattingService.getFirstAttachmentByPostId(postId);
+        return ResponseEntity.ok(attachment);
+    }
 }

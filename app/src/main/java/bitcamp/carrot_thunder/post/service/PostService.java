@@ -14,29 +14,29 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface PostService {
 
-  int add(Post post) throws Exception;
+    int add(Post post) throws Exception;
 
-  PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files,
-      UserDetailsImpl userDetails) throws Exception;
+    PostResponseDto createPost(PostRequestDto postRequestDto, MultipartFile[] files,
+                               UserDetailsImpl userDetails) throws Exception;
 
-  int increaseViewCount(Long postId) throws Exception;
+    int increaseViewCount(Long postId) ;
 
-  Post get(Long id) throws Exception;
+    Post get(Long id) throws Exception;
 
-  List<PostListResponseDto> getPostlist(User user, int page, String category);
+    List<PostListResponseDto> getPostlist(User user, int page, String category);
 
-  AttachedFile getAttachedFile(Long fileId) throws Exception;
+    AttachedFile getAttachedFile(Long fileId) throws Exception;
 
-  int deletePost(Long postId, User user);
+    int deletePost(Long postId, User user);
 
-  PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
+    PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
 
-  Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user);
-  // Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
+    Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user);
+    // Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
 
-  void toggleWishlist(Long article_id, User user);
+    void toggleWishlist(Long article_id, User user);
 
-  List<Post> getUserWishlist(User user);
+    List<Post> getUserWishlist(User user);
 
-  boolean isInWishlist(Long userId, Long postId);
+    boolean isInWishlist(Long userId, Long postId);
 }

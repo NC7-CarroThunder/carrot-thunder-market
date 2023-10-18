@@ -1,196 +1,191 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO">
 
-  <resultMap type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO" id="ChatRoomMap">
-    <id column="room_id" property="roomId"/>
-    <result column="article_id" property="postId"/>
-    <result column="seller_id" property="sellerId"/>
-    <result column="buyer_id" property="buyerId"/>
-    <result column="last_message" property="lastMessage"/>
-    <result column="last_updated" property="lastUpdated"/>
-    <result column="seller_nickname" property="sellerNickname"/>
-    <result column="buyer_nickname" property="buyerNickname"/>
-  </resultMap>
+    <resultMap type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO" id="ChatRoomMap">
+        <id column="room_id" property="roomId"/>
+        <result column="article_id" property="postId"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="buyer_id" property="buyerId"/>
+        <result column="last_message" property="lastMessage"/>
+        <result column="last_updated" property="lastUpdated"/>
+        <result column="seller_nickname" property="sellerNickname"/>
+        <result column="buyer_nickname" property="buyerNickname"/>
+    </resultMap>
 
-  <resultMap type="bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO" id="ChatMessageMap">
-    <id column="message_id" property="messageId"/>
-    <result column="room_id" property="roomId"/>
-    <result column="sender_id" property="senderId"/>
-    <result column="content" property="content"/>
-    <result column="sent_at" property="sentAt"/>
-    <result column="is_read" property="isRead"/>
-    <result column="sender_nickname" property="senderNickname"/>
-  </resultMap>
+    <resultMap type="bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO" id="ChatMessageMap">
+        <id column="message_id" property="messageId"/>
+        <result column="room_id" property="roomId"/>
+        <result column="sender_id" property="senderId"/>
+        <result column="content" property="content"/>
+        <result column="sent_at" property="sentAt"/>
+        <result column="is_read" property="isRead"/>
+        <result column="sender_nickname" property="senderNickname"/>
+    </resultMap>
 
-  <resultMap id="ChatRoomDetailMap" type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
-    <result column="roomId" property="roomId"/>
-    <result column="article_id" property="postId"/>
-    <result column="sellerId" property="sellerId"/>
-    <result column="buyerId" property="buyerId"/>
-    <result column="lastMessage" property="lastMessage"/>
-    <result column="lastUpdated" property="lastUpdated"/>
-    <result column="sellerNickname" property="sellerNickname"/>
-    <result column="buyerNickname" property="buyerNickname"/>
-    <result column="postTitle" property="postTitle"/>
-  </resultMap>
+    <resultMap id="ChatRoomDetailMap" type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
+        <result column="roomId" property="roomId"/>
+        <result column="article_id" property="postId"/>
+        <result column="sellerId" property="sellerId"/>
+        <result column="buyerId" property="buyerId"/>
+        <result column="lastMessage" property="lastMessage"/>
+        <result column="lastUpdated" property="lastUpdated"/>
+        <result column="sellerNickname" property="sellerNickname"/>
+        <result column="buyerNickname" property="buyerNickname"/>
+        <result column="postTitle" property="postTitle"/>
+    </resultMap>
 
-  <resultMap id="ChatRoomWithAttachmentMap"
-    type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
-    <result column="roomId" property="roomId"/>
-    <result column="postId" property="postId"/>
-    <result column="sellerId" property="sellerId"/>
-    <result column="buyerId" property="buyerId"/>
-    <result column="lastMessage" property="lastMessage"/>
-    <result column="lastUpdated" property="lastUpdated"/>
-    <result column="sellerNickname" property="sellerNickname"/>
-    <result column="buyerNickname" property="buyerNickname"/>
-    <result column="postTitle" property="postTitle"/>
-    <result column="postAttachment" property="postAttachment"/>
-    <result column="messageId" property="messageId"/>
-  </resultMap>
+    <resultMap id="ChatRoomWithAttachmentMap"
+               type="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
+        <result column="roomId" property="roomId"/>
+        <result column="postId" property="postId"/>
+        <result column="sellerId" property="sellerId"/>
+        <result column="buyerId" property="buyerId"/>
+        <result column="lastMessage" property="lastMessage"/>
+        <result column="lastUpdated" property="lastUpdated"/>
+        <result column="sellerNickname" property="sellerNickname"/>
+        <result column="buyerNickname" property="buyerNickname"/>
+        <result column="postTitle" property="postTitle"/>
+        <result column="postAttachment" property="postAttachment"/>
+        <result column="messageId" property="messageId"/>
+    </resultMap>
 
-  <select id="getChatRoomByPostIdAndUserId" resultMap="ChatRoomMap">
-    SELECT
-    cr.*,
-    m1.nickname AS seller_nickname,
-    m2.nickname AS buyer_nickname
-    FROM
-    tbl_chat_room cr
-    JOIN
-    tbl_user m1 ON cr.seller_id = m1.id
-    JOIN
-    tbl_user m2 ON cr.buyer_id = m2.id
-    WHERE
-    article_id = #{postId} AND (seller_id = #{currentUserId} OR buyer_id = #{currentUserId})
-    LIMIT 1
-  </select>
+    <select id="getChatRoomByPostIdAndUserId" resultMap="ChatRoomMap">
+        SELECT
+        cr.*,
+        m1.nickname AS seller_nickname,
+        m2.nickname AS buyer_nickname
+        FROM
+        tbl_chat_room cr
+        JOIN
+        tbl_user m1 ON cr.seller_id = m1.id
+        JOIN
+        tbl_user m2 ON cr.buyer_id = m2.id
+        WHERE
+        article_id = #{postId} AND (seller_id = #{currentUserId} OR buyer_id = #{currentUserId})
+        LIMIT 1
+    </select>
 
-  <select id="getMessagesByRoomId" resultMap="ChatMessageMap">
-    SELECT
-    m.*,
-    u.nickname AS sender_nickname
-    FROM tbl_chat_message m
-    JOIN tbl_user u ON m.sender_id = u.id
-    WHERE room_id = #{roomId}
-    ORDER BY sent_at ASC
-  </select>
+    <select id="getMessagesByRoomId" resultMap="ChatMessageMap">
+        SELECT
+        m.*,
+        u.nickname AS sender_nickname
+        FROM tbl_chat_message m
+        JOIN tbl_user u ON m.sender_id = u.id
+        WHERE room_id = #{roomId}
+        ORDER BY sent_at ASC
+    </select>
 
-  <insert id="saveMessage">
-    INSERT INTO tbl_chat_message (room_id, sender_id, content, sent_at, is_read)
-    VALUES (#{roomId}, #{senderId}, #{content}, now(), #{isRead})
-  </insert>
+    <insert id="saveMessage">
+        INSERT INTO tbl_chat_message (room_id, sender_id, content, sent_at, is_read)
+        VALUES (#{roomId}, #{senderId}, #{content}, now(), #{isRead})
+    </insert>
 
-  <select id="getChatRoomsForSeller" resultMap="ChatRoomDetailMap">
-    SELECT
-    cr.room_id AS roomId,
-    cr.article_id AS postId,
-    cr.seller_id AS sellerId,
-    cr.buyer_id AS buyerId,
-    cr.last_message AS lastMessage,
-    cr.last_updated AS lastUpdated,
-    m1.nickname AS sellerNickname,
-    m2.nickname AS buyerNickname,
-    a.title AS postTitle
-    FROM
-    tbl_chat_room cr
-    JOIN
-    tbl_article a ON cr.article_id = a.id
-    JOIN
-    tbl_user m1 ON cr.seller_id = m1.id
-    JOIN
-    tbl_user m2 ON cr.buyer_id = m2.id
-    WHERE
-    cr.seller_id = #{sellerId}
-  </select>
+    <select id="getChatRoomsForSeller" resultMap="ChatRoomDetailMap">
+        SELECT
+        cr.room_id AS roomId,
+        cr.article_id AS postId,
+        cr.seller_id AS sellerId,
+        cr.buyer_id AS buyerId,
+        cr.last_message AS lastMessage,
+        cr.last_updated AS lastUpdated,
+        m1.nickname AS sellerNickname,
+        m2.nickname AS buyerNickname,
+        a.title AS postTitle
+        FROM
+        tbl_chat_room cr
+        JOIN
+        tbl_article a ON cr.article_id = a.id
+        JOIN
+        tbl_user m1 ON cr.seller_id = m1.id
+        JOIN
+        tbl_user m2 ON cr.buyer_id = m2.id
+        WHERE
+        cr.seller_id = #{sellerId}
+    </select>
 
-  <select id="getChatRoomsForMember" resultMap="ChatRoomWithAttachmentMap">
-    SELECT
-    cr.room_id AS roomId,
-    cr.article_id AS postId,
-    cr.seller_id AS sellerId,
-    cr.buyer_id AS buyerId,
-    cm.message_id AS messageId, -- 메시지 ID 추가
-    cm.content AS lastMessage, -- 마지막 메시지 내용 추가
-    cr.last_updated AS lastUpdated,
-    m1.nickname AS sellerNickname,
-    m2.nickname AS buyerNickname,
-    a.title AS postTitle,
-    f.filepath AS postAttachment
-    FROM
-    tbl_chat_room cr
-    JOIN
-    tbl_user m1 ON cr.seller_id = m1.id
-    JOIN
-    tbl_user m2 ON cr.buyer_id = m2.id
-    LEFT JOIN (
-    SELECT room_id, MAX(message_id) AS max_message_id
-    FROM tbl_chat_message
-    GROUP BY room_id
-    ) max_message ON cr.room_id = max_message.room_id
-    LEFT JOIN tbl_chat_message cm ON max_message.room_id = cm.room_id AND max_message.max_message_id
-    = cm.message_id
-    LEFT JOIN (
-    SELECT article_id, MIN(filepath) as filepath
-    FROM tbl_file
-    GROUP BY article_id
-    ) f ON cr.article_id = f.article_id
-    LEFT JOIN tbl_article a ON cr.article_id = a.id
-    WHERE
-    cr.seller_id = #{userId} OR cr.buyer_id = #{userId}
-    ORDER BY cr.last_updated DESC
-  </select>
+    <select id="getChatRoomsForMember" resultMap="ChatRoomWithAttachmentMap">
+        SELECT
+        cr.room_id AS roomId,
+        cr.article_id AS postId,
+        cr.seller_id AS sellerId,
+        cr.buyer_id AS buyerId,
+        cm.message_id AS messageId, -- 메시지 ID 추가
+        cm.content AS lastMessage, -- 마지막 메시지 내용 추가
+        cr.last_updated AS lastUpdated,
+        m1.nickname AS sellerNickname,
+        m2.nickname AS buyerNickname,
+        a.title AS postTitle,
+        f.filepath AS postAttachment
+        FROM
+        tbl_chat_room cr
+        JOIN
+        tbl_user m1 ON cr.seller_id = m1.id
+        JOIN
+        tbl_user m2 ON cr.buyer_id = m2.id
+        LEFT JOIN (
+        SELECT room_id, MAX(message_id) AS max_message_id
+        FROM tbl_chat_message
+        GROUP BY room_id
+        ) max_message ON cr.room_id = max_message.room_id
+        LEFT JOIN tbl_chat_message cm ON max_message.room_id = cm.room_id AND max_message.max_message_id = cm.message_id
+        LEFT JOIN (
+        SELECT article_id, MIN(filepath) as filepath
+        FROM tbl_file
+        GROUP BY article_id
+        ) f ON cr.article_id = f.article_id
+        LEFT JOIN tbl_article a ON cr.article_id = a.id
+        WHERE
+        cr.seller_id = #{userId} OR cr.buyer_id = #{userId}
+        ORDER BY cr.last_updated DESC
+    </select>
 
 
-  <select id="checkChatRoomExists" resultType="String">
-    SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND buyer_id = #{currentUserId}
-    AND article_id = #{postId}
-  </select>
+    <select id="checkChatRoomExists" resultType="String">
+        SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND buyer_id = #{currentUserId}
+        AND article_id = #{postId}
+    </select>
 
-  <insert id="createChatRoom">
-    INSERT INTO tbl_chat_room (room_id, article_id, seller_id, buyer_id)
-    VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId})
-  </insert>
+    <insert id="createChatRoom">
+        INSERT INTO tbl_chat_room (room_id, article_id, seller_id, buyer_id)
+        VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId})
+    </insert>
 
-  <select id="getChatRoomByRoomId" resultMap="ChatRoomMap">
-    SELECT * FROM tbl_chat_room WHERE room_id = #{roomId}
-  </select>
+    <select id="getChatRoomByRoomId" resultMap="ChatRoomMap">
+        SELECT * FROM tbl_chat_room WHERE room_id = #{roomId}
+    </select>
 
-  <select id="getNicknameByUserId" resultType="String">
-    SELECT nickname FROM tbl_user WHERE id = #{userId}
-  </select>
+    <select id="getNicknameByUserId" resultType="String">
+        SELECT nickname FROM tbl_user WHERE id = #{userId}
+    </select>
 
-  <select id="getAllChatRoomsOrderedByLastUpdated" resultMap="ChatRoomMap">
-    SELECT * FROM tbl_chat_room ORDER BY last_updated DESC;
-  </select>
+    <select id="getAllChatRoomsOrderedByLastUpdated" resultMap="ChatRoomMap">
+        SELECT * FROM tbl_chat_room ORDER BY last_updated DESC;
+    </select>
 
-  <select id="getFirstAttachmentByPostId" resultType="String">
-    SELECT MIN(filepath) AS filepath
-    FROM tbl_file
-    WHERE article_id = #{postId}
-  </select>
+    <select id="getFirstAttachmentByPostId" resultType="String">
+        SELECT MIN(filepath) AS filepath
+        FROM tbl_file
+        WHERE article_id = #{postId}
+    </select>
 
-  <delete id="deleteChatRoomByPostId" parameterType="java.lang.Long">
-    DELETE FROM tbl_chat_room
-    WHERE article_id = #{postId}
-  </delete>
+    <delete id="deleteChatMsgByRoomId" parameterType="String">
+        DELETE FROM tbl_chat_message
+        WHERE room_id = #{roomIds}
+    </delete>
 
-  <delete id="deleteChatMsgByRoomId" parameterType="java.lang.String">
-    DELETE FROM tbl_chat_message
-    WHERE room_id = #{roomId}
-  </delete>
+    <delete id="deleteChatRoomByPostId" parameterType="java.lang.Long">
+        DELETE FROM tbl_chat_room
+        WHERE article_id = #{postId}
+    </delete>
 
-  <select id="getRoomIdByPostId" parameterType="java.lang.Long">
-    SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
-  </select>
 
-  <update id="updateChatRoomLastUpdated">
-    UPDATE tbl_chat_room
-    SET last_updated = now()
-    WHERE room_id = #{roomId}
-  </update>
+    <select id="getRoomIdByPostId" parameterType="java.lang.Long" >
+        SELECT room_id FROM tbl_chat_room WHERE article_id = #{postId}
+    </select>
+
 
 </mapper>
