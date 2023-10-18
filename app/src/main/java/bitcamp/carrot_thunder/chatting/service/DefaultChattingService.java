@@ -11,76 +11,76 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultChattingService implements ChattingService {
 
-    @Autowired
-    private ChattingDAO chattingDAO;
+  @Autowired
+  private ChattingDAO chattingDAO;
 
-    @Override
-    public ChatRoomVO getChatRoomByPostIdAndUserId(int postId, int currentUserId) {
-        return chattingDAO.getChatRoomByPostIdAndUserId(postId, currentUserId);
-    }
+  @Override
+  public ChatRoomVO getChatRoomByPostIdAndUserId(int postId, int currentUserId) {
+    return chattingDAO.getChatRoomByPostIdAndUserId(postId, currentUserId);
+  }
 
-    @Override
-    public List<ChatMessageVO> getMessagesByRoomId(String roomId) {
-        return chattingDAO.getMessagesByRoomId(roomId);
-    }
+  @Override
+  public List<ChatMessageVO> getMessagesByRoomId(String roomId) {
+    return chattingDAO.getMessagesByRoomId(roomId);
+  }
 
-    @Override
-    public void saveMessage(ChatMessageVO message) {
-        chattingDAO.saveMessage(message);
-    }
+  @Override
+  public void saveMessage(ChatMessageVO message) {
+    chattingDAO.saveMessage(message);
+  }
 
-    @Override
-    public List<ChatRoomVO> getChatRoomsForSeller(int sellerId) {
-        return chattingDAO.getChatRoomsForSeller(sellerId);
-    }
+  @Override
+  public List<ChatRoomVO> getChatRoomsForSeller(int sellerId) {
+    return chattingDAO.getChatRoomsForSeller(sellerId);
+  }
 
-    @Override
-    public List<ChatRoomVO> getChatRoomsForMember(int memberId) {
-        return chattingDAO.getChatRoomsForMember(memberId);
-    }
+  @Override
+  public List<ChatRoomVO> getChatRoomsForMember(int memberId) {
+    return chattingDAO.getChatRoomsForMember(memberId);
+  }
 
-    @Override
-    public String createOrGetChatRoom(int sellerId, int currentUserId, int postId) {
-        String existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
-        if (existingRoomId != null) {
-            return existingRoomId;
-        }
-        String newRoomId = UUID.randomUUID().toString();
-        createChatRoom(sellerId, currentUserId, newRoomId, postId); // 반환 값은 무시
-        return newRoomId;
+  @Override
+  public String createOrGetChatRoom(int sellerId, int currentUserId, int postId) {
+    String existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+    if (existingRoomId != null) {
+      return existingRoomId;
     }
+    String newRoomId = UUID.randomUUID().toString();
+    createChatRoom(sellerId, currentUserId, newRoomId, postId); // 반환 값은 무시
+    return newRoomId;
+  }
 
-    @Override
-    public ChatRoomVO getChatRoomByRoomId(String roomId) {
-        return chattingDAO.getChatRoomByRoomId(roomId);
-    }
+  @Override
+  public ChatRoomVO getChatRoomByRoomId(String roomId) {
+    return chattingDAO.getChatRoomByRoomId(roomId);
+  }
 
-    @Override
-    public String checkChatRoomExists(int sellerId, int currentUserId, int postId) {
-        return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
-    }
+  @Override
+  public String checkChatRoomExists(int sellerId, int currentUserId, int postId) {
+    return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+  }
 
-    @Override
-    public String getNicknameByUserId(int userId) {
-        return chattingDAO.getNicknameByUserId(userId);
-    }
+  @Override
+  public String getNicknameByUserId(int userId) {
+    return chattingDAO.getNicknameByUserId(userId);
+  }
 
-    @Override
-    public List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated() {
-        return chattingDAO.getAllChatRoomsOrderedByLastUpdated();
-    }
+  @Override
+  public List<ChatRoomVO> getAllChatRoomsOrderedByLastUpdated() {
+    return chattingDAO.getAllChatRoomsOrderedByLastUpdated();
+  }
 
-    @Override
-    public String getFirstAttachmentByPostId(Long postId) {
-        return chattingDAO.getFirstAttachmentByPostId(postId);
-    }
+  @Override
+  public String getFirstAttachmentByPostId(Long postId) {
+    return chattingDAO.getFirstAttachmentByPostId(postId);
+  }
 
-    @Override
-    public void updateChatRoomLastUpdated(String roomId) {
-        chattingDAO.updateChatRoomLastUpdated(roomId);
-    }
+  @Override
+  public void updateChatRoomLastUpdated(String roomId) {
+    chattingDAO.updateChatRoomLastUpdated(roomId);
+  }
 
-    public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
-        return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
-    }
+  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
+    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
+  }
 }
