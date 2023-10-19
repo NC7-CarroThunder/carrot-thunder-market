@@ -56,5 +56,9 @@ public interface UserDao {
 
   User getProfileDetail(Long userId);
 
-  int updateProfile(User user);
+  long updateProfile(User user);
+
+  long checkNicknameDuplicate(String nickname);
+
+  long checkEmailDuplicate(String email);
 }

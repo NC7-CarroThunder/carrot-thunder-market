@@ -216,4 +216,14 @@
     id=#{id}
   </update>
 
+  <select id="checkNicknameDuplicate" resultType="long">
+    SELECT COUNT(*) FROM tbl_user
+    WHERE nickname=#{nickName}
+  </select>
+
+  <select id="checkEmailDuplicate" resultType="long">
+    SELECT COUNT(*) FROM tbl_user
+    WHERE email=#{email}
+  </select>
+
 </mapper>
