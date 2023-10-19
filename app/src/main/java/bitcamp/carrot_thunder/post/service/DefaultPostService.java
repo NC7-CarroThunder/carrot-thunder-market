@@ -172,9 +172,9 @@ public class DefaultPostService implements PostService {
         for (Post post : posts) {
             PostListResponseDto responseDto = PostListResponseDto.of(post);
             boolean isLiked = false;
-            if (user != null) {
-                isLiked = postDao.isLiked(post.getId(), user.getId());
-            }
+//            if (user != null) {
+//                isLiked = postDao.isLiked(post.getId(), user.getId());
+//            }
             responseDto.setIsLiked(isLiked);
             dtoList.add(responseDto);
         }
