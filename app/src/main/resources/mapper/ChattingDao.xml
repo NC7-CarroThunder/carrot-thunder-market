@@ -202,7 +202,8 @@
 
     <update id="updateChatMessage">
         UPDATE tbl_chat_message
-        SET content = '삭제된 메세지입니다'
+        SET content = '삭제된 메세지입니다',
+        trans_content = ''
         WHERE message_id = #{messageId}
     </update>
 </mapper>

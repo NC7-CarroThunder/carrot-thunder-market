@@ -95,6 +95,7 @@ public class DefaultChattingService implements ChattingService {
     ChatMessageVO existingMessage = chattingDAO.getChatMessageById(messageId);
     if (existingMessage != null) {
       existingMessage.setContent(message.getContent());
+      existingMessage.setTransContent(message.getTransContent());
       chattingDAO.updateChatMessage(existingMessage);
     }
   }

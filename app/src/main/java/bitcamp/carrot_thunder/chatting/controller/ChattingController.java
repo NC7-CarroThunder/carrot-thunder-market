@@ -121,6 +121,7 @@ public class ChattingController {
     if (message != null) {
       message.setMessageId(messageId);
       message.setContent("삭제된 메시지입니다");
+      message.setTransContent("");
       chattingService.updateChatMessage(message);
 
       return ResponseEntity.ok("메시지가 삭제되었습니다.");
