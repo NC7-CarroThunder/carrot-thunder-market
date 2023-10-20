@@ -30,12 +30,12 @@ public class ChattingController {
   @Autowired
   private PapagoTranslationService translationService;
 
-  @PostMapping("/translate")
-  public String translate(@RequestBody TranslateRequestDto request) {
-    String inputText = request.getMessage();
-    String targetLang = request.getTargetLang();
-    return translationService.detectAndTranslate(inputText, targetLang);
-  }
+//  @PostMapping("/translate")
+//  public String translate(@RequestBody TranslateRequestDto request) {
+//    String inputText = request.getMessage();
+//    String targetLang = request.getTargetLang();
+//    return translationService.detectAndTranslate(inputText, targetLang);
+//  }
 
   @GetMapping("/chatting/room/{roomId}")
   public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,

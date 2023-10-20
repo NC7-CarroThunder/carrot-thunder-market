@@ -57,9 +57,12 @@ public class WebSocketController {
     message.setSenderNickname(senderNickname);
 
     if (!message.getContent().startsWith(":emoji") || !message.getContent().endsWith(":")) {
-      String translatedMessage = papagoTranslationService.detectAndTranslate(message.getContent(),
+      String originalMessage = message.getContent();
+      String translatedMessage = papagoTranslationService.detectAndTranslate(originalMessage,
           message.getTargetLang());
-      message.setContent(translatedMessage);
+
+      message.setContent(originalMessage); // 원본 메시지 설정
+      message.setTransContent(translatedMessage); // 번역된 메시지 설정
     }
 
     chattingService.saveMessage(message);
