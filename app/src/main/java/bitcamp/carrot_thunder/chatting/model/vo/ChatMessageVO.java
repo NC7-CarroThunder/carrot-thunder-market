@@ -9,6 +9,7 @@ public class ChatMessageVO implements Serializable {
   private String roomId;
   private int senderId;
   private String content;
+  private String transContent;
   private LocalDateTime sentAt;
   private char isRead;
   private String senderNickname;
@@ -76,5 +77,13 @@ public class ChatMessageVO implements Serializable {
 
   public void setTargetLang(String targetLang) {
     this.targetLang = targetLang;
+  }
+
+  public String getTransContent() {
+    return transContent;
+  }
+
+  public void setTransContent(String transContent) {
+    this.transContent = transContent;
   }
 }
