@@ -43,4 +43,8 @@ public interface ChattingDAO {
   List<String> getRoomIdByPostId(@Param("postId") Long postId);
 
   void updateChatRoomLastUpdated(@Param("roomId") String roomId);
+
+  ChatMessageVO getChatMessageById(@Param("messageId") int messageId);
+
+  void updateChatMessage(ChatMessageVO message);
 }

@@ -29,4 +29,8 @@ public interface ChattingService {
   String getFirstAttachmentByPostId(Long postId);
 
   void updateChatRoomLastUpdated(String roomId);
+
+  ChatMessageVO getChatMessageById(int messageId);
+
+  void updateChatMessage(ChatMessageVO content);
 }

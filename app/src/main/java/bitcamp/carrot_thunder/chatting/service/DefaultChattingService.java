@@ -83,4 +83,19 @@ public class DefaultChattingService implements ChattingService {
   public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
     return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
   }
+
+  @Override
+  public ChatMessageVO getChatMessageById(int messageId) {
+    return chattingDAO.getChatMessageById(messageId);
+  }
+
+  @Override
+  public void updateChatMessage(ChatMessageVO message) {
+    int messageId = message.getMessageId();
+    ChatMessageVO existingMessage = chattingDAO.getChatMessageById(messageId);
+    if (existingMessage != null) {
+      existingMessage.setContent(message.getContent());
+      chattingDAO.updateChatMessage(existingMessage);
+    }
+  }
 }

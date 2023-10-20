@@ -10,6 +10,8 @@ public class ChatRoomVO implements Serializable {
   private Long postId;
   private int sellerId;
   private int buyerId;
+
+  private int userId;
   private String lastMessage;
   private LocalDateTime lastUpdated;
   private String sellerNickname;
@@ -104,5 +106,13 @@ public class ChatRoomVO implements Serializable {
 
   public void setMessageId(Long messageId) {
     this.messageId = messageId;
+  }
+
+  public int getUserId() {
+    return userId;
+  }
+
+  public void setUserId(int userId) {
+    this.userId = userId;
   }
 }
