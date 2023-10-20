@@ -22,6 +22,7 @@
         <result column="room_id" property="roomId"/>
         <result column="sender_id" property="senderId"/>
         <result column="content" property="content"/>
+        <result column="trans_content" property="transContent"/>
         <result column="sent_at" property="sentAt"/>
         <result column="is_read" property="isRead"/>
         <result column="sender_nickname" property="senderNickname"/>
@@ -83,8 +84,8 @@
     </select>
 
     <insert id="saveMessage">
-        INSERT INTO tbl_chat_message (room_id, sender_id, content, sent_at, is_read)
-        VALUES (#{roomId}, #{senderId}, #{content}, now(), #{isRead})
+        INSERT INTO tbl_chat_message (room_id, sender_id, trans_content, content, sent_at, is_read)
+        VALUES (#{roomId}, #{senderId}, #{transContent}, #{content}, now(), #{isRead})
     </insert>
 
     <select id="getChatRoomsForSeller" resultMap="ChatRoomDetailMap">
