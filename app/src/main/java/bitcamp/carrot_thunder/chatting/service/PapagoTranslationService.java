@@ -24,15 +24,10 @@ public class PapagoTranslationService {
       // Step 1: 입력 텍스트의 언어 감지
       String detectedLang = detectLanguage(inputText);
 
-      if ("und".equals(detectedLang)) {
-        System.out.println("언어 감지에 실패했습니다. 원본 메시지 반환.");
-        return inputText;
+      if ("und".equals(detectedLang) || detectedLang.equals(targetLang)) {
+        return "";
       }
 
-      // 감지된 언어와 목표 언어가 동일한 경우 원본 텍스트 반환
-      if (detectedLang.equals(targetLang)) {
-        return inputText;
-      }
 
       // Step 2: 언어 감지 결과를 바탕으로 번역 수행
       String translatedText = translateText(inputText, detectedLang, targetLang);

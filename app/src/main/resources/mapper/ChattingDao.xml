@@ -10,6 +10,7 @@
         <result column="article_id" property="postId"/>
         <result column="seller_id" property="sellerId"/>
         <result column="buyer_id" property="buyerId"/>
+        <result column="user_id" property="userId"/>
         <result column="last_message" property="lastMessage"/>
         <result column="last_updated" property="lastUpdated"/>
         <result column="seller_nickname" property="sellerNickname"/>
@@ -21,7 +22,6 @@
         <result column="room_id" property="roomId"/>
         <result column="sender_id" property="senderId"/>
         <result column="content" property="content"/>
-        <result column="trans_content" property="transContent"/>
         <result column="sent_at" property="sentAt"/>
         <result column="is_read" property="isRead"/>
         <result column="sender_nickname" property="senderNickname"/>
@@ -32,6 +32,7 @@
         <result column="article_id" property="postId"/>
         <result column="sellerId" property="sellerId"/>
         <result column="buyerId" property="buyerId"/>
+        <result column="userId" property="userId"/>
         <result column="lastMessage" property="lastMessage"/>
         <result column="lastUpdated" property="lastUpdated"/>
         <result column="sellerNickname" property="sellerNickname"/>
@@ -45,6 +46,7 @@
         <result column="postId" property="postId"/>
         <result column="sellerId" property="sellerId"/>
         <result column="buyerId" property="buyerId"/>
+        <result column="userId" property="userId"/>
         <result column="lastMessage" property="lastMessage"/>
         <result column="lastUpdated" property="lastUpdated"/>
         <result column="sellerNickname" property="sellerNickname"/>
@@ -81,8 +83,8 @@
     </select>
 
     <insert id="saveMessage">
-        INSERT INTO tbl_chat_message (room_id, sender_id, trans_content, content, sent_at, is_read)
-        VALUES (#{roomId}, #{senderId}, #{transContent}, #{content}, now(), #{isRead})
+        INSERT INTO tbl_chat_message (room_id, sender_id, content, sent_at, is_read)
+        VALUES (#{roomId}, #{senderId}, #{content}, now(), #{isRead})
     </insert>
 
     <select id="getChatRoomsForSeller" resultMap="ChatRoomDetailMap">
@@ -151,8 +153,8 @@
     </select>
 
     <insert id="createChatRoom">
-        INSERT INTO tbl_chat_room (room_id, article_id, seller_id, buyer_id)
-        VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId})
+        INSERT INTO tbl_chat_room (room_id, article_id, seller_id, buyer_id, user_id)
+        VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId}, #{currentUserId})
     </insert>
 
     <select id="getChatRoomByRoomId" resultMap="ChatRoomMap">
@@ -191,5 +193,15 @@
         UPDATE tbl_chat_room
         SET last_updated = now()
         WHERE room_id = #{roomId}
+    </update>
+
+    <select id="getChatMessageById" parameterType="int" resultType="ChatMessageVO">
+        SELECT * FROM tbl_chat_message WHERE message_id = #{messageId}
+    </select>
+
+    <update id="updateChatMessage">
+        UPDATE tbl_chat_message
+        SET content = '삭제된 메세지입니다'
+        WHERE message_id = #{messageId}
     </update>
 </mapper>

@@ -11,14 +11,10 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -115,5 +111,21 @@ public class ChattingController {
   public ResponseEntity<String> getFirstAttachmentByPostId(@RequestParam Long postId) {
     String attachment = chattingService.getFirstAttachmentByPostId(postId);
     return ResponseEntity.ok(attachment);
+  }
+
+
+  @Transactional
+  @PutMapping("/chatting/message/delete/{messageId}")
+  public ResponseEntity<String> deleteChatMessage(@PathVariable int messageId) {
+    ChatMessageVO message = chattingService.getChatMessageById(messageId);
+    if (message != null) {
+      message.setMessageId(messageId);
+      message.setContent("삭제된 메시지입니다");
+      chattingService.updateChatMessage(message);
+
+      return ResponseEntity.ok("메시지가 삭제되었습니다.");
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메시지를 찾을 수 없습니다.");
+    }
   }
 }
