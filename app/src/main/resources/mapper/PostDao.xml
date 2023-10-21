@@ -361,4 +361,8 @@
     WHERE w.user_id = #{user_id}
   </select>
 
+  <select id="getPostOwnerId" resultType="Long" parameterType="Long">
+    SELECT user_id FROM tbl_article WHERE id=#{postId}
+  </select>
+
 </mapper>

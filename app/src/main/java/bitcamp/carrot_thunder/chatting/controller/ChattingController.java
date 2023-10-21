@@ -1,9 +1,10 @@
 package bitcamp.carrot_thunder.chatting.controller;
 
-import bitcamp.carrot_thunder.chatting.dto.TranslateRequestDto;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
+import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
 import bitcamp.carrot_thunder.chatting.service.ChattingService;
+import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.chatting.service.PapagoTranslationService;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.HashMap;
@@ -13,8 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -25,6 +32,12 @@ public class ChattingController {
 
   @Autowired
   private PapagoTranslationService translationService;
+
+  @Autowired
+  DefaultNotificationService defaultNotificationService;
+
+  @Autowired
+  SimpMessagingTemplate messagingTemplate;
 
 //  @PostMapping("/translate")
 //  public String translate(@RequestBody TranslateRequestDto request) {
@@ -80,8 +93,18 @@ public class ChattingController {
       }
     }
     try {
-
       String roomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId);
+
+      // 발신자의 닉네임을 가져옵니다.
+      String senderNickname = chattingService.getNicknameByUserId(currentUserId);
+
+      NotificationVO notification = new NotificationVO();
+      notification.setUserId((long) sellerId);
+      notification.setContent(senderNickname + "님이 채팅방을 개설했습니다.");
+      notification.setType("CHATROOM");
+
+      defaultNotificationService.createNotification(notification);
+
       if (roomId == null) {
         throw new RuntimeException("채팅방 ID를 가져오는데 실패했습니다.");
       }

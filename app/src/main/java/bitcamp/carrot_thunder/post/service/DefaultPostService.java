@@ -3,6 +3,8 @@ package bitcamp.carrot_thunder.post.service;
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
+import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
+import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.exception.NotHaveAuthorityException;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
@@ -21,6 +23,7 @@ import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +41,12 @@ public class DefaultPostService implements PostService {
 
     @Autowired
     NcpObjectStorageService ncpObjectStorageService;
+
+    @Autowired
+    DefaultNotificationService defaultNotificationService;
+
+    @Autowired
+    SimpMessagingTemplate messagingTemplate;
 
 
     @Override
@@ -253,6 +262,14 @@ public class DefaultPostService implements PostService {
             postDao.removeWishlist(user_id, article_id);
         } else {
             postDao.addWishlist(user_id, article_id);
+            Long postOwnerId = postDao.getPostOwnerId(article_id);
+
+            NotificationVO notification = new NotificationVO();
+            notification.setUserId(postOwnerId);
+            notification.setContent(user.getNickName() + "님이 게시글에 찜을 눌렀습니다.");
+            notification.setType("WISHLIST");
+
+            defaultNotificationService.createNotification(notification);
         }
     }
 

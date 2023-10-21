@@ -24,10 +24,10 @@ public class PapagoTranslationService {
       // Step 1: 입력 텍스트의 언어 감지
       String detectedLang = detectLanguage(inputText);
 
-      if ("und".equals(detectedLang) || detectedLang.equals(targetLang)) {
+      if ("und".equals(detectedLang) || detectedLang.equals(targetLang) || "unk".equals(
+          detectedLang)) {
         return "";
       }
-
 
       // Step 2: 언어 감지 결과를 바탕으로 번역 수행
       String translatedText = translateText(inputText, detectedLang, targetLang);

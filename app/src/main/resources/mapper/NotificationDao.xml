@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="bitcamp.carrot_thunder.user.model.dao.NotificationDao">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-    <insert id="insertNotification">
-        INSERT INTO tbl_notification (user_id, content, created_at, type, isRead)
-        VALUES (#{userId}, #{content}, NOW(), #{type}, #{isRead})
-    </insert>
+<mapper namespace="bitcamp.carrot_thunder.chatting.model.dao.NotificationDAO">
+  <resultMap id="NotificationMap" type="bitcamp.carrot_thunder.chatting.model.vo.NotificationVO">
+    <result column="noti_id" property="noti_id"/>
+    <result column="userId" property="userId"/>
+    <result column="content" property="content"/>
+    <result column="created_at" property="created_at"/>
+    <result column="type" property="type"/>
+    <result column="isRead" property="isRead"/>
+  </resultMap>
 
-    <select id="findNotificationsByUserId"
-            resultType="bitcamp.carrot_thunder.user.model.vo.Notification">
-        SELECT * FROM tbl_notification WHERE user_id = #{userId}
-    </select>
+  <insert id="insertNotification">
+    INSERT INTO tbl_notification (user_id, content, type, isRead)
+    VALUES (#{userId}, #{content}, #{type}, "n")
+  </insert>
 
-    <update id="updateReadStatus">
-        UPDATE tbl_notification SET isRead = #{isRead} WHERE id = #{id}
-    </update>
+  <!-- 2. 특정 유저의 안 읽은 알림 개수 조회 -->
+  <select id="countUnreadNotifications" resultType="int">
+    SELECT COUNT(*) FROM tbl_notification WHERE user_id = #{userId} AND isRead = "n"
+  </select>
 
-    <insert id="saveNotification" parameterType="bitcamp.carrot_thunder.user.model.vo.Notification">
-        INSERT INTO tbl_notification (user_id, content, created_at, type, isRead)
-        VALUES (#{userId}, #{content}, #{createdAt}, #{type}, #{isRead})
-    </insert>
+  <!-- 3. 특정 유저의 모든 알림 조회 -->
+  <select id="selectAllNotifications" resultMap="NotificationMap">
+    SELECT * FROM tbl_notification WHERE user_id = #{userId} ORDER BY created_at DESC
+  </select>
+
+  <!-- 4. 특정 유저의 모든 안 읽은 알림을 읽은 상태로 변경 -->
+  <update id="markAllNotificationsAsRead">
+    UPDATE tbl_notification SET isRead = "y" WHERE user_id = #{userId} AND isRead = "n"
+  </update>
+
+  <!-- 5. 특정 유저의 모든 알림 삭제 -->
+  <delete id="deleteAllNotifications">
+    DELETE FROM tbl_notification WHERE user_id = #{userId}
+  </delete>
 
 </mapper>
