@@ -11,8 +11,6 @@ import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.dto.UserEmailCheckDto;
 import bitcamp.carrot_thunder.user.dto.UserNameCheckDto;
 import bitcamp.carrot_thunder.user.model.vo.User;
-import bitcamp.carrot_thunder.user.model.vo.Notification;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
