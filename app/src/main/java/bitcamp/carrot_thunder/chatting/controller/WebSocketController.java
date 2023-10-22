@@ -71,16 +71,22 @@ public class WebSocketController {
     }
 
     Long receiverId;
-    if(message.getSenderId() == chatRoom.getSellerId()) {
+    if (message.getSenderId() == chatRoom.getSellerId()) {
       receiverId = Long.valueOf(chatRoom.getBuyerId());
     } else {
       receiverId = Long.valueOf(chatRoom.getSellerId());
     }
 
-    // 새로운 알림 생성
+    String previewMessage;
+    if (message.getContent().length() > 15) {
+      previewMessage = message.getContent().substring(0, 15) + "...";
+    } else {
+      previewMessage = message.getContent();
+    }
+
     NotificationVO notification = new NotificationVO();
     notification.setUserId(receiverId); // 받는 사람의 ID를 설정
-    notification.setContent(senderNickname + "님이 새로운 메시지를 보냈습니다.");
+    notification.setContent(senderNickname + "님이 새로운 메시지를 보냈습니다.\n미리보기: " + previewMessage);
     notification.setType("CHAT");
 
     // 알림 저장 및 웹소켓으로 알림 전송
