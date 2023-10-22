@@ -206,4 +206,24 @@
         trans_content = ''
         WHERE message_id = #{messageId}
     </update>
+
+    <update id="updateChatRoom" parameterType="map">
+        UPDATE tbl_chat_room
+        SET user_id = #{userId}
+        WHERE room_id = #{roomId}
+    </update>
+
+
+    <update id="leaveChatRoom" parameterType="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
+        UPDATE tbl_chat_room
+        SET seller_id = CASE
+        WHEN seller_id = #{userId} THEN -1
+        ELSE seller_id
+        END,
+        buyer_id = CASE
+        WHEN buyer_id = #{userId} THEN -1
+        ELSE buyer_id
+        END
+        WHERE room_id = #{roomId}
+    </update>
 </mapper>

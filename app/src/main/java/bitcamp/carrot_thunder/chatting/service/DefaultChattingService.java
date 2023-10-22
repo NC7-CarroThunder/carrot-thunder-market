@@ -108,4 +108,10 @@ public class DefaultChattingService implements ChattingService {
       chattingDAO.updateChatMessage(existingMessage);
     }
   }
+
+  @Override
+  public int leaveChatRoom(String roomId, int userId) {
+    int rowsAffected = chattingDAO.leaveChatRoom(roomId, userId);
+    return rowsAffected;
+  }
 }
