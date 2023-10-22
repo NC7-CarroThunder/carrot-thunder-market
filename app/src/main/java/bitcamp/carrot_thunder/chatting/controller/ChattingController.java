@@ -85,8 +85,17 @@ public class ChattingController {
     Map<String, Object> result = new HashMap<>();
     String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId);
     if (existingRoomId != null) {
+      System.out.println("-----------------타나?----------------");
+      ChatRoomVO chatRoom = new ChatRoomVO();
+      chatRoom.setUserId(currentUserId);
+      chatRoom.setBuyerId(currentUserId);
+      System.out.println("확인 : " + chatRoom.getBuyerId());
+      chatRoom.setRoomId(existingRoomId);
+      chattingService.rejoinChatRoom(chatRoom);
+
       ChatRoomVO existingRoom = chattingService.getChatRoomByPostIdAndUserId(postId, currentUserId);
       if (existingRoom != null && existingRoom.getRoomId().equals(existingRoomId)) {
+
         result.put("success", true);
         result.put("roomId", existingRoomId);
         return ResponseEntity.ok(result);

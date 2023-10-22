@@ -114,4 +114,9 @@ public class DefaultChattingService implements ChattingService {
     int rowsAffected = chattingDAO.leaveChatRoom(roomId, userId);
     return rowsAffected;
   }
+
+  @Override
+  public void rejoinChatRoom(ChatRoomVO chatRoom) {
+    chattingDAO.rejoinChatRoom(chatRoom);
+  }
 }

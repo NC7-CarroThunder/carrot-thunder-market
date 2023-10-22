@@ -35,4 +35,6 @@ public interface ChattingService {
   void updateChatMessage(ChatMessageVO content);
 
   int leaveChatRoom(String roomId, int userId);
+
+  void rejoinChatRoom(ChatRoomVO chatRoom);
 }
