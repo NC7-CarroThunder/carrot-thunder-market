@@ -152,4 +152,17 @@ public class ChattingController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메시지를 찾을 수 없습니다.");
     }
   }
+
+  @PutMapping("/chatting/leaveRoom")
+  public ResponseEntity<String> leaveChatRoom(@RequestParam String roomId, @RequestParam int userId) {
+    int rowsAffected = chattingService.leaveChatRoom(roomId, userId);
+    System.out.println("------->" + rowsAffected);
+    if (rowsAffected > 0) {
+      // 채팅방 나가기에 성공한 경우
+      return ResponseEntity.ok("채팅방에서 나갔습니다.");
+    } else {
+      // 채팅방 나가기에 실패한 경우
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 나가기에 실패했습니다.");
+    }
+  }
 }
