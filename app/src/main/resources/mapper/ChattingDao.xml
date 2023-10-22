@@ -149,7 +149,7 @@
 
 
     <select id="checkChatRoomExists" resultType="String">
-        SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND buyer_id = #{currentUserId}
+        SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND user_id = #{currentUserId}
         AND article_id = #{postId}
     </select>
 
@@ -224,6 +224,13 @@
         WHEN buyer_id = #{userId} THEN -1
         ELSE buyer_id
         END
+        WHERE room_id = #{roomId} AND (seller_id = #{userId} OR buyer_id = #{userId})
+    </update>
+
+    <update id="rejoinChatRoom" parameterType="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
+        UPDATE tbl_chat_room
+        SET buyer_id = #{userId}
         WHERE room_id = #{roomId}
     </update>
+
 </mapper>
