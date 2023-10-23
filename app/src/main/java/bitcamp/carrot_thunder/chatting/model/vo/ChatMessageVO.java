@@ -15,7 +15,6 @@ public class ChatMessageVO implements Serializable {
   private String senderNickname;
   private String targetLang;
 
-  private String status;
 
   public int getMessageId() {
     return messageId;
@@ -89,11 +88,4 @@ public class ChatMessageVO implements Serializable {
     this.transContent = transContent;
   }
 
-  public String getStatus() {
-    return status;
-  }
-
-  public void setStatus(String status) {
-    this.status = status;
-  }
 }

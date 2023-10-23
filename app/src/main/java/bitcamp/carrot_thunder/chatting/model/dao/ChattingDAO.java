@@ -54,4 +54,6 @@ public interface ChattingDAO {
   void rejoinChatRoom(ChatRoomVO chatRoom);
 
   ChatRoomVO getAnotherChatRoom(long postId, long buyerId, long userId);
+
+  int deleteChatRoomByRoomId(@Param("roomId") String roomId);
 }

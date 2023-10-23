@@ -92,13 +92,6 @@ public class WebSocketController {
     // 알림 저장 및 웹소켓으로 알림 전송
     defaultNotificationService.createNotification(notification);
 
-    chatRoom.getPostId();
-    chatRoom.getSellerId();
-    chatRoom.getBuyerId();
-    chatRoom.getUserId();
-
-
-
     chattingService.saveMessage(message, chattingService.getAnotherChatRoom(chatRoom));
     chattingService.updateChatRoomLastUpdated(message.getRoomId());
     messagingTemplate.convertAndSend("/topic/messages/" + message.getRoomId(), message);

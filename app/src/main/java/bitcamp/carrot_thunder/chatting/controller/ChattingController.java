@@ -6,6 +6,7 @@ import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
 import bitcamp.carrot_thunder.chatting.service.ChattingService;
 import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.chatting.service.PapagoTranslationService;
+import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -48,7 +45,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/room/{roomId}")
   public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,
-      HttpServletRequest request) {
+                                                         HttpServletRequest request) {
     Map<String, Object> response = new HashMap<>();
 
     if (roomId == null || roomId.trim().isEmpty() || !roomId.matches("^[a-fA-F0-9\\-]{36}$")) {
@@ -81,7 +78,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/createOrGetChatRoom")
   public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
-      @RequestParam int currentUserId, @RequestParam int postId) {
+                                                                 @RequestParam int currentUserId, @RequestParam int postId) {
     Map<String, Object> result = new HashMap<>();
     String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
     if (existingRoomId != null) {
@@ -171,6 +168,19 @@ public class ChattingController {
     } else {
       // 채팅방 나가기에 실패한 경우
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 나가기에 실패했습니다.");
+    }
+  }
+
+  @DeleteMapping("/chatting/delete/{roomId}")
+  public ResponseEntity<String> deleteChatRoom(@PathVariable("roomId") String roomId,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    int rowsAffected = chattingService.deleteChatRoomByRoomId(roomId, userDetails.getUsername());
+    if (rowsAffected > 0) {
+      // 채팅방 삭제에 성공한 경우
+      return ResponseEntity.ok("채팅방이 삭제되었습니다.");
+    } else {
+      // 채팅방 삭제에 실패한 경우
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 삭제에 실패했습니다.");
     }
   }
 }
