@@ -79,13 +79,13 @@
         u.nickname AS sender_nickname
         FROM tbl_chat_message m
         JOIN tbl_user u ON m.sender_id = u.id
-        WHERE room_id = #{roomId}
+        WHERE seller_room_id = #{roomId} or buyer_room_id =#{roomId}
         ORDER BY sent_at ASC
     </select>
 
     <insert id="saveMessage">
-        INSERT INTO tbl_chat_message (room_id, sender_id, trans_content, content, sent_at, is_read)
-        VALUES (#{roomId}, #{senderId}, #{transContent}, #{content}, now(), #{isRead})
+        INSERT INTO tbl_chat_message (seller_room_id, buyer_room_id, sender_id, trans_content, content, sent_at, is_read)
+        VALUES (#{sellerRoomId}, #{buyerRoomId}, #{message.senderId}, #{message.transContent}, #{message.content}, now(), #{message.isRead})
     </insert>
 
     <select id="getChatRoomsForSeller" resultMap="ChatRoomDetailMap">
@@ -112,7 +112,7 @@
     </select>
 
     <select id="getChatRoomsForMember" resultMap="ChatRoomWithAttachmentMap">
-        SELECT
+        SELECT DISTINCT
         cr.room_id AS roomId,
         cr.article_id AS postId,
         cr.seller_id AS sellerId,
@@ -131,11 +131,11 @@
         JOIN
         tbl_user m2 ON cr.buyer_id = m2.id
         LEFT JOIN (
-        SELECT room_id, MAX(message_id) AS max_message_id
+        SELECT seller_room_id, buyer_room_id, MAX(message_id) AS max_message_id
         FROM tbl_chat_message
-        GROUP BY room_id
-        ) max_message ON cr.room_id = max_message.room_id
-        LEFT JOIN tbl_chat_message cm ON max_message.room_id = cm.room_id AND max_message.max_message_id = cm.message_id
+        GROUP BY seller_room_id, buyer_room_id
+        ) max_message ON cr.room_id = max_message.seller_room_id or cr.room_id = max_message.buyer_room_id
+        LEFT JOIN tbl_chat_message cm ON(max_message.seller_room_id = cm.seller_room_id OR max_message.buyer_room_id = cm.buyer_room_id)  AND max_message.max_message_id = cm.message_id
         LEFT JOIN (
         SELECT article_id, MIN(filepath) as filepath
         FROM tbl_file
@@ -143,19 +143,19 @@
         ) f ON cr.article_id = f.article_id
         LEFT JOIN tbl_article a ON cr.article_id = a.id
         WHERE
-        cr.seller_id = #{userId} OR cr.buyer_id = #{userId}
+        cr.user_id = #{userId}
         ORDER BY cr.last_updated DESC
     </select>
 
 
     <select id="checkChatRoomExists" resultType="String">
         SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND user_id = #{currentUserId}
-        AND article_id = #{postId}
+        AND article_id = #{postId} AND user_id = #{userId}
     </select>
 
     <insert id="createChatRoom">
         INSERT INTO tbl_chat_room (room_id, article_id, seller_id, buyer_id, user_id)
-        VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId}, #{currentUserId})
+        VALUES (#{roomId}, #{postId}, #{sellerId}, #{currentUserId}, #{userId})
     </insert>
 
     <select id="getChatRoomByRoomId" resultMap="ChatRoomMap">
@@ -233,5 +233,22 @@
         last_updated = now()
         WHERE room_id = #{roomId}
     </update>
+
+    <select id="getAnotherChatRoom" resultMap="ChatRoomMap">
+        SELECT
+        cr.*,
+        m1.nickname AS seller_nickname,
+        m2.nickname AS buyer_nickname
+        FROM
+        tbl_chat_room cr
+        JOIN
+        tbl_user m1 ON cr.seller_id = m1.id
+        JOIN
+        tbl_user m2 ON cr.buyer_id = m2.id
+        WHERE
+        article_id = #{postId} AND buyer_id = #{buyerId} AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
 
 </mapper>

@@ -28,12 +28,28 @@ public class DefaultChattingService implements ChattingService {
 
   @Override
   public List<ChatMessageVO> getMessagesByRoomId(String roomId) {
+    System.out.println("=======" + roomId);
     return chattingDAO.getMessagesByRoomId(roomId);
   }
 
   @Override
-  public void saveMessage(ChatMessageVO message) {
-    chattingDAO.saveMessage(message);
+  public void saveMessage(ChatMessageVO message, ChatRoomVO anotherRoom) {
+    String sellerRoomId;
+    String buyerRoomId;
+    System.out.println("WebSocketController.saveMessage 유저 아이디 : " + anotherRoom.getUserId());
+    System.out.println("WebSocketController.saveMessage 판매자 아이디 : " + anotherRoom.getSellerId());
+    System.out.println("WebSocketController.saveMessage 구매자 아이디 : " + anotherRoom.getBuyerId());
+    System.out.println("WebSocketController.saveMessage  룸아이디 : " + message.getRoomId());
+    System.out.println("WebSocketController.saveMessage  어나더룸아이디 : " + anotherRoom.getRoomId());
+    if (anotherRoom.getUserId() == anotherRoom.getSellerId()) {
+      sellerRoomId = message.getRoomId();
+      buyerRoomId = anotherRoom.getRoomId();
+    } else {
+      buyerRoomId = anotherRoom.getRoomId();
+      sellerRoomId = message.getRoomId();
+    }
+    System.out.println("========" + sellerRoomId + "==============" + buyerRoomId + "==============" +message.toString());
+    chattingDAO.saveMessage(message, sellerRoomId, buyerRoomId);
   }
 
   @Override
@@ -46,14 +62,28 @@ public class DefaultChattingService implements ChattingService {
     return chattingDAO.getChatRoomsForMember(memberId);
   }
 
+
   @Override
-  public String createOrGetChatRoom(int sellerId, int currentUserId, int postId) {
-    String existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+  public String createOrGetChatRoom(int sellerId, int currentUserId, int postId, boolean isSeller) {
+    System.out.println("---------------------------------" + isSeller + "---------" + sellerId + "-------" + currentUserId);
+    String existingRoomId;
+    if (isSeller) {
+      existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, sellerId);
+    } else {
+      existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
+    }
     if (existingRoomId != null) {
       return existingRoomId;
     }
-    String newRoomId = UUID.randomUUID().toString();
-    createChatRoom(sellerId, currentUserId, newRoomId, postId); // 반환 값은 무시
+    String sellerNewRoomId = UUID.randomUUID().toString();
+    String buyerNewRoomId = UUID.randomUUID().toString();
+    System.out.println("======================");
+    if (isSeller) {
+      createChatRoom(sellerId, currentUserId, sellerNewRoomId, postId, sellerId);
+    } else {
+      createChatRoom(sellerId, currentUserId, buyerNewRoomId, postId, currentUserId);
+    }
+    String newRoomId = isSeller ? sellerNewRoomId : buyerNewRoomId;
     return newRoomId;
   }
 
@@ -63,8 +93,8 @@ public class DefaultChattingService implements ChattingService {
   }
 
   @Override
-  public String checkChatRoomExists(int sellerId, int currentUserId, int postId) {
-    return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+  public String checkChatRoomExists(int sellerId, int currentUserId, int postId, int userId) {
+    return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, userId);
   }
 
   @Override
@@ -87,9 +117,9 @@ public class DefaultChattingService implements ChattingService {
     chattingDAO.updateChatRoomLastUpdated(roomId);
   }
 
-  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
+  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId, int userId) {
 
-    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
+    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId, userId);
   }
 
 
@@ -119,4 +149,17 @@ public class DefaultChattingService implements ChattingService {
   public void rejoinChatRoom(ChatRoomVO chatRoom) {
     chattingDAO.rejoinChatRoom(chatRoom);
   }
+
+  @Override
+  public ChatRoomVO getAnotherChatRoom(ChatRoomVO chatRoom) {
+    long userId;
+    if (chatRoom.getUserId() == chatRoom.getSellerId()) {
+      userId = chatRoom.getBuyerId();
+    } else {
+      userId = chatRoom.getSellerId();
+    }
+    return chattingDAO.getAnotherChatRoom(chatRoom.getPostId(), chatRoom.getBuyerId(), userId);
+  }
+
+
 }
