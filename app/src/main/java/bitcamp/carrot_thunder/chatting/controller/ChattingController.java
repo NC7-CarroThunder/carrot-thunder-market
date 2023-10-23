@@ -129,7 +129,6 @@ public class ChattingController {
   @GetMapping("/chatting/myChatRooms")
   public ResponseEntity<Map<String, Object>> getMyChatRooms(@RequestParam int userId) {
     Map<String, Object> response = new HashMap<>();
-    System.out.println("--------------------------------");
     response.put("chatRooms", chattingService.getChatRoomsForMember(userId));
     return ResponseEntity.ok(response);
   }
@@ -166,7 +165,6 @@ public class ChattingController {
   @PutMapping("/chatting/leaveRoom")
   public ResponseEntity<String> leaveChatRoom(@RequestParam String roomId, @RequestParam int userId) {
     int rowsAffected = chattingService.leaveChatRoom(roomId, userId);
-    System.out.println("------->" + rowsAffected);
     if (rowsAffected > 0) {
       // 채팅방 나가기에 성공한 경우
       return ResponseEntity.ok("채팅방에서 나갔습니다.");

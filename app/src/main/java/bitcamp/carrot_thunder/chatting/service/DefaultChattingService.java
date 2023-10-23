@@ -28,7 +28,6 @@ public class DefaultChattingService implements ChattingService {
 
   @Override
   public List<ChatMessageVO> getMessagesByRoomId(String roomId) {
-    System.out.println("=======" + roomId);
     return chattingDAO.getMessagesByRoomId(roomId);
   }
 
@@ -36,11 +35,6 @@ public class DefaultChattingService implements ChattingService {
   public void saveMessage(ChatMessageVO message, ChatRoomVO anotherRoom) {
     String sellerRoomId;
     String buyerRoomId;
-    System.out.println("WebSocketController.saveMessage 유저 아이디 : " + anotherRoom.getUserId());
-    System.out.println("WebSocketController.saveMessage 판매자 아이디 : " + anotherRoom.getSellerId());
-    System.out.println("WebSocketController.saveMessage 구매자 아이디 : " + anotherRoom.getBuyerId());
-    System.out.println("WebSocketController.saveMessage  룸아이디 : " + message.getRoomId());
-    System.out.println("WebSocketController.saveMessage  어나더룸아이디 : " + anotherRoom.getRoomId());
     if (anotherRoom.getUserId() == anotherRoom.getSellerId()) {
       sellerRoomId = message.getRoomId();
       buyerRoomId = anotherRoom.getRoomId();
@@ -48,7 +42,6 @@ public class DefaultChattingService implements ChattingService {
       buyerRoomId = anotherRoom.getRoomId();
       sellerRoomId = message.getRoomId();
     }
-    System.out.println("========" + sellerRoomId + "==============" + buyerRoomId + "==============" +message.toString());
     chattingDAO.saveMessage(message, sellerRoomId, buyerRoomId);
   }
 
@@ -65,7 +58,6 @@ public class DefaultChattingService implements ChattingService {
 
   @Override
   public String createOrGetChatRoom(int sellerId, int currentUserId, int postId, boolean isSeller) {
-    System.out.println("---------------------------------" + isSeller + "---------" + sellerId + "-------" + currentUserId);
     String existingRoomId;
     if (isSeller) {
       existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, sellerId);
@@ -77,7 +69,6 @@ public class DefaultChattingService implements ChattingService {
     }
     String sellerNewRoomId = UUID.randomUUID().toString();
     String buyerNewRoomId = UUID.randomUUID().toString();
-    System.out.println("======================");
     if (isSeller) {
       createChatRoom(sellerId, currentUserId, sellerNewRoomId, postId, sellerId);
     } else {

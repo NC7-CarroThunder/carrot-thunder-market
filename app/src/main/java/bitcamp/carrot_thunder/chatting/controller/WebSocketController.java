@@ -98,7 +98,6 @@ public class WebSocketController {
     chatRoom.getUserId();
 
 
-    System.out.println("===============" + chattingService.getAnotherChatRoom(chatRoom));
 
     chattingService.saveMessage(message, chattingService.getAnotherChatRoom(chatRoom));
     chattingService.updateChatRoomLastUpdated(message.getRoomId());
