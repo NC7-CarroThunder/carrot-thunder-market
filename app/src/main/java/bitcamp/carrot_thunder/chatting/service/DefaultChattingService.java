@@ -151,4 +151,17 @@ public class DefaultChattingService implements ChattingService {
     }
     return chattingDAO.getAnotherChatRoom(chatRoom.getPostId(), chatRoom.getBuyerId(), userId);
   }
+
+  @Override
+  public int deleteChatRoomByRoomId(String roomId, String nickName) {
+    ChatRoomVO chatRoom = getChatRoomByRoomId(roomId);
+    ChatMessageVO message = new ChatMessageVO();
+    message.setRoomId(roomId);
+    message.setContent("(" + nickName + ")님이 채팅방을 나갔습니다");
+    message.setSenderId(chatRoom.getUserId());
+
+    saveMessage(message, getAnotherChatRoom(chatRoom));
+    int rowsAffected = chattingDAO.deleteChatRoomByRoomId(roomId);
+    return rowsAffected;
+  }
 }

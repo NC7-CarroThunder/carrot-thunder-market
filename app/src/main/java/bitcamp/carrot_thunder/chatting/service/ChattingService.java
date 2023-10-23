@@ -2,6 +2,8 @@ package bitcamp.carrot_thunder.chatting.service;
 
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface ChattingService {
@@ -41,4 +43,6 @@ public interface ChattingService {
   void rejoinChatRoom(ChatRoomVO chatRoom);
 
   ChatRoomVO getAnotherChatRoom(ChatRoomVO chatRoom);
+
+  int deleteChatRoomByRoomId(@Param("roomId") String roomId, String nickName);
 }
