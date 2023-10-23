@@ -3,8 +3,9 @@ package bitcamp.carrot_thunder.chatting.service;
 import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,21 @@ public class DefaultChattingService implements ChattingService {
 
   @Override
   public List<ChatRoomVO> getChatRoomsForMember(int memberId) {
-    return chattingDAO.getChatRoomsForMember(memberId);
+    List<ChatRoomVO> chatRooms = chattingDAO.getChatRoomsForMember(memberId);
+    List<ChatRoomVO> filteredChatRooms = new ArrayList<>();
+    Set<String> seenRoomIds = new HashSet<>(); // Set을 사용하여 중복 방을 추적
+
+    for (ChatRoomVO chatRoom : chatRooms) {
+      String roomId = chatRoom.getRoomId();
+
+      // 중복 방이 이미 추적되지 않았다면 추가
+      if (!seenRoomIds.contains(roomId)) {
+        seenRoomIds.add(roomId);
+        filteredChatRooms.add(chatRoom);
+      }
+    }
+
+    return filteredChatRooms;
   }
 
 
@@ -159,8 +174,12 @@ public class DefaultChattingService implements ChattingService {
     message.setRoomId(roomId);
     message.setContent("(" + nickName + ")님이 채팅방을 나갔습니다");
     message.setSenderId(chatRoom.getUserId());
+    System.out.println("===========" + chatRoom.getUserId());
 
-    saveMessage(message, getAnotherChatRoom(chatRoom));
+    if (getAnotherChatRoom(chatRoom) != null) {
+      saveMessage(message, getAnotherChatRoom(chatRoom));
+    }
+
     int rowsAffected = chattingDAO.deleteChatRoomByRoomId(roomId);
     return rowsAffected;
   }
