@@ -160,6 +160,4 @@ public class DefaultChattingService implements ChattingService {
     }
     return chattingDAO.getAnotherChatRoom(chatRoom.getPostId(), chatRoom.getBuyerId(), userId);
   }
-
-
 }
