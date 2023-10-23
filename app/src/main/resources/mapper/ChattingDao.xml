@@ -140,14 +140,14 @@
         ) f ON cr.article_id = f.article_id
         LEFT JOIN tbl_article a ON cr.article_id = a.id
         WHERE cr.user_id = #{userId}
-        HAVING MAX(CASE WHEN m1.id = #{userId} THEN 1 ELSE 0 END) = 1 OR MAX(CASE WHEN m2.id = #{userId} THEN 1 ELSE 0 END) = 1
         ORDER BY cr.last_updated DESC
     </select>
 
 
-    <select id="checkChatRoomExists" resultType="String">
-        SELECT room_id FROM tbl_chat_room WHERE seller_id = #{sellerId} AND user_id = #{currentUserId}
-        AND article_id = #{postId} AND user_id = #{userId}
+    <select id="checkChatRoomExists" resultType="java.lang.String">
+        SELECT room_id
+        FROM tbl_chat_room
+        WHERE seller_id = #{sellerId} AND buyer_id = #{currentUserId} AND article_id = #{postId} AND user_id = #{userId}
     </select>
 
     <insert id="createChatRoom">
