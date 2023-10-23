@@ -117,33 +117,30 @@
         cr.article_id AS postId,
         cr.seller_id AS sellerId,
         cr.buyer_id AS buyerId,
-        cm.message_id AS messageId, -- 메시지 ID 추가
-        cm.content AS lastMessage, -- 마지막 메시지 내용 추가
+        cm.message_id AS messageId,
+        cm.content AS lastMessage,
         cr.last_updated AS lastUpdated,
         m1.nickname AS sellerNickname,
         m2.nickname AS buyerNickname,
         a.title AS postTitle,
         f.filepath AS postAttachment
-        FROM
-        tbl_chat_room cr
-        JOIN
-        tbl_user m1 ON cr.seller_id = m1.id
-        JOIN
-        tbl_user m2 ON cr.buyer_id = m2.id
+        FROM tbl_chat_room cr
+        JOIN tbl_user m1 ON cr.seller_id = m1.id
+        JOIN tbl_user m2 ON cr.buyer_id = m2.id
         LEFT JOIN (
         SELECT seller_room_id, buyer_room_id, MAX(message_id) AS max_message_id
         FROM tbl_chat_message
         GROUP BY seller_room_id, buyer_room_id
-        ) max_message ON cr.room_id = max_message.seller_room_id or cr.room_id = max_message.buyer_room_id
-        LEFT JOIN tbl_chat_message cm ON(max_message.seller_room_id = cm.seller_room_id OR max_message.buyer_room_id = cm.buyer_room_id)  AND max_message.max_message_id = cm.message_id
+        ) max_message ON cr.room_id = max_message.seller_room_id OR cr.room_id = max_message.buyer_room_id
+        LEFT JOIN tbl_chat_message cm ON (max_message.seller_room_id = cm.seller_room_id OR max_message.buyer_room_id = cm.buyer_room_id) AND max_message.max_message_id = cm.message_id
         LEFT JOIN (
         SELECT article_id, MIN(filepath) as filepath
         FROM tbl_file
         GROUP BY article_id
         ) f ON cr.article_id = f.article_id
         LEFT JOIN tbl_article a ON cr.article_id = a.id
-        WHERE
-        cr.user_id = #{userId}
+        WHERE cr.user_id = #{userId}
+        HAVING MAX(CASE WHEN m1.id = #{userId} THEN 1 ELSE 0 END) = 1 OR MAX(CASE WHEN m2.id = #{userId} THEN 1 ELSE 0 END) = 1
         ORDER BY cr.last_updated DESC
     </select>
 
