@@ -75,8 +75,10 @@ public class SecurityConfig {
         // 사전에 약속된 출처를 명시
         config.addAllowedOrigin("http://localhost:3000");
         //config.addAllowedOrigin("http://localhost:3001");
-        //config.addAllowedOrigin("http://carrothunder.store/");
-        //config.addAllowedOrigin("https://carrothunder.store/");
+        config.addAllowedOrigin("http://carrothunder.store/");
+        config.addAllowedOrigin("https://carrothunder.store/");
+        config.addAllowedOrigin("http://carrothunder.store:3000");
+        config.addAllowedOrigin("https://carrothunder.store:3000");
         //채팅 테스트용 origin
         // config.addAllowedOrigin("http://localhost:8080");
 
