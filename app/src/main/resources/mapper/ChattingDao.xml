@@ -229,7 +229,8 @@
 
     <update id="rejoinChatRoom" parameterType="bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO">
         UPDATE tbl_chat_room
-        SET buyer_id = #{userId}
+        SET buyer_id = #{userId},
+        last_updated = now()
         WHERE room_id = #{roomId}
     </update>
 
