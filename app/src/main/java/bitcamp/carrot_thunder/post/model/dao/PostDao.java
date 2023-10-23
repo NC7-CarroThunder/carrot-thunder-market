@@ -14,7 +14,6 @@ import org.apache.ibatis.annotations.Param;
 
 public interface PostDao {
 
-
     int insert(Post post);
     Post findBy(Long id);
     int updateCount(Long postId);
@@ -44,4 +43,6 @@ public interface PostDao {
     int deleteWishListByPostId(Long postId);
     List<Post> getPostsByUserId(Long userId);
     List<Post> getUserWishlist(Long user_id);
+    Long getPostOwnerId(Long postId);
+
 }

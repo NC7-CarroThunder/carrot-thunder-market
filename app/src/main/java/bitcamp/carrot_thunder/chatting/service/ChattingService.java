@@ -33,4 +33,8 @@ public interface ChattingService {
   ChatMessageVO getChatMessageById(int messageId);
 
   void updateChatMessage(ChatMessageVO content);
+
+  int leaveChatRoom(String roomId, int userId);
+
+  void rejoinChatRoom(ChatRoomVO chatRoom);
 }

@@ -47,4 +47,8 @@ public interface ChattingDAO {
   ChatMessageVO getChatMessageById(@Param("messageId") int messageId);
 
   void updateChatMessage(ChatMessageVO message);
+
+  int leaveChatRoom(String roomId, int userId);
+
+  void rejoinChatRoom(ChatRoomVO chatRoom);
 }

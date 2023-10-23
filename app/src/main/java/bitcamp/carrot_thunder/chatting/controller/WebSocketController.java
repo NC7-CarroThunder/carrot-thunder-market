@@ -2,7 +2,9 @@ package bitcamp.carrot_thunder.chatting.controller;
 
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
+import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
 import bitcamp.carrot_thunder.chatting.service.ChattingService;
+import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.chatting.service.PapagoTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -23,6 +25,9 @@ public class WebSocketController {
 
   @Autowired
   private PapagoTranslationService papagoTranslationService;
+
+  @Autowired
+  private DefaultNotificationService defaultNotificationService;
 
   @MessageMapping("/chat/sendMessage")
   @SendTo("/topic/public")
@@ -64,6 +69,28 @@ public class WebSocketController {
       message.setContent(originalMessage); // 원본 메시지 설정
       message.setTransContent(translatedMessage); // 번역된 메시지 설정
     }
+
+    Long receiverId;
+    if (message.getSenderId() == chatRoom.getSellerId()) {
+      receiverId = Long.valueOf(chatRoom.getBuyerId());
+    } else {
+      receiverId = Long.valueOf(chatRoom.getSellerId());
+    }
+
+    String previewMessage;
+    if (message.getContent().length() > 15) {
+      previewMessage = message.getContent().substring(0, 15) + "...";
+    } else {
+      previewMessage = message.getContent();
+    }
+
+    NotificationVO notification = new NotificationVO();
+    notification.setUserId(receiverId); // 받는 사람의 ID를 설정
+    notification.setContent(senderNickname + "님이 새로운 메시지를 보냈습니다.\n미리보기: " + previewMessage);
+    notification.setType("CHAT");
+
+    // 알림 저장 및 웹소켓으로 알림 전송
+    defaultNotificationService.createNotification(notification);
 
     chattingService.saveMessage(message);
     chattingService.updateChatRoomLastUpdated(message.getRoomId());

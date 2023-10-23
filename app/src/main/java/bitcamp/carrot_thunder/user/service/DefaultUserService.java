@@ -3,7 +3,6 @@ package bitcamp.carrot_thunder.user.service;
 
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.jwt.JwtUtil;
-import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.dto.LoginRequestDto;
 import bitcamp.carrot_thunder.user.dto.PasswdCheckRequestDto;
@@ -15,7 +14,6 @@ import bitcamp.carrot_thunder.user.dto.SignupRequestDto;
 import bitcamp.carrot_thunder.user.dto.UserEmailCheckDto;
 import bitcamp.carrot_thunder.user.dto.UserNameCheckDto;
 import bitcamp.carrot_thunder.user.model.dao.UserDao;
-import bitcamp.carrot_thunder.user.model.vo.Notification;
 import bitcamp.carrot_thunder.user.model.vo.Role;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.List;

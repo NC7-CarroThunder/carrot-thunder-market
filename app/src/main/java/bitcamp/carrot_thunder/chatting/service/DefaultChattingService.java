@@ -6,6 +6,7 @@ import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,6 +14,12 @@ public class DefaultChattingService implements ChattingService {
 
   @Autowired
   private ChattingDAO chattingDAO;
+
+  @Autowired
+  DefaultNotificationService defaultNotificationService;
+
+  @Autowired
+  SimpMessagingTemplate messagingTemplate;
 
   @Override
   public ChatRoomVO getChatRoomByPostIdAndUserId(int postId, int currentUserId) {
@@ -81,8 +88,10 @@ public class DefaultChattingService implements ChattingService {
   }
 
   public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
+
     return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
   }
+
 
   @Override
   public ChatMessageVO getChatMessageById(int messageId) {
@@ -98,5 +107,16 @@ public class DefaultChattingService implements ChattingService {
       existingMessage.setTransContent(message.getTransContent());
       chattingDAO.updateChatMessage(existingMessage);
     }
+  }
+
+  @Override
+  public int leaveChatRoom(String roomId, int userId) {
+    int rowsAffected = chattingDAO.leaveChatRoom(roomId, userId);
+    return rowsAffected;
+  }
+
+  @Override
+  public void rejoinChatRoom(ChatRoomVO chatRoom) {
+    chattingDAO.rejoinChatRoom(chatRoom);
   }
 }
