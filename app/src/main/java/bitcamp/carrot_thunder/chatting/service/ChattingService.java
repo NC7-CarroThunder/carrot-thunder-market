@@ -10,17 +10,19 @@ public interface ChattingService {
 
   List<ChatMessageVO> getMessagesByRoomId(String roomId);
 
-  void saveMessage(ChatMessageVO message);
+  void saveMessage(ChatMessageVO message, ChatRoomVO anotherRoom);
 
   List<ChatRoomVO> getChatRoomsForSeller(int sellerId);
 
   List<ChatRoomVO> getChatRoomsForMember(int memberId);
 
-  String createOrGetChatRoom(int sellerId, int currentUserId, int postId);
+  //String createOrGetChatRoom(int sellerId, int currentUserId, int postId);
+
+  String createOrGetChatRoom(int sellerId, int currentUserId, int postId, boolean isSeller);
 
   ChatRoomVO getChatRoomByRoomId(String roomId);
 
-  String checkChatRoomExists(int sellerId, int currentUserId, int postId);
+  String checkChatRoomExists(int sellerId, int currentUserId, int postId, int userId);
 
   String getNicknameByUserId(int userId);
 
@@ -37,4 +39,6 @@ public interface ChattingService {
   int leaveChatRoom(String roomId, int userId);
 
   void rejoinChatRoom(ChatRoomVO chatRoom);
+
+  ChatRoomVO getAnotherChatRoom(ChatRoomVO chatRoom);
 }

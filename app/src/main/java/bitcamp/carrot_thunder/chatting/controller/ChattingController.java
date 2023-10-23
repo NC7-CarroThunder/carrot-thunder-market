@@ -83,13 +83,11 @@ public class ChattingController {
   public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
       @RequestParam int currentUserId, @RequestParam int postId) {
     Map<String, Object> result = new HashMap<>();
-    String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId);
+    String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
     if (existingRoomId != null) {
-      System.out.println("-----------------타나?----------------");
       ChatRoomVO chatRoom = new ChatRoomVO();
       chatRoom.setUserId(currentUserId);
       chatRoom.setBuyerId(currentUserId);
-      System.out.println("확인 : " + chatRoom.getBuyerId());
       chatRoom.setRoomId(existingRoomId);
       chattingService.rejoinChatRoom(chatRoom);
 
@@ -102,7 +100,9 @@ public class ChattingController {
       }
     }
     try {
-      String roomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId);
+      String sellerRoomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId, false);
+      String BuyerRoomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId, true);
+
 
       // 발신자의 닉네임을 가져옵니다.
       String senderNickname = chattingService.getNicknameByUserId(currentUserId);
@@ -114,11 +114,11 @@ public class ChattingController {
 
       defaultNotificationService.createNotification(notification);
 
-      if (roomId == null) {
+      if (BuyerRoomId == null) {
         throw new RuntimeException("채팅방 ID를 가져오는데 실패했습니다.");
       }
       result.put("success", true);
-      result.put("roomId", roomId);
+      result.put("roomId", BuyerRoomId);
     } catch (Exception e) {
       result.put("success", false);
       result.put("message", e.getMessage());
@@ -165,7 +165,6 @@ public class ChattingController {
   @PutMapping("/chatting/leaveRoom")
   public ResponseEntity<String> leaveChatRoom(@RequestParam String roomId, @RequestParam int userId) {
     int rowsAffected = chattingService.leaveChatRoom(roomId, userId);
-    System.out.println("------->" + rowsAffected);
     if (rowsAffected > 0) {
       // 채팅방 나가기에 성공한 경우
       return ResponseEntity.ok("채팅방에서 나갔습니다.");
