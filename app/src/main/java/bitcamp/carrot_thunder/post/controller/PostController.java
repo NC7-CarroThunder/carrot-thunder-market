@@ -63,9 +63,14 @@ public class PostController {
   @GetMapping("/posts/list")
   public ResponseDto<List<PostListResponseDto>> getAllPosts(
       @AuthenticationPrincipal UserDetailsImpl userDetails,
-      String pageNo, String category) {
-    System.out.println("category : " + category);
+      String pageNo, String category,
+      String word) {
+
     User user = userDetails != null ? userDetails.getUser() : null;
+    if (!word.equals("")) {
+      return ResponseDto.success(postService.getPostlistByWord(user, Integer.parseInt(pageNo), word));
+    }
+
     return ResponseDto.success(postService.getPostlist(user, Integer.parseInt(pageNo), category));
   }
 

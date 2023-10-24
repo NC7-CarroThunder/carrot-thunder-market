@@ -23,6 +23,7 @@ public interface PostDao {
     List<Post> findAll();
     List<Post> findByPage(int start, int end);
     List<Post> findByPageAndCategory(int start, int end, ItemCategory category);
+    List<Post> findByPageAndWord(int start, int end, String word);
     int delete(Long id);
     int deleteFile(Long fileId);
     int deleteFiles(Long postId);

@@ -24,6 +24,7 @@ public interface PostService {
     Post get(Long id) throws Exception;
 
     List<PostListResponseDto> getPostlist(User user, int page, String category);
+    List<PostListResponseDto> getPostlistByWord(User user, int page, String word);
 
     AttachedFile getAttachedFile(Long fileId) throws Exception;
 

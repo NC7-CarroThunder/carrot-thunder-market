@@ -194,6 +194,22 @@ public class DefaultPostService implements PostService {
         return dtoList;
     }
 
+    @Override
+    public List<PostListResponseDto> getPostlistByWord(User user, int page, String word) {
+        List<Post> posts;
+        posts = postDao.findByPageAndWord((page - 1) * 8, 8, word);
+        List<PostListResponseDto> dtoList = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostListResponseDto responseDto = PostListResponseDto.of(post);
+            boolean isLiked = false;
+            responseDto.setIsLiked(isLiked);
+            dtoList.add(responseDto);
+        }
+
+        return dtoList;
+    }
+
     public AttachedFile getAttachedFile(Long fileId) throws Exception {
         return postDao.findFileByfileId(fileId);
     }
