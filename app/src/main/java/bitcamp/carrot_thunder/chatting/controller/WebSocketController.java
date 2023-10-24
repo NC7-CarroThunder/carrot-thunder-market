@@ -91,6 +91,10 @@ public class WebSocketController {
 
     // 알림 저장 및 웹소켓으로 알림 전송
     defaultNotificationService.createNotification(notification);
+    chattingService.updateChatRoomLastUpdated(message.getRoomId());
+    ChatRoomVO anotherChatRoomId = chattingService.getAnotherChatRoom(chatRoom);
+    chattingService.updateChatRoomLastUpdated(anotherChatRoomId.getRoomId());
+
 
     chattingService.saveMessage(message, chattingService.getAnotherChatRoom(chatRoom));
 
@@ -98,6 +102,7 @@ public class WebSocketController {
     messagingTemplate.convertAndSend("/topic/messages/" + message.getRoomId(), message);
     ChatRoomVO anotherChatRoom = chattingService.getAnotherChatRoom(chatRoom);
     messagingTemplate.convertAndSend("/topic/messages/" + anotherChatRoom.getRoomId(), message);
+    messagingTemplate.convertAndSend("/topic/newChatRoom", message.getRoomId());
 
     return message;
   }
