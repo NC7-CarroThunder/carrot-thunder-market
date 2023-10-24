@@ -14,19 +14,20 @@ public interface ChattingDAO {
 
   List<ChatMessageVO> getMessagesByRoomId(String roomId);
 
-  void saveMessage(ChatMessageVO message);
+  void saveMessage(ChatMessageVO message, String sellerRoomId, String buyerRoomId);
 
   List<ChatRoomVO> getChatRoomsForSeller(int sellerId);
 
   List<ChatRoomVO> getChatRoomsForMember(int memberId);
 
   String checkChatRoomExists(@Param("sellerId") int sellerId,
-      @Param("currentUserId") int currentUserId, @Param("postId") int postId);
+      @Param("currentUserId") int currentUserId, @Param("postId") int postId, @Param("userId") int userId);
 
   int createChatRoom(@Param("sellerId") int sellerId,
       @Param("currentUserId") int currentUserId,
       @Param("roomId") String roomId,
-      @Param("postId") int postId);
+      @Param("postId") int postId,
+      @Param("userId") int userId);
 
   ChatRoomVO getChatRoomByRoomId(String roomId);
 
@@ -51,4 +52,8 @@ public interface ChattingDAO {
   int leaveChatRoom(String roomId, int userId);
 
   void rejoinChatRoom(ChatRoomVO chatRoom);
+
+  ChatRoomVO getAnotherChatRoom(long postId, long buyerId, long userId);
+
+  int deleteChatRoomByRoomId(@Param("roomId") String roomId);
 }

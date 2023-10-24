@@ -3,8 +3,9 @@ package bitcamp.carrot_thunder.chatting.service;
 import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,17 @@ public class DefaultChattingService implements ChattingService {
   }
 
   @Override
-  public void saveMessage(ChatMessageVO message) {
-    chattingDAO.saveMessage(message);
+  public void saveMessage(ChatMessageVO message, ChatRoomVO anotherRoom) {
+    String sellerRoomId;
+    String buyerRoomId;
+    if (anotherRoom.getUserId() == anotherRoom.getSellerId()) {
+      sellerRoomId = message.getRoomId();
+      buyerRoomId = anotherRoom.getRoomId();
+    } else {
+      buyerRoomId = anotherRoom.getRoomId();
+      sellerRoomId = message.getRoomId();
+    }
+    chattingDAO.saveMessage(message, sellerRoomId, buyerRoomId);
   }
 
   @Override
@@ -43,17 +53,43 @@ public class DefaultChattingService implements ChattingService {
 
   @Override
   public List<ChatRoomVO> getChatRoomsForMember(int memberId) {
-    return chattingDAO.getChatRoomsForMember(memberId);
+    List<ChatRoomVO> chatRooms = chattingDAO.getChatRoomsForMember(memberId);
+    List<ChatRoomVO> filteredChatRooms = new ArrayList<>();
+    Set<String> seenRoomIds = new HashSet<>(); // Set을 사용하여 중복 방을 추적
+
+    for (ChatRoomVO chatRoom : chatRooms) {
+      String roomId = chatRoom.getRoomId();
+
+      // 중복 방이 이미 추적되지 않았다면 추가
+      if (!seenRoomIds.contains(roomId)) {
+        seenRoomIds.add(roomId);
+        filteredChatRooms.add(chatRoom);
+      }
+    }
+
+    return filteredChatRooms;
   }
 
+
   @Override
-  public String createOrGetChatRoom(int sellerId, int currentUserId, int postId) {
-    String existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+  public String createOrGetChatRoom(int sellerId, int currentUserId, int postId, boolean isSeller) {
+    String existingRoomId;
+    if (isSeller) {
+      existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, sellerId);
+    } else {
+      existingRoomId = chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
+    }
     if (existingRoomId != null) {
       return existingRoomId;
     }
-    String newRoomId = UUID.randomUUID().toString();
-    createChatRoom(sellerId, currentUserId, newRoomId, postId); // 반환 값은 무시
+    String sellerNewRoomId = UUID.randomUUID().toString();
+    String buyerNewRoomId = UUID.randomUUID().toString();
+    if (isSeller) {
+      createChatRoom(sellerId, currentUserId, sellerNewRoomId, postId, sellerId);
+    } else {
+      createChatRoom(sellerId, currentUserId, buyerNewRoomId, postId, currentUserId);
+    }
+    String newRoomId = isSeller ? sellerNewRoomId : buyerNewRoomId;
     return newRoomId;
   }
 
@@ -63,8 +99,8 @@ public class DefaultChattingService implements ChattingService {
   }
 
   @Override
-  public String checkChatRoomExists(int sellerId, int currentUserId, int postId) {
-    return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId);
+  public String checkChatRoomExists(int sellerId, int currentUserId, int postId, int userId) {
+    return chattingDAO.checkChatRoomExists(sellerId, currentUserId, postId, userId);
   }
 
   @Override
@@ -87,9 +123,9 @@ public class DefaultChattingService implements ChattingService {
     chattingDAO.updateChatRoomLastUpdated(roomId);
   }
 
-  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId) {
+  public int createChatRoom(int sellerId, int currentUserId, String newRoomId, int postId, int userId) {
 
-    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId);
+    return chattingDAO.createChatRoom(sellerId, currentUserId, newRoomId, postId, userId);
   }
 
 
@@ -118,5 +154,33 @@ public class DefaultChattingService implements ChattingService {
   @Override
   public void rejoinChatRoom(ChatRoomVO chatRoom) {
     chattingDAO.rejoinChatRoom(chatRoom);
+  }
+
+  @Override
+  public ChatRoomVO getAnotherChatRoom(ChatRoomVO chatRoom) {
+    long userId;
+    if (chatRoom.getUserId() == chatRoom.getSellerId()) {
+      userId = chatRoom.getBuyerId();
+    } else {
+      userId = chatRoom.getSellerId();
+    }
+    return chattingDAO.getAnotherChatRoom(chatRoom.getPostId(), chatRoom.getBuyerId(), userId);
+  }
+
+  @Override
+  public int deleteChatRoomByRoomId(String roomId, String nickName) {
+    ChatRoomVO chatRoom = getChatRoomByRoomId(roomId);
+    ChatMessageVO message = new ChatMessageVO();
+    message.setRoomId(roomId);
+    message.setContent("(" + nickName + ")님이 채팅방을 나갔습니다");
+    message.setSenderId(chatRoom.getUserId());
+    System.out.println("===========" + chatRoom.getUserId());
+
+    if (getAnotherChatRoom(chatRoom) != null) {
+      saveMessage(message, getAnotherChatRoom(chatRoom));
+    }
+
+    int rowsAffected = chattingDAO.deleteChatRoomByRoomId(roomId);
+    return rowsAffected;
   }
 }

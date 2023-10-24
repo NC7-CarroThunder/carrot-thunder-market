@@ -8,7 +8,6 @@ public class HomeController {
 
   @GetMapping("/")
   public String home() throws Exception {
-    //System.out.println("여기 들어옵니까?");
     return "/index.html";
   }
 }
