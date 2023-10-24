@@ -174,10 +174,12 @@ public class DefaultChattingService implements ChattingService {
     message.setRoomId(roomId);
     message.setContent("(" + nickName + ")님이 채팅방을 나갔습니다");
     message.setSenderId(chatRoom.getUserId());
-    System.out.println("===========" + chatRoom.getUserId());
 
     if (getAnotherChatRoom(chatRoom) != null) {
       saveMessage(message, getAnotherChatRoom(chatRoom));
+      messagingTemplate.convertAndSend("/topic/messages/" + message.getRoomId(), message);
+      ChatRoomVO anotherChatRoom = getAnotherChatRoom(chatRoom);
+      messagingTemplate.convertAndSend("/topic/messages/" + anotherChatRoom.getRoomId(), message);
     }
 
     int rowsAffected = chattingDAO.deleteChatRoomByRoomId(roomId);
