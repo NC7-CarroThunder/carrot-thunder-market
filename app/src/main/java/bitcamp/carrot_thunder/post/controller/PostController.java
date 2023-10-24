@@ -94,13 +94,13 @@ public class PostController {
   @PutMapping("/posts/{postId}")
   public ResponseDto<PostResponseDto> updatePost(
       @PathVariable Long postId,
-      @RequestBody PostUpdateRequestDto postUpdateRequestDto,
-      // @RequestPart MultipartFile[] files,
+      @RequestPart PostUpdateRequestDto postUpdateRequestDto,
+      @RequestPart MultipartFile[] multipartFiles,
       @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
     return ResponseDto
         .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
-            userDetails.getUser()));
+            userDetails.getUser(), multipartFiles));
   }
 
   /**
