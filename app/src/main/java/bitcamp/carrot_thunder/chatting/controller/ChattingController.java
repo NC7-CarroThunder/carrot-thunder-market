@@ -46,7 +46,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/room/{roomId}")
   public ResponseEntity<Map<String, Object>> getChatRoom(@PathVariable("roomId") String roomId,
-                                                         HttpServletRequest request) {
+      HttpServletRequest request) {
     Map<String, Object> response = new HashMap<>();
 
     if (roomId == null || roomId.trim().isEmpty() || !roomId.matches("^[a-fA-F0-9\\-]{36}$")) {
@@ -79,7 +79,7 @@ public class ChattingController {
 
   @GetMapping("/chatting/createOrGetChatRoom")
   public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
-                                                                 @RequestParam int currentUserId, @RequestParam int postId) {
+      @RequestParam int currentUserId, @RequestParam int postId) {
     Map<String, Object> result = new HashMap<>();
     String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
     if (existingRoomId != null) {
@@ -95,17 +95,6 @@ public class ChattingController {
     try {
       String sellerRoomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId, false);
       String BuyerRoomId = chattingService.createOrGetChatRoom(sellerId, currentUserId, postId, true);
-
-
-      // 발신자의 닉네임을 가져옵니다.
-      String senderNickname = chattingService.getNicknameByUserId(currentUserId);
-
-      NotificationVO notification = new NotificationVO();
-      notification.setUserId((long) sellerId);
-      notification.setContent(senderNickname + "님이 채팅방을 개설했습니다.");
-      notification.setType("CHATROOM");
-
-      defaultNotificationService.createNotification(notification);
 
       if (BuyerRoomId == null) {
         throw new RuntimeException("채팅방 ID를 가져오는데 실패했습니다.");
@@ -169,7 +158,7 @@ public class ChattingController {
 
   @DeleteMapping("/chatting/delete/{roomId}")
   public ResponseEntity<String> deleteChatRoom(@PathVariable("roomId") String roomId,
-                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
     int rowsAffected = chattingService.deleteChatRoomByRoomId(roomId, userDetails.getUsername());
     if (rowsAffected > 0) {
       // 채팅방 삭제에 성공한 경우
@@ -185,6 +174,6 @@ public class ChattingController {
   public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException ex) {
     String paramName = ex.getParameterName();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body("Required request parameter '" + paramName + "' is not present");
+        .body("Required request parameter '" + paramName + "' is not present");
   }
 }

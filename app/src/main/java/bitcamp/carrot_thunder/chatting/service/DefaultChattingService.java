@@ -4,6 +4,7 @@ import bitcamp.carrot_thunder.chatting.model.dao.ChattingDAO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatMessageVO;
 import bitcamp.carrot_thunder.chatting.model.vo.ChatRoomVO;
 
+import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,15 @@ public class DefaultChattingService implements ChattingService {
     String buyerNewRoomId = UUID.randomUUID().toString();
     if (isSeller) {
       createChatRoom(sellerId, currentUserId, sellerNewRoomId, postId, sellerId);
+      String BuyerRoomId = createOrGetChatRoom(sellerId, currentUserId, postId, true);
+      String senderNickname = getNicknameByUserId(currentUserId);
+      NotificationVO notification = new NotificationVO();
+      notification.setUserId((long) sellerId);
+      notification.setContent(senderNickname + "님이 채팅방을 개설했습니다.");
+      notification.setType("CHATROOM");
+
+      defaultNotificationService.createNotification(notification);
+      messagingTemplate.convertAndSend("/topic/newChatRoom", BuyerRoomId);
     } else {
       createChatRoom(sellerId, currentUserId, buyerNewRoomId, postId, currentUserId);
     }
