@@ -158,7 +158,7 @@ public class UserController {
   public ResponseDto<ProfileRequestDto> updateProfile(
           @AuthenticationPrincipal UserDetailsImpl userDetails,
           @RequestPart ProfileRequestDto profileRequestDto,
-          @RequestPart MultipartFile multipartFile,
+          @RequestPart(name = "multipartFile", required = false) MultipartFile multipartFile,
           HttpServletResponse response) throws Exception {
     return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto, response));
   }
