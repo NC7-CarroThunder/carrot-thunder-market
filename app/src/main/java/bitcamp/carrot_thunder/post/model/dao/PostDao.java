@@ -25,6 +25,7 @@ public interface PostDao {
     List<Post> findByPageAndCategory(int start, int end, ItemCategory category);
     int delete(Long id);
     int deleteFile(Long fileId);
+    int deleteFiles(Long postId);
 
     int deleteChat(Long roodId);
 

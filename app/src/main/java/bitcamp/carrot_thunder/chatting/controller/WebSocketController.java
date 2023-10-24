@@ -93,8 +93,11 @@ public class WebSocketController {
     defaultNotificationService.createNotification(notification);
 
     chattingService.saveMessage(message, chattingService.getAnotherChatRoom(chatRoom));
-    chattingService.updateChatRoomLastUpdated(message.getRoomId());
+
+    // 현재 채팅방과 다른 채팅방 모두에 메시지를 전송
     messagingTemplate.convertAndSend("/topic/messages/" + message.getRoomId(), message);
+    ChatRoomVO anotherChatRoom = chattingService.getAnotherChatRoom(chatRoom);
+    messagingTemplate.convertAndSend("/topic/messages/" + anotherChatRoom.getRoomId(), message);
 
     return message;
   }

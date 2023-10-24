@@ -7,7 +7,11 @@ import bitcamp.carrot_thunder.user.service.PurchaseService;
 import bitcamp.carrot_thunder.user.service.UserService;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,5 +70,13 @@ public class PayController {
                                     @RequestBody String postId, HttpServletResponse response) throws Exception {
         JSONObject jsonObject = new JSONObject(postId);
         return purchaseService.ConfirmedPurchase((jsonObject.getLong("postId")),response);
+    }
+
+    // Handle MissingServletRequestParameterException and set a custom response status
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException ex) {
+        String paramName = ex.getParameterName();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Required request parameter '" + paramName + "' is not present");
     }
 }

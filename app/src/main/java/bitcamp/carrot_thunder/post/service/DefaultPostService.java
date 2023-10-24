@@ -106,32 +106,35 @@ public class DefaultPostService implements PostService {
 
 
     @Transactional
-    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user) {
+    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user, MultipartFile[] multipartFiles) {
 
         Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+
+        //업데이트전 기존의 들어있는 이미지 파일 제거
+
+        if (!post.getAttachedFiles().isEmpty()) {
+            postDao.deleteFiles(postId);
+        }
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
             throw NotHaveAuthorityException.EXCEPTION;
         }
 
-//        List<String> uploadedImageUrls = new ArrayList<>();
+        ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
+        for (MultipartFile part : multipartFiles) {
+            if (part.getSize() > 0) {
+                String uploadFileUrl = ncpObjectStorageService.uploadFile(
+                        "carrot-thunder", "article/", part);
+                AttachedFile attachedFile = new AttachedFile();
+                attachedFile.setFilePath(uploadFileUrl);
 
-//        for (MultipartFile file : files) {
-//            String imageUrl = ncpObjectStorageService.uploadFile("carrot-thunder", "article/", file);
-//            uploadedImageUrls.add(imageUrl);
-//        }
-
-//        if (!post.getAttachedFiles().isEmpty()) {
-//            postDao.insertFiles(post);
-//        } else {
-//            throw No
-//        }
-
+                attachedFiles.add(attachedFile);
+            }
+        }
+        post.setAttachedFiles(attachedFiles);
+        postDao.insertFiles(post);
         post.update(requestDto);
         postDao.update(post);
-//        List<String> remainingImages = getRemainingImages(requestDto);
-//
-//        handleImageUpdates(post, remainingImages);
         return PostResponseDto.of(post);
     }
 

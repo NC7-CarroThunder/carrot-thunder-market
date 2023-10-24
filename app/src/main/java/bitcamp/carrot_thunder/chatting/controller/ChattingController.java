@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -182,5 +183,13 @@ public class ChattingController {
       // 채팅방 삭제에 실패한 경우
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 삭제에 실패했습니다.");
     }
+  }
+
+  // Handle MissingServletRequestParameterException and set a custom response status
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException ex) {
+    String paramName = ex.getParameterName();
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body("Required request parameter '" + paramName + "' is not present");
   }
 }

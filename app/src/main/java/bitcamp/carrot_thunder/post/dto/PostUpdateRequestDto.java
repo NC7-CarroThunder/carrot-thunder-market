@@ -10,4 +10,6 @@ public class PostUpdateRequestDto {
   private String content;
   private int price;
   private String address;
+  private String dealingType;
+  private String itemCategory;
 }

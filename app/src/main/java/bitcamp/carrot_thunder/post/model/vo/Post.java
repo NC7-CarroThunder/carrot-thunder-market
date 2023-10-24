@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.mail.FetchProfile;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -41,6 +43,8 @@ public class Post implements Serializable {
         this.content = requestDto.getContent();
         this.price = requestDto.getPrice();
         this.address = requestDto.getAddress();
+        this.itemCategory = ItemCategory.valueOf(requestDto.getItemCategory());
+        this.dealingType = DealingType.valueOf(requestDto.getDealingType());
     }
 
 

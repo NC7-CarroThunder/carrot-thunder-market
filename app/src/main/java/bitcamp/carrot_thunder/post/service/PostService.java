@@ -31,7 +31,7 @@ public interface PostService {
 
     PostResponseDto getPost(Long postId, UserDetailsImpl userDetails);
 
-    Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user);
+    Object updatePost(Long postId, PostUpdateRequestDto requestDto, User user,MultipartFile[] multipartFiles);
     // Object updatePost(Long postId, PostUpdateRequestDto requestDto,UserDetailsImpl userDetails , MultipartFile[] files );
 
     int update(Post post);

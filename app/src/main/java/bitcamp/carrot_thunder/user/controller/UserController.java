@@ -21,8 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -158,7 +162,7 @@ public class UserController {
   public ResponseDto<ProfileRequestDto> updateProfile(
           @AuthenticationPrincipal UserDetailsImpl userDetails,
           @RequestPart ProfileRequestDto profileRequestDto,
-          @RequestPart MultipartFile multipartFile,
+          @RequestPart(name = "multipartFile", required = false) MultipartFile multipartFile,
           HttpServletResponse response) throws Exception {
     return ResponseDto.success(userService.updateProfile(userDetails, multipartFile, profileRequestDto, response));
   }
@@ -187,6 +191,14 @@ public class UserController {
           @RequestBody UserEmailCheckDto userEmailCheckDto,
           HttpServletResponse response) throws Exception {
     return ResponseDto.success(userService.userEmailCheck(userDetails, userEmailCheckDto, response));
+  }
+
+  // Handle MissingServletRequestParameterException and set a custom response status
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<String> handleMissingParam(MissingServletRequestParameterException ex) {
+    String paramName = ex.getParameterName();
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body("Required request parameter '" + paramName + "' is not present");
   }
 
 
