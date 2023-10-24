@@ -30,13 +30,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = jwtUtil.resolveToken(request);
         String requestURL =request.getRequestURL().toString();
-        if (requestURL.equals("http://carrothunder:8888/api/users/kakao/callback")) {
+        if (requestURL.equals("http://carrothunder.store:8888/api/users/kakao/callback")) {
             filterChain.doFilter(request,response);
             return;
-        } else if (requestURL.equals("http://carrothunder:8888/api/users/login")) {
+        } else if (requestURL.equals("http://carrothunder.store:8888/api/users/login")) {
             filterChain.doFilter(request,response);
             return;
-        } else if (requestURL.equals("http://carrothunder:8888/api/users/signup")) {
+        } else if (requestURL.equals("http://carrothunder.store:8888/api/users/signup")) {
             filterChain.doFilter(request,response);
             return;
         }
