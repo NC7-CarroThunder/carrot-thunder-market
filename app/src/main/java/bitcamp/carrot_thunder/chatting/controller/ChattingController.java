@@ -83,11 +83,6 @@ public class ChattingController {
     Map<String, Object> result = new HashMap<>();
     String existingRoomId = chattingService.checkChatRoomExists(sellerId, currentUserId, postId, currentUserId);
     if (existingRoomId != null) {
-      ChatRoomVO chatRoom = new ChatRoomVO();
-      chatRoom.setUserId(currentUserId);
-      chatRoom.setBuyerId(currentUserId);
-      chatRoom.setRoomId(existingRoomId);
-      chattingService.rejoinChatRoom(chatRoom);
 
       ChatRoomVO existingRoom = chattingService.getChatRoomByPostIdAndUserId(postId, currentUserId);
       if (existingRoom != null && existingRoom.getRoomId().equals(existingRoomId)) {
