@@ -225,10 +225,8 @@ public class DefaultPostService implements PostService {
                 postDao.deleteFile(attachedFile.getId());
             }
         }
-        List<String> roomIdList = chattingDao.getRoomIdByPostId(postId);
-        for (String roomIds : roomIdList) {
-            chattingDao.deleteChatMsgByRoomId(roomIds);
-        }
+//        List<String> roomIdList = chattingDao.getRoomIdByPostId(postId);
+
         chattingDao.deleteChatRoomByPostId(postId);
         postDao.deleteWishListByPostId(postId);
 
