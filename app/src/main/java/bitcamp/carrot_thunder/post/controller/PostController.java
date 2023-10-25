@@ -3,6 +3,7 @@ package bitcamp.carrot_thunder.post.controller;
 import bitcamp.carrot_thunder.NcpObjectStorageService;
 import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.dto.ResponseDto;
+import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.post.dto.PostListResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api")
 public class PostController {
@@ -49,14 +52,19 @@ public class PostController {
   @Autowired
   DefaultNotificationService defaultNotificationService;
 
+  @Autowired
+  JwtUtil jwtUtil;
+
   @GetMapping("form")
   public void form() {
   }
 
   @PostMapping("/posts")
   public PostResponseDto add(@RequestPart PostRequestDto postRequestDto,
-      @RequestPart MultipartFile[] multipartFiles,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+                             @RequestPart MultipartFile[] multipartFiles,
+                             @AuthenticationPrincipal UserDetailsImpl userDetails,
+                             HttpServletResponse response) throws Exception {
+    createToken(userDetails,response);
     return postService.createPost(postRequestDto, multipartFiles, userDetails);
   }
 
@@ -84,7 +92,9 @@ public class PostController {
 
   @GetMapping("/posts/{postId}")
   public ResponseDto<PostResponseDto> getPost(@PathVariable Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                              HttpServletResponse response) {
+    createToken(userDetails,response);
     postService.increaseViewCount(postId);
     return ResponseDto.success(postService.getPost(postId, userDetails));
   }
@@ -103,8 +113,10 @@ public class PostController {
       @PathVariable Long postId,
       @RequestPart PostUpdateRequestDto postUpdateRequestDto,
       @RequestPart MultipartFile[] multipartFiles,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails,
+      HttpServletResponse response) {
 
+    createToken(userDetails,response);
     return ResponseDto
         .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
             userDetails.getUser(), multipartFiles));
@@ -121,7 +133,9 @@ public class PostController {
 
   @DeleteMapping("/posts/{postId}")
   public ResponseDto<Integer> deletePost(@PathVariable Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                         HttpServletResponse response) {
+    createToken(userDetails,response);
     return ResponseDto.success(postService.deletePost(postId, userDetails.getUser()));
   }
 
@@ -187,5 +201,12 @@ public class PostController {
     String paramName = ex.getParameterName();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body("Required request parameter '" + paramName + "' is not present");
+  }
+
+  private void createToken(UserDetailsImpl userDetails, HttpServletResponse response) {
+    if (userDetails != null) {
+      User user = userDetails.getUser();
+      response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
+    }
   }
 }

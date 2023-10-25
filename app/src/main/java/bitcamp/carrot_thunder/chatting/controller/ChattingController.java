@@ -6,12 +6,15 @@ import bitcamp.carrot_thunder.chatting.model.vo.NotificationVO;
 import bitcamp.carrot_thunder.chatting.service.ChattingService;
 import bitcamp.carrot_thunder.chatting.service.DefaultNotificationService;
 import bitcamp.carrot_thunder.chatting.service.PapagoTranslationService;
+import bitcamp.carrot_thunder.jwt.JwtUtil;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
 import bitcamp.carrot_thunder.user.model.vo.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +39,9 @@ public class ChattingController {
 
   @Autowired
   SimpMessagingTemplate messagingTemplate;
+
+  @Autowired
+  JwtUtil jwtUtil;
 
 //  @PostMapping("/translate")
 //  public String translate(@RequestBody TranslateRequestDto request) {
@@ -68,14 +74,6 @@ public class ChattingController {
     return chattingService.getMessagesByRoomId(roomId);
   }
 
-  @GetMapping("/chatting/roomsForSeller")
-  public List<ChatRoomVO> getRoomsForSeller(HttpServletRequest request) {
-    User loginUser = (User) request.getSession().getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new IllegalArgumentException("로그인이 필요합니다.");
-    }
-    return chattingService.getChatRoomsForSeller(Math.toIntExact(loginUser.getId()));
-  }
 
   @GetMapping("/chatting/createOrGetChatRoom")
   public ResponseEntity<Map<String, Object>> createOrGetChatRoom(@RequestParam int sellerId,
@@ -109,17 +107,21 @@ public class ChattingController {
   }
 
   @GetMapping("/chatting/myChatRooms")
-  public ResponseEntity<Map<String, Object>> getMyChatRooms(@RequestParam int userId) {
+  public ResponseEntity<Map<String, Object>> getMyChatRooms(
+          @AuthenticationPrincipal UserDetailsImpl userDetails,
+          HttpServletResponse servletResponsere) {
     Map<String, Object> response = new HashMap<>();
-    response.put("chatRooms", chattingService.getChatRoomsForMember(userId));
+    response.put("chatRooms", chattingService.getChatRoomsForMember(userDetails.getUser().getId()));
+    User user = userDetails.getUser();
+    servletResponsere.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/chatting/allRoomsOrdered")
-  public ResponseEntity<List<ChatRoomVO>> getAllChatRoomsOrdered() {
-    List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
-    return ResponseEntity.ok(rooms);
-  }
+//  @GetMapping("/chatting/allRoomsOrdered")
+//  public ResponseEntity<List<ChatRoomVO>> getAllChatRoomsOrdered() {
+//    List<ChatRoomVO> rooms = chattingService.getAllChatRoomsOrderedByLastUpdated();
+//    return ResponseEntity.ok(rooms);
+//  }
 
   @GetMapping("/chatting/getFirstAttachment")
   public ResponseEntity<String> getFirstAttachmentByPostId(@RequestParam Long postId) {
@@ -130,36 +132,33 @@ public class ChattingController {
 
   @Transactional
   @PutMapping("/chatting/message/delete/{messageId}")
-  public ResponseEntity<String> deleteChatMessage(@PathVariable int messageId) {
+  public ResponseEntity<String> deleteChatMessage(@PathVariable int messageId,
+                                                  @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                  HttpServletResponse servletResponse) {
     ChatMessageVO message = chattingService.getChatMessageById(messageId);
     if (message != null) {
       message.setMessageId(messageId);
       message.setContent("삭제된 메시지입니다");
       message.setTransContent("");
       chattingService.updateChatMessage(message);
-
+      User user = userDetails.getUser();
+      servletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
       return ResponseEntity.ok("메시지가 삭제되었습니다.");
     } else {
+      User user = userDetails.getUser();
+      servletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("메시지를 찾을 수 없습니다.");
-    }
-  }
-
-  @PutMapping("/chatting/leaveRoom")
-  public ResponseEntity<String> leaveChatRoom(@RequestParam String roomId, @RequestParam int userId) {
-    int rowsAffected = chattingService.leaveChatRoom(roomId, userId);
-    if (rowsAffected > 0) {
-      // 채팅방 나가기에 성공한 경우
-      return ResponseEntity.ok("채팅방에서 나갔습니다.");
-    } else {
-      // 채팅방 나가기에 실패한 경우
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("채팅방 나가기에 실패했습니다.");
     }
   }
 
   @DeleteMapping("/chatting/delete/{roomId}")
   public ResponseEntity<String> deleteChatRoom(@PathVariable("roomId") String roomId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                               HttpServletResponse servletResponse) {
     int rowsAffected = chattingService.deleteChatRoomByRoomId(roomId, userDetails.getUsername());
+    User user = userDetails.getUser();
+    servletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
+
     if (rowsAffected > 0) {
       // 채팅방 삭제에 성공한 경우
       return ResponseEntity.ok("채팅방이 삭제되었습니다.");

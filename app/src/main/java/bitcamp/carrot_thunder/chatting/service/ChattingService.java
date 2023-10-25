@@ -16,7 +16,7 @@ public interface ChattingService {
 
   List<ChatRoomVO> getChatRoomsForSeller(int sellerId);
 
-  List<ChatRoomVO> getChatRoomsForMember(int memberId);
+  List<ChatRoomVO> getChatRoomsForMember(long memberId);
 
   //String createOrGetChatRoom(int sellerId, int currentUserId, int postId);
 
