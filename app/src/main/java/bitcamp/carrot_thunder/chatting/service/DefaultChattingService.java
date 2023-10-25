@@ -91,7 +91,7 @@ public class DefaultChattingService implements ChattingService {
       String senderNickname = getNicknameByUserId(currentUserId);
       NotificationVO notification = new NotificationVO();
       notification.setUserId((long) sellerId);
-      notification.setContent(senderNickname + "님이 채팅방을 개설했습니다.");
+      notification.setContent(senderNickname + "님이 구매를 희망합니다.");
       notification.setType("CHATROOM");
 
       defaultNotificationService.createNotification(notification);
