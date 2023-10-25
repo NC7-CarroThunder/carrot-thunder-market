@@ -157,9 +157,10 @@ public class PostController {
 
   @GetMapping("/wishlist")
   public ResponseEntity<List<Post>> getUserWishlist(
-      @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+      @AuthenticationPrincipal UserDetailsImpl userDetailsImpl, HttpServletResponse response) {
     User user = userDetailsImpl.getUser();
     List<Post> wishlist = postService.getUserWishlist(user);
+    createToken(userDetailsImpl,response);
     return ResponseEntity.ok(wishlist);
   }
 
@@ -191,7 +192,8 @@ public class PostController {
 
   @GetMapping("/mypost")
   public ResponseDto<List<PostListResponseDto>> getMyPosts(Long postId,
-      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletResponse response) {
+    createToken(userDetails, response );
     return ResponseDto.success(postService.getMyPosts(postId, userDetails));
   }
 
