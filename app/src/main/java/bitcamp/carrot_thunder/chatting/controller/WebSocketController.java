@@ -14,6 +14,9 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+
 @RestController
 public class WebSocketController {
 
@@ -68,6 +71,7 @@ public class WebSocketController {
 
       message.setContent(originalMessage); // 원본 메시지 설정
       message.setTransContent(translatedMessage); // 번역된 메시지 설정
+      message.setSentAt(LocalDateTime.now());
     }
 
     Long receiverId;
