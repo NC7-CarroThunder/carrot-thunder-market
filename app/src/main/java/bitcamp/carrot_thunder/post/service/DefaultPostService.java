@@ -118,7 +118,9 @@ public class DefaultPostService implements PostService {
 //        for (AttachedFile element : requestDto.getAttachedFiles()) {
 //            System.out.println(element.getFilePath());
 //        }
-//        System.out.println("추가이미지 크기 : " + multipartFiles.length);
+//        if (multipartFiles != null) {
+//            System.out.println("추가이미지 크기 : " + multipartFiles.length);
+//        }
 //        System.out.println("postId : " + postId);
 
         ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
@@ -158,16 +160,19 @@ public class DefaultPostService implements PostService {
 
 
 
-        for (MultipartFile part : multipartFiles) {
-            if (part.getSize() > 0) {
-                String uploadFileUrl = ncpObjectStorageService.uploadFile(
-                        "carrot-thunder", "article/", part);
-                AttachedFile attachedFile = new AttachedFile();
-                attachedFile.setFilePath(uploadFileUrl);
+        if (multipartFiles != null) {
+            for (MultipartFile part : multipartFiles) {
+                if (part.getSize() > 0) {
+                    String uploadFileUrl = ncpObjectStorageService.uploadFile(
+                            "carrot-thunder", "article/", part);
+                    AttachedFile attachedFile = new AttachedFile();
+                    attachedFile.setFilePath(uploadFileUrl);
 
-                attachedFiles.add(attachedFile);
+                    attachedFiles.add(attachedFile);
+                }
             }
         }
+
         post.setAttachedFiles(attachedFiles);
         postDao.insertFiles(post);
         post.update(requestDto);
