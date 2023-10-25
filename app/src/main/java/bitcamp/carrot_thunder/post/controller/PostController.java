@@ -9,6 +9,7 @@ import bitcamp.carrot_thunder.post.dto.PostRequestDto;
 import bitcamp.carrot_thunder.post.dto.PostResponseDto;
 import bitcamp.carrot_thunder.post.dto.PostUpdateRequestDto;
 import bitcamp.carrot_thunder.post.dto.WishlistRequest;
+import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import bitcamp.carrot_thunder.post.model.vo.Post;
 import bitcamp.carrot_thunder.post.service.PostService;
 import bitcamp.carrot_thunder.secret.UserDetailsImpl;
@@ -112,11 +113,14 @@ public class PostController {
   public ResponseDto<PostResponseDto> updatePost(
       @PathVariable Long postId,
       @RequestPart PostUpdateRequestDto postUpdateRequestDto,
-      @RequestPart MultipartFile[] multipartFiles,
+      @RequestPart(name = "multipartFiles", required = false) MultipartFile[] multipartFiles,
       @AuthenticationPrincipal UserDetailsImpl userDetails,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws Exception {
 
     createToken(userDetails,response);
+//    for (AttachedFile element : postUpdateRequestDto.getAttachedFiles()) {
+//      System.out.println("path : " + element.getFilePath());
+//    }
     return ResponseDto
         .success((PostResponseDto) postService.updatePost(postId, postUpdateRequestDto,
             userDetails.getUser(), multipartFiles));

@@ -106,21 +106,55 @@ public class DefaultPostService implements PostService {
 
 
     @Transactional
-    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user, MultipartFile[] multipartFiles) {
+    public PostResponseDto updatePost(Long postId, PostUpdateRequestDto requestDto, User user, MultipartFile[] multipartFiles) throws Exception {
 
         Post post = (Post) postDao.findById(postId).orElseThrow(() -> NotFoundPostException.EXCEPTION);
+        List<AttachedFile> fileList = postDao.findImagesByPostId(postId);
+//        System.out.println("원래 파일 목록 ------------------------"  );
+//        for (AttachedFile originElement : fileList) {
+//            System.out.println(originElement.getFilePath());
+//        }
+//        System.out.println("업데이트할 기본 파일 목록 ------------------------"  );
+//        for (AttachedFile element : requestDto.getAttachedFiles()) {
+//            System.out.println(element.getFilePath());
+//        }
+//        System.out.println("postId : " + postId);
 
-        //업데이트전 기존의 들어있는 이미지 파일 제거
-
-        if (!post.getAttachedFiles().isEmpty()) {
-            postDao.deleteFiles(postId);
+        ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
+        //이미지 관련하여, 기존에 쓰이다가 버려질 이미지들 제거
+        if (!requestDto.getAttachedFiles().isEmpty()) {
+            for (AttachedFile originElement : post.getAttachedFiles()) {
+                //여기서, 기존파일중, 업데이트과정중에서 제거한파일이 있으면 제거한 파일또한 스토리지에서 제거한다.d
+                String path = originElement.getFilePath();
+                boolean isExistFile = false;
+                for (AttachedFile element : requestDto.getAttachedFiles()) {
+                    System.out.println("원래파일 : " + path + "  업데이트 요청 파일 : " + element.getFilePath() + "  " + element.getFilePath().equals(path));
+                    if (element.getFilePath().equals(path)) {
+                        isExistFile = true;
+                    }
+                }
+                if (!isExistFile) {
+                    ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + path);
+                } else {
+                    AttachedFile file = new AttachedFile();
+                    file.setFilePath(path);
+                    attachedFiles.add(file);
+                }
+            }
+        } else {
+            for (AttachedFile originElement : fileList) {
+                String path = originElement.getFilePath();
+                ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + path);
+            }
         }
+        postDao.deleteFiles(postId);
 
         if (!Objects.equals(user.getNickName(), post.getUser().getNickName())) {
             throw NotHaveAuthorityException.EXCEPTION;
         }
 
-        ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
+
+
         for (MultipartFile part : multipartFiles) {
             if (part.getSize() > 0) {
                 String uploadFileUrl = ncpObjectStorageService.uploadFile(

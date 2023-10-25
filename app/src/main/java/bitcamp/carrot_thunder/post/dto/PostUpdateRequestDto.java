@@ -3,6 +3,8 @@ package bitcamp.carrot_thunder.post.dto;
 import bitcamp.carrot_thunder.post.model.vo.AttachedFile;
 import lombok.Getter;
 
+import java.util.List;
+
 
 @Getter
 public class PostUpdateRequestDto {
@@ -12,4 +14,5 @@ public class PostUpdateRequestDto {
   private String address;
   private String dealingType;
   private String itemCategory;
+  List<AttachedFile> attachedFiles;
 }
