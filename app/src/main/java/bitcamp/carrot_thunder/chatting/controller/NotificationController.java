@@ -65,7 +65,10 @@ public class NotificationController {
   }
 
   private void createToken(UserDetailsImpl userDetails, HttpServletResponse response) {
-    User user = userDetails.getUser();
-    response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
+    if (userDetails != null) {
+      User user = userDetails.getUser();
+      response.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(user.getNickName(),user.getId(),user.getPoint(), user.getPhoto()));
+    }
+
   }
 }
