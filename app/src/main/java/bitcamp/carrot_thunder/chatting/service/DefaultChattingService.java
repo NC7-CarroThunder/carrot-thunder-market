@@ -53,7 +53,7 @@ public class DefaultChattingService implements ChattingService {
   }
 
   @Override
-  public List<ChatRoomVO> getChatRoomsForMember(int memberId) {
+  public List<ChatRoomVO> getChatRoomsForMember(long memberId) {
     List<ChatRoomVO> chatRooms = chattingDAO.getChatRoomsForMember(memberId);
     List<ChatRoomVO> filteredChatRooms = new ArrayList<>();
     Set<String> seenRoomIds = new HashSet<>(); // Set을 사용하여 중복 방을 추적

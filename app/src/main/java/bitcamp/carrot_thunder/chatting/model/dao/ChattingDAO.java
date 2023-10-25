@@ -16,9 +16,9 @@ public interface ChattingDAO {
 
   void saveMessage(ChatMessageVO message, String sellerRoomId, String buyerRoomId);
 
-  List<ChatRoomVO> getChatRoomsForSeller(int sellerId);
+  List<ChatRoomVO> getChatRoomsForSeller(long sellerId);
 
-  List<ChatRoomVO> getChatRoomsForMember(int memberId);
+  List<ChatRoomVO> getChatRoomsForMember(long memberId);
 
   String checkChatRoomExists(@Param("sellerId") int sellerId,
       @Param("currentUserId") int currentUserId, @Param("postId") int postId, @Param("userId") int userId);
