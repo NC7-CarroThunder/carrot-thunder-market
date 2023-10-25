@@ -118,23 +118,25 @@ public class DefaultPostService implements PostService {
 //        for (AttachedFile element : requestDto.getAttachedFiles()) {
 //            System.out.println(element.getFilePath());
 //        }
+//        System.out.println("추가이미지 크기 : " + multipartFiles.length);
 //        System.out.println("postId : " + postId);
 
         ArrayList<AttachedFile> attachedFiles = new ArrayList<>();
         //이미지 관련하여, 기존에 쓰이다가 버려질 이미지들 제거
         if (!requestDto.getAttachedFiles().isEmpty()) {
-            for (AttachedFile originElement : post.getAttachedFiles()) {
+            for (AttachedFile originElement : fileList) {
                 //여기서, 기존파일중, 업데이트과정중에서 제거한파일이 있으면 제거한 파일또한 스토리지에서 제거한다.d
                 String path = originElement.getFilePath();
                 boolean isExistFile = false;
                 for (AttachedFile element : requestDto.getAttachedFiles()) {
-                    System.out.println("원래파일 : " + path + "  업데이트 요청 파일 : " + element.getFilePath() + "  " + element.getFilePath().equals(path));
+                    //System.out.println("원래파일 : " + path + "  업데이트 요청 파일 : " + element.getFilePath() + "  " + element.getFilePath().equals(path));
                     if (element.getFilePath().equals(path)) {
                         isExistFile = true;
                     }
                 }
                 if (!isExistFile) {
                     ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + path);
+                    //System.out.println("삭제해야할 파일 : " + path);
                 } else {
                     AttachedFile file = new AttachedFile();
                     file.setFilePath(path);
@@ -144,6 +146,7 @@ public class DefaultPostService implements PostService {
         } else {
             for (AttachedFile originElement : fileList) {
                 String path = originElement.getFilePath();
+                //System.out.println("삭제해야할 파일 : " + path);
                 ncpObjectStorageService.deleteFile("carrot-thunder", "article/" + path);
             }
         }
