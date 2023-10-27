@@ -288,3 +288,5 @@ build
 
 # Ignore Connection Information
 app/src/main/resources/application-secret.properties
+
+.idea
