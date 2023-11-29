@@ -63,6 +63,7 @@ public class WebSocketController {
 
     String senderNickname = chattingService.getNicknameByUserId(message.getSenderId());
     message.setSenderNickname(senderNickname);
+    message.setSentAt(LocalDateTime.now());
 
     if (!message.getContent().startsWith(":emoji") || !message.getContent().endsWith(":")) {
       String originalMessage = message.getContent();
@@ -71,7 +72,6 @@ public class WebSocketController {
 
       message.setContent(originalMessage); // 원본 메시지 설정
       message.setTransContent(translatedMessage); // 번역된 메시지 설정
-      message.setSentAt(LocalDateTime.now());
     }
 
     Long receiverId;
